@@ -1,8 +1,8 @@
 
 import pydot
-from keggtools.models import KEGGPathway
-from keggtools.resolver import KEGGPathwayResolver
-from keggtools.utils import ColorGradient
+from .models import KEGGPathway
+from .resolver import KEGGPathwayResolver
+from .utils import ColorGradient
 
 
 class KEGGPathwayRenderer:

@@ -1,8 +1,8 @@
 
 from urllib.request import Request, urlopen
-from keggtools.const import parse_tsv, USER_AGENT
-from keggtools.storage import KEGGDataStorage
-from keggtools.models import KEGGPathway
+from .const import parse_tsv, USER_AGENT
+from .storage import KEGGDataStorage
+from .models import KEGGPathway
 
 
 class KEGGPathwayResolver:

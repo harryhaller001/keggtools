@@ -6,8 +6,8 @@ import os
 from datetime import datetime
 
 
-ENSEMBLE_ID_TO_GENE_ID = "_dbOrg_Ensembl_Gene_ID__to__Gene_ID_10090"
-GENE_ID_TO_GENE_SYMBOL = "_dbOrg_Gene_ID__to__Gene_Symbol_10090"
+ENSEMBLE_ID_TO_GENE_ID = "_dbOrg_Ensembl_Gene_ID__to__Gene_ID_10090.dump"
+GENE_ID_TO_GENE_SYMBOL = "_dbOrg_Gene_ID__to__Gene_Symbol_10090.dump"
 
 
 def getcwd():

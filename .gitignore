@@ -133,3 +133,5 @@ dmypy.json
 *.dump
 /.cache
 
+# Ignore visual code settings
+/.vscode

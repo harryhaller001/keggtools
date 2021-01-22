@@ -1,8 +1,8 @@
 
-from keggtools.models import KEGGPathway
-from keggtools.storage import KEGGDataStorage
-from keggtools.resolver import KEGGPathwayResolver
-from keggtools.utils import Converter
+from .models import KEGGPathway
+from .storage import KEGGDataStorage
+from .resolver import KEGGPathwayResolver
+from .utils import Converter
 
 import scipy.stats as stats
 

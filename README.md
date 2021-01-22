@@ -89,3 +89,14 @@ print(resolver.get_pathway_list())
 ### Rendering
 
 
+## Development
+
+Fast install with `virtualenv` for development.
+
+```bash
+python3 -m virtualenv venv
+source ./venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+

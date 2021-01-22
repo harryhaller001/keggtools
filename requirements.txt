@@ -1,15 +1,10 @@
-Package    Version
----------- ---------
-certifi    2020.12.5
-chardet    4.0.0
-idna       2.10
-numpy      1.19.5
-pip        20.3.3
-pydot      1.4.1
-pyparsing  2.4.7
-requests   2.25.1
-scipy      1.5.4
-setuptools 51.0.0
-tqdm       4.56.0
-urllib3    1.26.2
-wheel      0.36.2
+certifi==2020.12.5
+chardet==4.0.0
+idna==2.10
+numpy==1.19.5
+pydot==1.4.1
+pyparsing==2.4.7
+requests==2.25.1
+scipy==1.5.4
+tqdm==4.56.0
+urllib3==1.26.2

@@ -1,0 +1,52 @@
+
+name: unittest
+
+on:
+  workflow_dispatch:
+  # Later use workflow on push & release
+  # push:
+  #  branches: 
+  #    - main
+
+# Jobs
+jobs:
+
+  build:
+    # Run on ubuntu latest
+    runs-on: ubuntu-latest
+    
+    # Matrix testing
+    strategy:
+      matrix:
+        # Check for all python versions >3.5
+        python-version: [3.5, 3.6, 3.7, 3.8]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      # Install dependencies from freeze
+      # TODO: install pytest, mypy
+      # TODO: include lint for python
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      # Install package from setup.py
+      - name: Install package
+        run: |
+          python setup.py install
+      
+      # Run unittest on installed package
+      # - name: Unittest
+      #   run: |
+      #     pytest
+      
+      # Run static code analysis using Mypi
+      # - name: Run static code analysis
+      #   run: mypy
+      

@@ -100,3 +100,36 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+
+
+### Testing
+
+### Static code analysis
+
+Static code analysis using mypy
+
+```bash
+# Install mypy
+pip install mypy
+
+# Or
+pip install -r dev_requirements.txt
+```
+
+Windows
+
+```bash
+# Testing setup.py and package
+mypy setup.py
+python setup.py install
+# mypy --python-executable E:\Github\keggtools\venv\Scripts\python.exe -p keggtools --ignore-missing-imports
+mypy -p keggtools
+```
+
+Linux
+
+```bash
+mypy setup.py
+python3 setup.py install
+mypy -p keggtools
+```

@@ -1,6 +1,4 @@
 
-from urllib.request import Request, urlopen
-
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) " \
              "Chrome/42.0.2311.152 Safari/537.36"
@@ -66,16 +64,26 @@ def parse_tsv(data: str):
     return [tuple(line.strip().split("\t")) for line in data.split("\n")]
 
 
-def request(url: str):
-    """
-    Request URL
-    :param url: str
-    :return: byte
-    """
-    req = Request(url=url, method='GET')
-    req.headers["User-Agent"] = USER_AGENT
-    req = urlopen(req)
-    return req.read().decode("utf-8")
+# def request(url: str):
+#     """
+#     Request URL
+#     :param url: str
+#     :return: byte
+#     """
+#     req = Request(url=url, method='GET')
+#     req.headers["User-Agent"] = USER_AGENT
+#     req = urlopen(req)
+#     return req.read().decode("utf-8")
+
+import requests
+from typing import Optional
+# from urllib.request import Request, urlopen
+
+def request(url: str, encoding: Optional[str] = "utf-8"):
+
+    response = requests.get(url=url)
+
+    return response.content
 
 
 if __name__ == "__main__":

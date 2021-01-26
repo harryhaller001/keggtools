@@ -29,17 +29,20 @@ jobs:
           python-version: ${{ matrix.python-version }}
       
       # Install dependencies from freeze
-      # TODO: install pytest, mypy
       # TODO: include lint for python
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install pytest mypy
           pip install -r requirements.txt
       
-      # Install package from setup.py
+      # Install package from setup.py and static code analysis
       - name: Install package
         run: |
+          mypy setup.py
           python setup.py install
+          pymy -p keggtools
+
       
       # Run unittest on installed package
       # - name: Unittest

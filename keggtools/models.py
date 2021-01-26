@@ -1,5 +1,7 @@
 
-import xml.etree.ElementTree as ElementTree
+from xml.etree import ElementTree as ElementTree
+from xml.etree.ElementTree import Element, SubElement
+from typing import Type, Union
 import pydot
 
 
@@ -16,7 +18,7 @@ class Relation:
         self.subtypes = {}
 
     @staticmethod
-    def parse(item: ElementTree):
+    def parse(item: Element):
         """
         Parse xml ElementTree into KEGG Relation
         :param item: ElementTree
@@ -49,7 +51,7 @@ class Component:
         self.id = ""
 
     @staticmethod
-    def parse(item: ElementTree):
+    def parse(item: Element):
         """
         Parsing ElementTree into Component
         :param item: ElementTree
@@ -81,7 +83,7 @@ class Graphics:
         return self.attrib[item]
 
     @staticmethod
-    def parse(item: ElementTree):
+    def parse(item: Element):
         """
         Parse xml ElementTree into KEGG Graphics
         :param item: ElementTree
@@ -126,7 +128,7 @@ class Entry:
         return int(self.name.split(":")[1])
 
     @staticmethod
-    def parse(item: ElementTree):
+    def parse(item: Element):
         """
         Parsing xml ElementTree into KEGG Entry
         :param item: ElementTree
@@ -172,7 +174,7 @@ class KEGGPathway:
         self.entries = []
         self.reactions = []
 
-    def get_entry_by_id(self, entry_id):
+    def get_entry_by_id(self, entry_id: Union[str, int]):
         for item in self.entries:
             if int(item.id) == int(entry_id):
                 return item

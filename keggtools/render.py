@@ -3,7 +3,7 @@ import pydot
 from .models import KEGGPathway
 from .resolver import KEGGPathwayResolver
 from .utils import ColorGradient
-
+from typing import Any, Dict, Optional, List
 
 class KEGGPathwayRenderer:
     """
@@ -11,13 +11,14 @@ class KEGGPathwayRenderer:
     """
     def __init__(self, kegg_pathway: KEGGPathway):
         self.pathway = kegg_pathway
-        self.overlay = {}
+        self.overlay: Dict[int, Any] = {}
         self.exp_min = 0
         self.exp_max = 0
         self.render_string = None
 
-        self.cmap_upreg = []
-        self.cmap_downreg = []
+        # TODO: fix any typing
+        self.cmap_upreg: List[Any] = []
+        self.cmap_downreg: List[Any] = []
 
         self.upper_color = (255, 0, 0)
         self.lower_color = (0, 0, 255)

@@ -27,7 +27,7 @@ def chunks(l, n):
 class Downloader:
     def __init__(self, url: str):
         self.url = url
-        self.output = None
+        self.output = ""
 
     def set_output(self, filename: str):
         self.output = filename

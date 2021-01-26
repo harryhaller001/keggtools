@@ -133,3 +133,13 @@ mypy setup.py
 python3 setup.py install
 mypy -p keggtools
 ```
+
+
+## Build process
+
+Build package
+
+```bash
+# Build .egg, .whl and .tar
+python setup.py sdist bdist_wheel
+```

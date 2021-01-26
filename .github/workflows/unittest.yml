@@ -4,9 +4,9 @@ name: unittest
 on:
   workflow_dispatch:
   # Later use workflow on push & release
-  # push:
-  #  branches: 
-  #    - main
+  push:
+    branches: 
+      - main
 
 # Jobs
 jobs:
@@ -43,13 +43,13 @@ jobs:
           python setup.py install
           mypy -p keggtools
 
+      # Build whl and egg
+      - name: Build package
+          run: |
+            python setup.py sdist bdist_wheel
+
       
       # Run unittest on installed package
       # - name: Unittest
       #   run: |
       #     pytest
-      
-      # Run static code analysis using Mypi
-      # - name: Run static code analysis
-      #   run: mypy
-      

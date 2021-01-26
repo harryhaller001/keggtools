@@ -3,10 +3,15 @@ name: unittest
 
 on:
   workflow_dispatch:
-  # Later use workflow on push & release
   push:
     branches: 
       - main
+
+  # Run action when pull request is opened
+  pull_request:
+    types:  [opened, reopened, synchronize]
+
+  
 
 # Jobs
 jobs:

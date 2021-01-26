@@ -45,8 +45,8 @@ jobs:
 
       # Build whl and egg
       - name: Build package
-          run: |
-            python setup.py sdist bdist_wheel
+        run: |
+          python setup.py sdist bdist_wheel
 
       
       # Run unittest on installed package

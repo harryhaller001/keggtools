@@ -41,7 +41,7 @@ jobs:
         run: |
           mypy setup.py
           python setup.py install
-          pymy -p keggtools
+          mypy -p keggtools
 
       
       # Run unittest on installed package

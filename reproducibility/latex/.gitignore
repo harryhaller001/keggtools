@@ -1,0 +1,11 @@
+
+# Ignore all outputs of pdflatex
+*.aux
+*.log
+*.out
+*.pdf
+
+# Ignore latexmk outputs
+*.fdb_latexmk
+*.fls
+*.gz

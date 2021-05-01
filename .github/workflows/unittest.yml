@@ -4,14 +4,13 @@ name: unittest
 on:
   workflow_dispatch:
   push:
-    branches: 
+    branches:
       - main
 
   # Run action when pull request is opened
   pull_request:
     types:  [opened, reopened, synchronize]
 
-  
 
 # Jobs
 jobs:
@@ -19,7 +18,7 @@ jobs:
   build:
     # Run on ubuntu latest
     runs-on: ubuntu-latest
-    
+
     # Matrix testing
     strategy:
       matrix:
@@ -32,7 +31,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      
+
       # Install dependencies from freeze
       # TODO: include lint for python
       - name: Install dependencies
@@ -40,7 +39,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest mypy wheel
           pip install -r requirements.txt
-      
+
       # Install package from setup.py and static code analysis
       - name: Static code analysis
         run: |
@@ -53,7 +52,7 @@ jobs:
         run: |
           python setup.py sdist bdist_wheel
 
-      
+
       # Run unittest on installed package
       # - name: Unittest
       #   run: |

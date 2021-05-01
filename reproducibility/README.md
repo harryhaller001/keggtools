@@ -16,3 +16,10 @@ Figure 1: Object relations in the KEGG database
 dot figure1.dot -Tpng > figure1.png
 ```
 
+
+# Notebook execution
+```bash
+jupyter notebook --to notebook --inplace --execute notebook.ipynb
+```
+
+

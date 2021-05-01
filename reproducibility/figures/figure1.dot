@@ -1,0 +1,33 @@
+// ORM structure of KEGGTOOLS models
+// Modified from https://www.kegg.jp/kegg/xml/docs/kgml_class.png
+
+digraph KGMLTree {
+
+    // Node specs
+    node [shape=record fontname=Arial];
+    rankdir=BT;
+    splines="ortho";
+
+    // nodes
+    pathway  [label="{pathway|- name\l- org\l- number\l- title\l- image\l}"];
+    // reaction  [label="{reaction|- id\l- name\l- type\l}"];
+    relation [label="{relation|- entry1\l- entry2\l- type\l}"];
+    subtype [label="{subtype|- name\l- value\l}"];
+    entry [label="{entry|- id\l- name\l-type\l- link\l- reaction\l}"];
+    component [label="{component|- id\l}"]
+    graphics [label="{graphics|- name\l- x\l- y\l- coords\l- type\l- width\l- height\l- fgcolor\l}"]
+
+
+    // Edges
+    // reaction -> pathway [arrowhead=odiamond arrowsize=1];
+    relation -> pathway [arrowhead=odiamond arrowsize=1];
+    subtype -> relation [arrowhead=odiamond arrowsize=1];
+    entry -> pathway [arrowhead=odiamond arrowsize=1];
+    component -> entry [arrowhead=odiamond arrowsize=1];
+    graphics -> entry [arrowhead=odiamond arrowsize=1];
+
+    {rank=same; entry; relation}
+    {rank=same; subtype; component; graphics}
+
+
+}

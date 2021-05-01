@@ -1,0 +1,5 @@
+
+# Ignore rendered figures
+/figures/*.png
+
+

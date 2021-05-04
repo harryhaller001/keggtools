@@ -1,0 +1,11 @@
+
+FROM jupyter/datascience-notebook
+
+LABEL maintainer="harryhaller001"
+
+# Update pip
+RUN pip3 install pip --upgrade
+
+# Install python dependencies
+RUN pip3 install scanpy python-igraph louvain leidenalg scikit-learn matplotlib pandas numpy umap-learn
+

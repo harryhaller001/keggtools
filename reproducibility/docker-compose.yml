@@ -1,0 +1,18 @@
+
+
+version: "3.1"
+
+
+services:
+    notebook:
+        build:
+            context: ./
+            dockerfile: Dockerfile.dev
+        image: scanpy-notebook-server
+        volumes:
+            - ./notebooks:/home/jovyan/work/notebooks
+            - ./figures:/home/jovyan/work/figures
+
+        ports:
+            - 8888:8888
+

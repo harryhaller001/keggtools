@@ -1,5 +1,10 @@
 
 # Ignore rendered figures
 /figures/*.png
+/notebooks/*.csv
 
+/notebooks/rawdata/*
+!/notebooks/rawdata/.git*
+
+*.tar.gz
 

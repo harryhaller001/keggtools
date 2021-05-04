@@ -61,28 +61,17 @@ def parse_tsv(data: str):
     :param data: str
     :return: list
     """
+    # TODO: replace with build-in lib
     return [tuple(line.strip().split("\t")) for line in data.split("\n")]
 
 
-# def request(url: str):
-#     """
-#     Request URL
-#     :param url: str
-#     :return: byte
-#     """
-#     req = Request(url=url, method='GET')
-#     req.headers["User-Agent"] = USER_AGENT
-#     req = urlopen(req)
-#     return req.read().decode("utf-8")
 
 import requests
 from typing import Optional
-# from urllib.request import Request, urlopen
 
 def request(url: str, encoding: Optional[str] = "utf-8"):
-
     response = requests.get(url=url)
-
+    response.raise_for_status()
     return response.content
 
 

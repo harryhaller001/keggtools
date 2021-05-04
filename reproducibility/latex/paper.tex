@@ -34,7 +34,7 @@
 \usepackage{graphicx}
 \graphicspath{ {../figures/} }
 \usepackage{wrapfig}
-
+\usepackage[export]{adjustbox}
 
 % Begin document
 \begin{document}
@@ -85,6 +85,7 @@
 % \end{figure}
 
 
+% figure of KEGG database structure
 \begin{wrapfigure}{l}{0.5\textwidth}
 
     % 1142x1858 px
@@ -97,6 +98,21 @@
 
 \lipsum[3-4]
 
+
+% Figure of single cell analysis
+\begin{figure}
+
+    \includegraphics[width=0.5\textwidth, valign=t]{figure2.png}
+    \includegraphics[width=0.5\textwidth, valign=t]{figure3.png}
+
+    \caption{Analysis of the single cell RNA dataset PBMC3K. It show the cell distribution in the UMAP space with
+    cluster annotation (left) and identified marker genes (right).
+    }
+\end{figure}
+
+
+
 \subsection*{Subtitle}
 \lipsum[4-5]
 \end{document}
+

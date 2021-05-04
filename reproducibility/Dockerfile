@@ -46,6 +46,15 @@ RUN jupyter notebook --to notebook --inplace --execute notebook.ipynb
 FROM ubuntu:18.04 as latex-stage
 
 # Update ubuntu and install pdflatex and dependencies
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    graphviz \
+    texlive-base \
+    texlive \
+    texlive-latex-extra \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /root
 
 
 # Copy latex files

@@ -9,18 +9,30 @@ def read(fname: str):
 setup(
     name = "keggtools",
     version = "0.2.0",
+    license="MIT",
     author = "harryhaller001",
     author_email = "harryhaller001@gmail.com",
     description = ("Enrichment analysis and visualisation toolkit for KEGG pathways"),
-    packages=setuptools.find_packages(), # ['keggtools'],
+    packages=setuptools.find_packages(),
     long_description=read('README.md'),
     long_description_content_type="text/markdown",
     classifiers=[
+        "Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    url="https://github.com/harryhaller001/keggtools"
+    url="https://github.com/harryhaller001/keggtools",
+    install_requires=[
+        "tqdm",
+        "requests",
+        "pydot",
+        "scipy"
+    ],
+    # download_url="https://github.com/harryhaller001/keggtools" # TODO: add release
 )
 

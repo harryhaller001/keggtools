@@ -17,10 +17,6 @@ def get_all_pathways(org: str):
         return pathways
 
 
-"""
-TODO: p-value calculation
-"""
-
 
 class KEGGPathwayAnalysisResult:
     def __init__(self, org: str, pathway_id: str, pathway_name: str, found_genes: list, pathway_genes: list):
@@ -75,11 +71,11 @@ class KEGGPathwayAnalysis:
         self.summary = buffer
 
     """def run_analysis(self, gene_list: list):
-        
+
         # List of gene ids. Return {<pathway-id>: [<gene-id>, ...]}
         # :param gene_list: list
         # :return: dict
-        
+
         result = {}
 
         for pathway_id, name in self.all_pathways.items():

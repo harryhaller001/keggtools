@@ -22,5 +22,5 @@ RUN pip3 install pip --upgrade
 RUN pip3 install scanpy python-igraph louvain leidenalg scikit-learn matplotlib pandas numpy umap-learn
 
 # Install keggtools
-RUN pip3 install pydot requests tqdm keggtools==0.2.0
+RUN pip3 install pydot requests tqdm keggtools==0.3.0
 

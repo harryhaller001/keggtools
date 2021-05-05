@@ -1,5 +1,5 @@
 
-# from urllib.request import Request, urlopen
+import logging
 from .utils import parse_tsv, request
 from .storage import KEGGDataStorage
 from .models import KEGGPathway
@@ -12,28 +12,41 @@ class KEGGPathwayResolver:
     """
     def __init__(self, org: str):
         """
-        Need <org> 3 letter code
+        Need <org> 3 letter code for organism
         :param org: str
         """
+
+        if type(org) != str:
+            logging.error(f"Expect type str. Got type {type(org).__name__}")
+            raise TypeError("Expect type str for organism.")
+
         self.organism = org
+
 
     @staticmethod
     def request(url: str):
         """
-        Request URL
+        GET request to given Url
         :param url: str
         :return: byte
         """
 
         return request(url=url)
 
+
     def get_pathway_list(self):
         """
         Request list of pathways linked to organism. {<pathway-id>: <name>}
         :return: dict
         """
+
         # path:mmu00010	Glycolysis / Gluconeogenesis - Mus musculus (mouse)
         # path:<org><code>\t<name> - <org>
+
+        # Request list of pathways from API
+
+        # TODO: check if pathway list is cached
+
         data = parse_tsv(KEGGPathwayResolver.request(url="http://rest.kegg.jp/list/pathway/{ORG}".format(ORG=self.organism)))
         pathways = {}
         for line in data:

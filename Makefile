@@ -3,6 +3,7 @@
 
 install:
 	python3 -m pip install -r requirements.txt
+	python setup.py install
 
 devinstall:
 	python3 -m pip install -r requirements-dev.txt
@@ -30,10 +31,16 @@ check:
 	python3 setup.py sdist bdist_wheel
 	twine check ./dist/*
 
-upload:
+upload: check
 	twine upload --skip-existing ./dist/*
 
 
 lint:
 	pylint keggtools
+
+
+
+# TODO: implement unit testing
+test:
+	pytest keggtools
 

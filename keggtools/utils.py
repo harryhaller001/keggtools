@@ -1,4 +1,7 @@
+""" Basic utils for HTTP requests, parsing and rendering """
 
+
+import logging
 from tqdm import tqdm
 import requests
 import math
@@ -6,7 +9,7 @@ import os
 from datetime import datetime
 import csv
 from io import StringIO
-from typing import Optional
+from typing import Optional, Union
 
 
 
@@ -19,7 +22,8 @@ def get_timestamp():
     return datetime.now().timestamp()
 
 
-# Code using from https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks
+# Code using from
+# https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks
 # Thanks to Ned Batchelder (https://stackoverflow.com/users/14343/ned-batchelder)
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
@@ -48,8 +52,11 @@ class Downloader:
         wrote = 0
 
         with open(self.output, 'wb') as f:
-            for data in tqdm(r.iter_content(block_size), total=math.ceil(total_size // block_size), unit='KB',
+            for data in tqdm(r.iter_content(block_size),
+                             total=math.ceil(total_size // block_size),
+                             unit='KB',
                              unit_scale=True):
+
                 wrote = wrote + len(data)
                 f.write(data)
         if total_size != 0 and wrote != total_size:
@@ -64,14 +71,26 @@ def parse_tsv(data: str):
     :param data: str
     :return: list
     """
-    return list(csv.reader(StringIO(data), delimiter="\t"))
+    if type(data) == str:
+        fstream = StringIO(data)
+    else:
+        raise TypeError("Type of 'data' must be str or bytes.")
+
+    return list(csv.reader(fstream, delimiter="\t"))
 
 
 
-def request(url: str, encoding: Optional[str] = "utf-8"):
+def request(url: str, encoding="utf-8"):
+    logging.info(f"Requesting Url {url}")
     response = requests.get(url=url)
+    logging.info(f"Request finished with status code {response.status_code}")
     response.raise_for_status()
-    return response.content
+    content = response.content
+
+    if type(content) == bytes:
+        return content.decode(encoding)
+    else:
+        return content
 
 
 class ColorGradient:
@@ -80,31 +99,32 @@ class ColorGradient:
     print(c.get_list())
     print(c.render_graphviz())
     """
+
     def __init__(self, start: tuple, stop: tuple, steps: int):
         self.start = start
         self.stop = stop
         self.steps = steps
 
+
     @staticmethod
     def to_css(color: tuple):
         return "rgb({R},{G},{B})".format(R=color[0], G=color[1], B=color[2])
 
+
     def get_list(self):
         return [ColorGradient.list_to_hex(code) for code in ColorGradient._gradient(self.stop, self.start, self.steps)]
 
-    @staticmethod
-    def _arrayMultiply(array, c):
-        return [element * c for element in array]
-
-    @staticmethod
-    def _arraySum(a, b):
-        return list(map(sum, zip(a, b)))
 
     @staticmethod
     def _intermediate(a, b, ratio):
-        aComponent = ColorGradient._arrayMultiply(a, ratio)
-        bComponent = ColorGradient._arrayMultiply(b, 1 - ratio)
-        return ColorGradient._arraySum(aComponent, bComponent)
+
+        def _array_multiply(array, c):
+            return [element * c for element in array]
+
+        a_component = _array_multiply(a, ratio)
+        b_component = _array_multiply(b, 1 - ratio)
+        return list(map(sum, zip(a_component, b_component)))
+
 
     @staticmethod
     def _gradient(a, b, steps):
@@ -114,9 +134,11 @@ class ColorGradient:
         result.append(a)
         return result
 
+
     @staticmethod
     def list_to_hex(code: list):
         return "#" + "".join(["{:02x}".format(int(num)) for num in code])
+
 
     def render_graphviz(self):
         result = self.get_list()
@@ -130,11 +152,12 @@ class ColorGradient:
 
 
 if __name__ == "__main__":
-    # down = Downloader(url="http://example.com")
-    # down.set_output("test.bin")
-    # down.run()
+
+    logging.basicConfig(level=logging.DEBUG)
+
     c = ColorGradient(start=(0, 179, 0), stop=(187, 0, 0), steps=20)
     print(c.get_list())
     print(c.render_graphviz())
-    pass
+
+    request("http://example.com/")
 

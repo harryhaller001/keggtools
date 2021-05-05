@@ -1,20 +1,11 @@
 
+import logging
 import os
 import re
 import pickle
 
-from .utils import parse_tsv, request as request_url
-
-
-KEGG_DATA = ".cache"
-
-
-def getcwd():
-    """
-    Get absolute path for this file
-    :return: str
-    """
-    return os.path.split(__file__)[0]
+from .utils import parse_tsv, request as request_url, getcwd
+from .const import KEGG_DATA
 
 
 class KEGGDataStorage:
@@ -22,13 +13,22 @@ class KEGGDataStorage:
     Storage Handler
     Dirname of storage saved in variable KEGG_DATA
     """
+    @staticmethod
+    def _check_env():
+        # Check if folder exists
+        cache_dir = os.path.join(getcwd(), KEGG_DATA)
+        if not os.path.isdir(cache_dir):
+            logging.debug(f"Cache directory does not exist. Creating directory {cache_dir}")
+            os.mkdir(cache_dir)
 
     @staticmethod
     def build_path(filename: str):
+        KEGGDataStorage._check_env()
         return os.path.join(getcwd(), KEGG_DATA, filename)
 
     @staticmethod
     def exist(filename: str):
+        KEGGDataStorage._check_env()
         return os.path.isfile(os.path.join(getcwd(), KEGG_DATA, filename))
 
     @staticmethod
@@ -37,7 +37,7 @@ class KEGGDataStorage:
         Get organism codes from file or KEGG API. {<org>: <org-name>}
         :return: dict
         """
-        path = os.path.join(getcwd(), KEGG_DATA, "organism.dump")
+        path = KEGGDataStorage.build_path("organism.dump")
         organism_list = {}
 
         if not os.path.isfile(path):
@@ -47,10 +47,10 @@ class KEGGDataStorage:
                 if len(item) == 4 and item[0] != "":
                     organism_list[item[1]] = item[2]
             pickle.dump(organism_list, open(path, "wb"))
-            print("Request organism list and dump to {PATH}".format(PATH=path))
+            logging.debug("Request organism list and dump to {PATH}".format(PATH=path))
         else:
             organism_list = pickle.load(open(path, "rb"))
-            print("Load organism list from {PATH}".format(PATH=path))
+            logging.debug("Load organism list from {PATH}".format(PATH=path))
         return organism_list
 
     @staticmethod
@@ -84,7 +84,7 @@ class KEGGDataStorage:
         for item in os.listdir(os.path.join(getcwd(), KEGG_DATA)):
             if re.match(pattern, item, re.IGNORECASE):
                 found.append(item)
-        print("Found {N} pathway files".format(N=len(found)))
+        logging.debug("Found {N} pathway files".format(N=len(found)))
         return found
 
     @staticmethod
@@ -138,6 +138,7 @@ class KEGGDataStorage:
         :param data: str
         :return: str
         """
+        KEGGDataStorage._check_env()
         path = os.path.join(getcwd(), KEGG_DATA, filename)
         with open(path, "w") as f:
             f.write(data)
@@ -152,6 +153,7 @@ class KEGGDataStorage:
         :param data: str
         :return: str
         """
+        KEGGDataStorage._check_env()
         path = os.path.join(getcwd(), KEGG_DATA, filename)
         pickle.dump(data, open(path, "wb"))
         return path
@@ -163,6 +165,7 @@ class KEGGDataStorage:
         :param filename: str
         :return: str
         """
+        KEGGDataStorage._check_env()
         path = os.path.join(getcwd(), KEGG_DATA, filename)
         if not os.path.isfile(path):
             raise FileNotFoundError("File at path {PATH} does not exist".format(PATH=path))
@@ -178,6 +181,7 @@ class KEGGDataStorage:
         :param filename: str
         :return: object
         """
+        KEGGDataStorage._check_env()
         path = os.path.join(getcwd(), KEGG_DATA, filename)
         if not os.path.isfile(path):
             raise FileNotFoundError("File at path {PATH} does not exist".format(PATH=path))
@@ -186,24 +190,25 @@ class KEGGDataStorage:
 
 if __name__ == "__main__":
 
+    logging.basicConfig(level=logging.DEBUG)
+
     # get all stored pathways files from folder
     pathway_files = KEGGDataStorage.list_existing_pathways()
-    print("Found {N} kgml files in folder".format(N=len(pathway_files)))
-    print(pathway_files)
+    logging.debug("Found {N} kgml files in folder".format(N=len(pathway_files)))
 
     # convert pathway file string to pathway ids
     pathway_ids = [KEGGDataStorage.pathway_file_to_id(p) for p in pathway_files]
-    print(pathway_ids)
+    logging.debug(len(pathway_ids), "total pathway ids found.")
 
-    # load organism list from KEGG API
-    print(KEGGDataStorage.get_organism_list())
+    # load organism list
+    logging.debug(len(KEGGDataStorage.get_organism_list().keys()), "organisms found.")
 
     # check if pathway file exists
-    print(KEGGDataStorage.pathway_file_exist(org="mmu", code="00010"))
+    logging.debug(KEGGDataStorage.pathway_file_exist(org="mmu", code="00010"))
 
     # check if organism 3 letter code exists
-    print(KEGGDataStorage.check_organism("mmu"))
+    logging.debug(KEGGDataStorage.check_organism("mmu"))
 
     # get name of organism from code
-    print(KEGGDataStorage.get_organism_name(org_code="mmu"))
+    logging.debug(KEGGDataStorage.get_organism_name(org_code="mmu"))
 

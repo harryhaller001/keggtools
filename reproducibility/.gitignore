@@ -3,6 +3,10 @@
 /figures/*.png
 /notebooks/*.csv
 
+# Ignore testing notebook
+/notebooks/testing.ipynb
+
+# Ignore all rawdata
 /notebooks/rawdata/*
 !/notebooks/rawdata/.git*
 

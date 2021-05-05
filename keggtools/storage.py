@@ -3,7 +3,7 @@ import os
 import re
 import pickle
 
-from .const import parse_tsv, request as request_url
+from .utils import parse_tsv, request as request_url
 
 
 KEGG_DATA = ".cache"

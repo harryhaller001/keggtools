@@ -4,20 +4,23 @@ import requests
 import math
 import os
 from datetime import datetime
+import csv
+from io import StringIO
+from typing import Optional
 
-
-ENSEMBLE_ID_TO_GENE_ID = "_dbOrg_Ensembl_Gene_ID__to__Gene_ID_10090.dump"
-GENE_ID_TO_GENE_SYMBOL = "_dbOrg_Gene_ID__to__Gene_Symbol_10090.dump"
 
 
 def getcwd():
-    return os.path.split(__file__)[0]
+    # return os.path.split(__file__)[0]
+    return os.path.dirname(__file__)
 
 
 def get_timestamp():
     return datetime.now().timestamp()
 
 
+# Code using from https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks
+# Thanks to Ned Batchelder (https://stackoverflow.com/users/14343/ned-batchelder)
 def chunks(l, n):
     """Yield successive n-sized chunks from l."""
     for i in range(0, len(l), n):
@@ -53,62 +56,22 @@ class Downloader:
             print("ERROR, something went wrong")
 
 
-class Parser:
-    @staticmethod
-    def parse_tsv(data: str):
-        return [tuple(line.strip().split("\t")) for line in data.split("\n")]
 
 
-class Converter:
-    def __init__(self):
-        self.ensemble_to_geneid_dict = {}
-        self.geneid_to_symbol_dict = {}
-        self._load_data()
+def parse_tsv(data: str):
+    """
+    Parse .tsv file from string
+    :param data: str
+    :return: list
+    """
+    return list(csv.reader(StringIO(data), delimiter="\t"))
 
-    def list_convert(self, items: list, convert_function):
-        result = []
-        for i in items:
-            convert = convert_function(i)
-            if convert:
-                result.append(convert)
-        return result
 
-    @staticmethod
-    def reverse_dict(data: dict):
-        return dict(zip(data.items(), data.keys()))
 
-    def _load_data(self):
-        # load dict: ensemble > geneid
-        path = os.path.join(getcwd(), ENSEMBLE_ID_TO_GENE_ID)
-        for line in open(path, "r").readlines():
-            key, val = line.strip().split("\t")
-            if key != "" and val != "" and val != "-":
-                if "//" in val:
-                    val = val.split("//")[0]
-                self.ensemble_to_geneid_dict[str(key)] = val
-
-        # load dict: geneid > genesymbol
-        path = os.path.join(getcwd(), GENE_ID_TO_GENE_SYMBOL)
-        for line in open(path, "r").readlines():
-            key, val = line.strip().split("\t")
-            if key != "" and val != "" and val != "-":
-                if "//" in val:
-                    val = val.split("//")[0]
-                self.geneid_to_symbol_dict[key] = val
-
-    def ensemble_to_geneid(self, ensemble: str):
-        return self.ensemble_to_geneid_dict.get(ensemble, None)
-
-    def geneid_to_ensemble(self, geneid):
-        rev = Converter.reverse_dict(self.ensemble_to_geneid_dict)
-        return rev.get(str(geneid), None)
-
-    def geneid_to_symbol(self, geneid):
-        return self.geneid_to_symbol_dict.get(str(geneid), None)
-
-    def symbol_to_geneid(self, symbol: str):
-        rev = Converter.reverse_dict(self.geneid_to_symbol_dict)
-        return rev.get(symbol, None)
+def request(url: str, encoding: Optional[str] = "utf-8"):
+    response = requests.get(url=url)
+    response.raise_for_status()
+    return response.content
 
 
 class ColorGradient:

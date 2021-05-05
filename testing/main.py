@@ -4,7 +4,7 @@ from keggtools.resolver import KEGGPathwayResolver
 from keggtools.analysis import KEGGPathwayAnalysisResult, KEGGPathwayAnalysis
 from keggtools.render import KEGGPathwayRenderer
 from keggtools.storage import KEGGDataStorage
-from keggtools.utils import Converter
+
 
 import pandas
 import os
@@ -41,11 +41,6 @@ gene_df = load_bulk_data(filename=GENE_DATA)
 gene_df = gene_df[gene_df["log2FoldChange"] > 0]
 print(gene_df.head())
 
-# Convert ensemble to geneId
-conv = Converter()
-gene_id_list = [int(p) for p in conv.list_convert(list(gene_df["name"]), conv.ensemble_to_geneid)]
-print(gene_id_list)
-print("Found {N} genes in dataset".format(N=len(gene_id_list)))
 
 # run analysis
 analysis = KEGGPathwayAnalysis(org="mmu")

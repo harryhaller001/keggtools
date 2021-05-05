@@ -4,11 +4,11 @@ import setuptools
 from distutils.core import setup
 
 def read(fname: str):
-    return open(os.path.join(os.path.dirname(__file__), fname), encoding="utf-8").read()
+    return open(os.path.join(os.path.dirname(__file__), fname), mode="r", encoding="utf-8").read()
 
 setup(
     name = "keggtools",
-    version = "0.2.0",
+    version = "0.3.0",
     license="MIT",
     author = "harryhaller001",
     author_email = "harryhaller001@gmail.com",

@@ -1,6 +1,6 @@
 
 # from urllib.request import Request, urlopen
-from .const import parse_tsv, USER_AGENT, request
+from .utils import parse_tsv, request
 from .storage import KEGGDataStorage
 from .models import KEGGPathway
 
@@ -24,10 +24,7 @@ class KEGGPathwayResolver:
         :param url: str
         :return: byte
         """
-        # req = Request(url=url, method='GET')
-        # req.headers["User-Agent"] = USER_AGENT
-        # req = urlopen(req)
-        # return req.read().decode("utf-8")
+
         return request(url=url)
 
     def get_pathway_list(self):

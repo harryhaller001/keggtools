@@ -1,4 +1,6 @@
 
+# Dependency handling
+
 install:
 	python3 -m pip install -r requirements.txt
 
@@ -16,4 +18,22 @@ freeze:
 devfreeze:
 	python3 -m pip freeze --exclude keggtools > requirements-dev.txt
 
+
+
+# Twine package upload and checks
+
+check:
+	mypy setup.py
+	python setup.py install
+	mypy -p keggtools
+	rm ./dist/*
+	python3 setup.py sdist bdist_wheel
+	twine check ./dist/*
+
+upload:
+	twine upload --skip-existing ./dist/*
+
+
+lint:
+	pylint keggtools
 

@@ -2,7 +2,6 @@
 from .models import KEGGPathway
 from .storage import KEGGDataStorage
 from .resolver import KEGGPathwayResolver
-from .utils import Converter
 from typing import List, Any
 import scipy.stats as stats
 
@@ -65,7 +64,6 @@ class KEGGPathwayAnalysis:
     def __init__(self, org: str):
         self.organism = org
         self.summary: List[Any] = []
-        self.converter = Converter()
         self.all_pathways = get_all_pathways(org=self.organism)
 
     def sort_subset(self, subset: list):

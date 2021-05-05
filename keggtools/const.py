@@ -1,8 +1,5 @@
 
 
-USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) " \
-             "Chrome/42.0.2311.152 Safari/537.36"
-
 IMMUNE_SYSTEM_PATHWAYS = {"04640": "Hematopoietic cell lineage",
                           "04610": "Complement and coagulation cascades04611Platelet activation",
                           "04620": "Toll-like receptor signaling pathway",
@@ -55,25 +52,8 @@ ENTRY_TYPE = ["ortholog",
               "other"]
 
 
-def parse_tsv(data: str):
-    """
-    Parse .tsv file from string
-    :param data: str
-    :return: list
-    """
-    # TODO: replace with build-in lib
-    return [tuple(line.strip().split("\t")) for line in data.split("\n")]
-
-
-
-import requests
-from typing import Optional
-
-def request(url: str, encoding: Optional[str] = "utf-8"):
-    response = requests.get(url=url)
-    response.raise_for_status()
-    return response.content
 
 
 if __name__ == "__main__":
-    print(request("http://www.example.com/"))
+    # print(request("http://www.example.com/"))
+    pass

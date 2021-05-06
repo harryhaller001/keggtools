@@ -1,4 +1,6 @@
+""" KEGG pathway models to parse object relational """
 
+import logging
 from xml.etree import ElementTree as ElementTree
 from xml.etree.ElementTree import Element, SubElement
 from typing import Type, Union
@@ -203,7 +205,7 @@ class KEGGPathway:
         for entry in self.entries:
             if entry.type == "gene":
                 result[entry.get_id()] = entry.graphics.name
-        print("Get {N} unique genes from pathway".format(N=len(result.keys())))
+        logging.debug("Get {N} unique genes from pathway".format(N=len(result.keys())))
         return result
 
     def __str__(self):
@@ -248,7 +250,7 @@ class KEGGPathway:
                 # TODO: implement parsing
                 pass
             else:
-                print(child.tag)
+                logging.debug(child.tag)
 
         return pathw
 

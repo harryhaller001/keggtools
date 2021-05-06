@@ -1,3 +1,4 @@
+""" Caching """
 
 import logging
 import os
@@ -31,6 +32,8 @@ class KEGGDataStorage:
         KEGGDataStorage._check_env()
         return os.path.isfile(os.path.join(getcwd(), KEGG_DATA, filename))
 
+
+    # TODO: remove from storage  --> http request must be performed in resolver
     @staticmethod
     def get_organism_list():
         """
@@ -116,6 +119,15 @@ class KEGGDataStorage:
         :return: bool
         """
         return os.path.isfile(os.path.join(getcwd(), KEGG_DATA, "{ORG}_path{CODE}.kgml".format(ORG=org, CODE=code)))
+
+    @staticmethod
+    def pathway_list_exist(org: str):
+        """
+        Check if list of pathways exists in local stoarage
+        :param org: str
+        :return bool
+        """
+        return os.path.isfile(os.path.join(getcwd(), KEGG_DATA, "pathway_{ORG}.dump".format(ORG=org)))
 
     @staticmethod
     def load_pathway(org: str, code: str):

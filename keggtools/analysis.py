@@ -1,4 +1,7 @@
+""" KEGG Enrichment analysis core """
 
+import logging
+import csv
 from .models import KEGGPathway
 from .storage import KEGGDataStorage
 from .resolver import KEGGPathwayResolver
@@ -6,15 +9,15 @@ from typing import List, Any
 import scipy.stats as stats
 
 
-def get_all_pathways(org: str):
-    filename = "pathways_{ORG}.dump".format(ORG=org)
-    if KEGGDataStorage.exist(filename=filename):
-        return KEGGDataStorage.load_dump(filename=filename)
-    else:
-        resolve = KEGGPathwayResolver(org=org)
-        pathways = resolve.get_pathway_list()
-        KEGGDataStorage.save_dump(filename=filename, data=pathways)
-        return pathways
+# def get_all_pathways(org: str):
+#     filename = "pathways_{ORG}.dump".format(ORG=org)
+#     if KEGGDataStorage.exist(filename=filename):
+#         return KEGGDataStorage.load_dump(filename=filename)
+#     else:
+#         resolve = KEGGPathwayResolver(org=org)
+#         pathways = resolve.get_pathway_list()
+#         KEGGDataStorage.save_dump(filename=filename, data=pathways)
+#         return pathways
 
 
 
@@ -57,10 +60,34 @@ class KEGGPathwayAnalysisResult:
 
 
 class KEGGPathwayAnalysis:
-    def __init__(self, org: str):
+    def __init__(self, org: str, pathways=None):
         self.organism = org
         self.summary: List[Any] = []
-        self.all_pathways = get_all_pathways(org=self.organism)
+        self.resolver = KEGGPathwayResolver(self.organism)
+
+        # self.all_pathways = get_all_pathways(org=self.organism)
+        self.all_pathways = {}
+
+        if pathways == None:
+            # If pathways are not set use all pathways
+            self.all_pathways = self.resolver.get_pathway_list()
+
+        elif type(pathways) == dict:
+            # Use given data when dict is passed
+            self.all_pathways = pathways
+
+        elif type(pathways) == list:
+            # Load all pathways and filter for pathways in list
+            for key, value in self.resolver.get_pathway_list().items():
+                if key in pathways:
+                    self.all_pathways[key] = value
+            if len(self.all_pathways.keys()) == 0:
+                raise ValueError("Pathways filter does not succeed. Still 0 pathways in list.")
+
+        else:
+            # still not pathways, raise error
+            raise ValueError("Pass list or dict of pathways to filter list.")
+
 
     def sort_subset(self, subset: list):
         buffer = []
@@ -101,7 +128,9 @@ class KEGGPathwayAnalysis:
         absolute_pathway_genes = 0
 
         for pathway_id, name in self.all_pathways.items():
-            pathway = KEGGPathway.parse(KEGGDataStorage.load_pathway("mmu", pathway_id))
+
+            pathway = self.resolver.get_pathway(code=pathway_id)
+            # pathway = KEGGPathway.parse(KEGGDataStorage.load_pathway("mmu", pathway_id))
 
             genes_found = []
             all_pathways_genes = pathway.get_genes().keys()
@@ -146,6 +175,8 @@ class KEGGPathwayAnalysis:
                                  PATHWAY_ID=pathway_id, COUNT=len(gene_symbols),
                                  GENES=",".join(gene_symbols)))
         """
+
+        # TODO use csv dict writer
         for item in self.summary:
             result.append(item.line_summary())
         return "\n".join(result)

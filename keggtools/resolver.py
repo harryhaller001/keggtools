@@ -1,3 +1,4 @@
+""" Resolve requests to KEGG data Api """
 
 import logging
 from .utils import parse_tsv, request
@@ -45,16 +46,30 @@ class KEGGPathwayResolver:
 
         # Request list of pathways from API
 
-        # TODO: check if pathway list is cached
+        store = KEGGDataStorage()
+        if store.pathway_list_exist(org=self.organism):
+            # return pathway list dump
+            logging.debug(f"Found pathway list for organism {self.organism} in cache.")
+            data = store.load_dump(filename="pathway_{ORG}.dump".format(ORG=self.organism))
+            return data
 
-        data = parse_tsv(KEGGPathwayResolver.request(url="http://rest.kegg.jp/list/pathway/{ORG}".format(ORG=self.organism)))
-        pathways = {}
-        for line in data:
-            if len(line) == 2 and line[0] != "":
-                pathways[line[0].split(":")[1].strip(self.organism)] = line[1].split(" - ")[0]
+        else:
+            # request pathway list
+            logging.debug(f"Not found pathway list for organism {self.organism} in cache. Requesting from API")
+            data = parse_tsv(KEGGPathwayResolver.request(url="http://rest.kegg.jp/list/pathway/{ORG}".format(ORG=self.organism)))
+            pathways = {}
+            for line in data:
+                if len(line) == 2 and line[0] != "":
+                    pathways[line[0].split(":")[1].strip(self.organism)] = line[1].split(" - ")[0]
 
-        print("Loading list of {N} pathways for organism {ORG}".format(N=len(pathways.keys()), ORG=self.organism))
-        return pathways
+            logging.debug("Loading list of {N} pathways for organism {ORG}".format(N=len(pathways.keys()), ORG=self.organism))
+
+            # save dump
+            store.save_dump(filename="pathway_{ORG}.dump".format(ORG=self.organism), data=pathways)
+
+            # return pathway list
+            return pathways
+
 
     @staticmethod
     def build_url(org: str, code: str):
@@ -76,12 +91,12 @@ class KEGGPathwayResolver:
         if store.pathway_file_exist(org=self.organism, code=code):
             # load from file
             data = store.load(filename="{ORG}_path{CODE}.kgml".format(ORG=self.organism, CODE=code))
-            print("Load pathway path:{ORG}{CODE} from file".format(ORG=self.organism, CODE=code))
+            logging.debug("Load pathway path:{ORG}{CODE} from file".format(ORG=self.organism, CODE=code))
         else:
             # request pathway and store
             data = KEGGPathwayResolver.request(KEGGPathwayResolver.build_url(org=self.organism, code=code))
             store.save(filename="{ORG}_path{CODE}.kgml".format(ORG=self.organism, CODE=code), data=data)
-            print("Download pathway path:{ORG}{CODE} from rest.kegg.jp".format(ORG=self.organism, CODE=code))
+            logging.debug("Download pathway path:{ORG}{CODE} from rest.kegg.jp".format(ORG=self.organism, CODE=code))
         return KEGGPathway.parse(data)
 
     def link_pathways(self, geneid: str):
@@ -107,11 +122,11 @@ class KEGGPathwayResolver:
         for code in pathways:
             if not KEGGDataStorage.pathway_file_exist(org=self.organism, code=code):
                 url = KEGGPathwayResolver.build_url(org=self.organism, code=code)
-                print("Requesting path:{ORG}{CODE} {URL}...".format(URL=url, ORG=self.organism, CODE=code))
+                logging.debug("Requesting path:{ORG}{CODE} {URL}...".format(URL=url, ORG=self.organism, CODE=code))
                 KEGGDataStorage.save(filename="{ORG}_path{CODE}.kgml".format(ORG=self.organism, CODE=code),
                                      data=KEGGPathwayResolver.request(url))
                 downloads += 1
-        print("Download {N} pathway KGML files from KEGG".format(N=downloads))
+        logging.debug("Download {N} pathway KGML files from KEGG".format(N=downloads))
         return None
 
     @staticmethod
@@ -119,7 +134,7 @@ class KEGGPathwayResolver:
         filename = "compound.dump"
         if not KEGGDataStorage.exist(filename=filename):
             url = "http://rest.kegg.jp/list/compound/"
-            print("Requesting components {URL}...".format(URL=url))
+            logging.debug("Requesting components {URL}...".format(URL=url))
             result = {}
             for items in parse_tsv(KEGGPathwayResolver.request(url=url)):
                 if len(items) >= 2 and items[0] != "":
@@ -131,6 +146,6 @@ class KEGGPathwayResolver:
 
 
 if __name__ == "__main__":
-
-    print(KEGGPathwayResolver.get_components())
+    logging.basicConfig(level=logging.DEBUG)
+    logging.info(KEGGPathwayResolver.get_components())
 

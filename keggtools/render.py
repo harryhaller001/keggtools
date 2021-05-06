@@ -1,4 +1,6 @@
+""" Render pipeline """
 
+import logging
 import pydot
 from .models import KEGGPathway
 from .resolver import KEGGPathwayResolver
@@ -256,7 +258,7 @@ class KEGGPathwayRenderer:
                             <stop offset="0%" style="stop-color:{COLOR_UP};stop-opacity:1" />
                             <stop offset="50%" style="stop-color:rgb(255,255,255);stop-opacity:1" />
                             <stop offset="100%" style="stop-color:{COLOR_DOWN};stop-opacity:1" />
-                        </linearGradient> 
+                        </linearGradient>
                     </defs>
                     <g>
                         <rect x="20" y="50" width="20" height="100" fill="url(#cmap)" />
@@ -264,7 +266,7 @@ class KEGGPathwayRenderer:
                         <text x="55" y="150" fill="black" alignment-baseline="central">{LOWER}</text>
                         <text x="55" y="100" fill="black" alignment-baseline="central">0</text>
                         <text x="55" y="50" fill="black" alignment-baseline="central">{UPPER}</text>
-   
+
                         <line x1="40" y1="50" x2="50" y2="50" style="stroke:rgb(0,0,0);stroke-width:2" />
                         <line x1="40" y1="100" x2="50" y2="100" style="stroke:rgb(0,0,0);stroke-width:2" />
                         <line x1="40" y1="150" x2="50" y2="150" style="stroke:rgb(0,0,0);stroke-width:2" />
@@ -281,5 +283,5 @@ if __name__ == "__main__":
     # print(renderer.group_render())
     # print(renderer.render())
     print(renderer.raw_render())
-    
+
 

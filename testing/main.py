@@ -27,7 +27,7 @@ def load_bulk_data(filename: str):
         csv_reader = csv.reader(f)
         csv_headings = next(csv_reader)
         logging.debug(f"Loading gene data with header {csv_headings}")
-    
+
     return pandas.read_csv(filename, header=None, names=csv_headings,
                            skiprows=1)
 

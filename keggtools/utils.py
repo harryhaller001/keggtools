@@ -60,7 +60,7 @@ class Downloader:
                 wrote = wrote + len(data)
                 f.write(data)
         if total_size != 0 and wrote != total_size:
-            print("ERROR, something went wrong")
+            logging.error("ERROR, something went wrong")
 
 
 
@@ -95,9 +95,7 @@ def request(url: str, encoding="utf-8"):
 
 class ColorGradient:
     """
-    c = ColorGradient(start=(0, 179, 0), stop=(187, 0, 0), steps=20)
-    print(c.get_list())
-    print(c.render_graphviz())
+    Create color gradient
     """
 
     def __init__(self, start: tuple, stop: tuple, steps: int):

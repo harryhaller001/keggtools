@@ -3,7 +3,8 @@
 # Example list for immune system pathways
 IMMUNE_SYSTEM_PATHWAYS = {
     "04640": "Hematopoietic cell lineage",
-    "04610": "Complement and coagulation cascades04611Platelet activation",
+    "04610": "Complement and coagulation cascades",
+    "04611": "Platelet activation",
     "04620": "Toll-like receptor signaling pathway",
     "04621": "NOD-like receptor signaling pathway",
     "04622": "RIG-I-like receptor signaling pathway",
@@ -65,4 +66,11 @@ ENTRY_TYPE = [
 
 # KEGG cache folder name
 
-KEGG_DATA = ".cache"
+import os
+
+if os.environ.get("KEGG_DATA", None) != None:
+    # if KEGG_DATA is set, overwrite caching dir
+    KEGG_DATA = os.environ["KEGG_DATA"]
+else:
+    # fallback to default caching dir
+    KEGG_DATA = os.path.join(os.path.dirname(__file__), ".cache")

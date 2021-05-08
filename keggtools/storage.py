@@ -17,7 +17,7 @@ class KEGGDataStorage:
     @staticmethod
     def _check_env():
         # Check if folder exists
-        cache_dir = os.path.join(getcwd(), KEGG_DATA)
+        cache_dir = KEGG_DATA
         if not os.path.isdir(cache_dir):
             logging.debug(f"Cache directory does not exist. Creating directory {cache_dir}")
             os.mkdir(cache_dir)
@@ -25,12 +25,12 @@ class KEGGDataStorage:
     @staticmethod
     def build_path(filename: str):
         KEGGDataStorage._check_env()
-        return os.path.join(getcwd(), KEGG_DATA, filename)
+        return os.path.join(KEGG_DATA, filename)
 
     @staticmethod
     def exist(filename: str):
         KEGGDataStorage._check_env()
-        return os.path.isfile(os.path.join(getcwd(), KEGG_DATA, filename))
+        return os.path.isfile(os.path.join(KEGG_DATA, filename))
 
 
     # TODO: remove from storage  --> http request must be performed in resolver
@@ -84,7 +84,7 @@ class KEGGDataStorage:
         # <org>_path<code>.kgml
         found = []
         pattern = r"[a-z]{3}_path[0-9]{5}\.kgml"
-        for item in os.listdir(os.path.join(getcwd(), KEGG_DATA)):
+        for item in os.listdir(KEGG_DATA):
             if re.match(pattern, item, re.IGNORECASE):
                 found.append(item)
         logging.debug("Found {N} pathway files".format(N=len(found)))
@@ -118,7 +118,7 @@ class KEGGDataStorage:
         :param code: str
         :return: bool
         """
-        return os.path.isfile(os.path.join(getcwd(), KEGG_DATA, "{ORG}_path{CODE}.kgml".format(ORG=org, CODE=code)))
+        return os.path.isfile(os.path.join(KEGG_DATA, "{ORG}_path{CODE}.kgml".format(ORG=org, CODE=code)))
 
     @staticmethod
     def pathway_list_exist(org: str):
@@ -127,7 +127,7 @@ class KEGGDataStorage:
         :param org: str
         :return bool
         """
-        return os.path.isfile(os.path.join(getcwd(), KEGG_DATA, "pathway_{ORG}.dump".format(ORG=org)))
+        return os.path.isfile(os.path.join(KEGG_DATA, "pathway_{ORG}.dump".format(ORG=org)))
 
     @staticmethod
     def load_pathway(org: str, code: str):
@@ -151,7 +151,7 @@ class KEGGDataStorage:
         :return: str
         """
         KEGGDataStorage._check_env()
-        path = os.path.join(getcwd(), KEGG_DATA, filename)
+        path = os.path.join(KEGG_DATA, filename)
         with open(path, "w") as f:
             f.write(data)
             f.close()
@@ -166,7 +166,7 @@ class KEGGDataStorage:
         :return: str
         """
         KEGGDataStorage._check_env()
-        path = os.path.join(getcwd(), KEGG_DATA, filename)
+        path = os.path.join(KEGG_DATA, filename)
         pickle.dump(data, open(path, "wb"))
         return path
 
@@ -178,7 +178,7 @@ class KEGGDataStorage:
         :return: str
         """
         KEGGDataStorage._check_env()
-        path = os.path.join(getcwd(), KEGG_DATA, filename)
+        path = os.path.join(KEGG_DATA, filename)
         if not os.path.isfile(path):
             raise FileNotFoundError("File at path {PATH} does not exist".format(PATH=path))
         with open(path, "r") as f:
@@ -194,7 +194,7 @@ class KEGGDataStorage:
         :return: object
         """
         KEGGDataStorage._check_env()
-        path = os.path.join(getcwd(), KEGG_DATA, filename)
+        path = os.path.join(KEGG_DATA, filename)
         if not os.path.isfile(path):
             raise FileNotFoundError("File at path {PATH} does not exist".format(PATH=path))
         return pickle.load(open(path, "rb"))

@@ -11,6 +11,7 @@ devinstall:
 freeze:
 	python3 -m pip freeze \
 		--exclude keggtools \
+		--exclude mygene \
 		--exclude pytest \
 		--exclude mypy \
 		--exclude mypy-extension \

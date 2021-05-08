@@ -8,7 +8,7 @@ def read(fname: str):
 
 setup(
     name = "keggtools",
-    version = "0.3.0",
+    version = "0.4.0",
     license="MIT",
     author = "harryhaller001",
     author_email = "harryhaller001@gmail.com",

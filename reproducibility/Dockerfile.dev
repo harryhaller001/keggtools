@@ -21,6 +21,12 @@ RUN pip3 install pip --upgrade
 # Install python dependencies
 RUN pip3 install scanpy python-igraph louvain leidenalg scikit-learn matplotlib pandas numpy umap-learn
 
+# Set caching dir
+ENV KEGG_DATA="/var/data/kegg_data/.caching"
+
+# Set persistance
+VOLUME [ "/var/data/kegg_data/.caching" ]
+
 # Install keggtools
-RUN pip3 install pydot requests tqdm keggtools==0.3.0
+RUN pip3 install pydot requests tqdm mygene keggtools==0.3.0
 

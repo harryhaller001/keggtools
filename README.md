@@ -1,5 +1,5 @@
 # keggtools
-Library for KEGG pathway enrichment analysis
+Library for KEGG pathway enrichment analysis.
 
 ## Installation
 
@@ -20,7 +20,7 @@ Python dependencies
 * `requests`
 * `tqdm`
 * `pydot`
-* `scipy` (Needed?)
+* `scipy`
 
 Installation of python dependencies:
 
@@ -29,16 +29,15 @@ python3 -m pip install requests tqdm pydot scipy
 ```
 
 
-Installation `keggtools` package using `pip`:
+Installation `keggtools` PyPI package using `pip`:
 
 ```bash
 python3 -m pip install keggtools
 ```
 
-Installation `keggtools` from github source:
+Installation `keggtools` from Github source:
 
 ```bash
-# ??? Not sure
 python3 -m pip install git+git@github.com:harryhaller001/keggtools.git
 ```
 
@@ -46,12 +45,6 @@ Installation `keggtools` from release source:
 
 ```bash
 # TODO add release
-```
-
-Run unittest to verify `keggtools` installation
-
-```bash
-# TODO: implement unittest
 ```
 
 
@@ -104,6 +97,12 @@ pip install -r requirements.txt
 
 ### Testing
 
+Run unittest to verify `keggtools` installation
+
+```bash
+# TODO: implement unittest
+```
+
 ### Static code analysis
 
 Static code analysis using mypy
@@ -143,3 +142,4 @@ Build package
 # Build .egg, .whl and .tar
 python setup.py sdist bdist_wheel
 ```
+

@@ -12,6 +12,8 @@ RUN apt-get update \
         graphviz \
     && rm -rf /var/lib/apt/lists/*
 
+# Create caching dir
+RUN mkdir -p /home/jovyan/work/kegg_data/caching/ && chown jovyan:users -R /home/jovyan/work/kegg_data/caching/
 
 USER jovyan
 
@@ -22,11 +24,11 @@ RUN pip3 install pip --upgrade
 RUN pip3 install scanpy python-igraph louvain leidenalg scikit-learn matplotlib pandas numpy umap-learn
 
 # Set caching dir
-ENV KEGG_DATA="/var/data/kegg_data/.caching"
+ENV KEGG_DATA="/home/jovyan/work/kegg_data/caching"
 
 # Set persistance
-VOLUME [ "/var/data/kegg_data/.caching" ]
+VOLUME [ "/home/jovyan/work/kegg_data/caching" ]
 
 # Install keggtools
-RUN pip3 install pydot requests tqdm mygene keggtools==0.3.0
+RUN pip3 install pydot requests tqdm mygene keggtools==0.4.0
 

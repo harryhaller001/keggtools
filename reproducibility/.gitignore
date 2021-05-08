@@ -1,6 +1,6 @@
 
 # Ignore rendered figures
-/figures/*.png
+# /figures/*.png
 /notebooks/*.csv
 
 # Ignore testing notebook

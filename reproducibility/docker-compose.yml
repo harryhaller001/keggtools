@@ -15,7 +15,7 @@ services:
         volumes:
             - ./notebooks:/home/jovyan/work/notebooks
             - ./figures:/home/jovyan/work/figures
-            - kegg_data:"/var/data/kegg_data/.caching"
+            - kegg_data:/home/jovyan/work/kegg_data/caching
 
         ports:
             - 8888:8888

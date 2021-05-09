@@ -43,7 +43,10 @@ lint:
 
 
 
-# TODO: implement unit testing
-test:
-	pytest keggtools
+# run unit testing
+
+unittest:
+	@mypy ./test/test_package.py
+	@pylint ./test/test_package.py
+	@pytest -p keggtools --show-capture=log
 

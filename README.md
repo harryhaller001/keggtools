@@ -9,80 +9,87 @@ Dependencies
 
 * `graphviz`
 
-Install graphviz on `Ubuntu`. More graphviz install options [https://www.graphviz.org/download/](https://www.graphviz.org/download/)
-```bash
-# pydot is needed for rendering of pathways and required graphviz
-sudo apt install graphviz
-```
-
-Python dependencies
+`python` dependencies
 
 * `requests`
 * `tqdm`
 * `pydot`
 * `scipy`
 
-Installation of python dependencies:
+Installation of `python` dependencies:
 
 ```bash
 python3 -m pip install requests tqdm pydot scipy
 ```
 
 
-Installation `keggtools` PyPI package using `pip`:
+Installation `keggtools` package using `pip`:
 
 ```bash
 python3 -m pip install keggtools
 ```
 
-Installation `keggtools` from Github source:
-
-```bash
-python3 -m pip install git+git@github.com:harryhaller001/keggtools.git
-```
-
-Installation `keggtools` from release source:
-
-```bash
-# TODO add release
-```
-
+To get a more detailed list of install options, please read the `INSTALL.md`
 
 ## API
 
-### Download and caching
+### Download and Parsing
 
 
 ```python
 from keggtools.resolver import KEGGPathwayResolver
+from keggtools.const import IMMUNE_SYSTEM_PATHWAYS
 
-# Get all components
-print(KEGGPathwayResolver.get_components())
+ORGANISM_ID = "hsa"
+resolver = KEGGPathwayResolver(org=ORGANISM_ID)
 
-# List all pathways
+# Select first immune system pathway as example
+pathway_id = list(IMMUNE_SYSTEM_PATHWAYS.keys())[1]
 
-# TODO: check taxid exists
-organism_id = 10090
-
-resolver = KEGGPathwayResolver(organism_id)
-
-# TODO: maybe move to static methods
-print(resolver.get_pathway_list())
+# Resolve pathway
+pathway = resolver.get_pathway(code=pathway_id)
+print(pathway)
 ```
-
-
-### Parsing
-
 
 
 ### Enrichment and Testing
 
+```python
+from keggtools.analysis import KEGGPathwayAnalysis
 
+# Init analysis with organism code
+analysis = KEGGPathwayAnalysis(org=ORGANISM_ID)
+
+# Study genes as list of entrez gene id's
+study_genes = []
+analysis.run_analysis(gene_list=study_genes)
+
+# to_dataframe method requires pandas installation
+result = analysis.to_dataframe()
+print(result.head())
+```
 
 ### Rendering
 
+```python
+import pydot
+from keggtools.render import KEGGPathwayRenderer
+
+# Load and parse pathway
+pathway = KEGGPathwayResolver(org=ORGANISM_ID).get_pathway(pathway_id)
+renderer = KEGGPathwayRenderer(kegg_pathway=pathway)
+
+# Render to dot graph
+dot_string = renderer.raw_render()
+
+# Export dot graph as png
+graphs = pydot.graph_from_dot_data(dot_string)[0]
+graph.write_png("./output.png")
+```
 
 ## Development
+
+### Dev installation
 
 Fast install with `virtualenv` for development.
 
@@ -93,53 +100,41 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-
-
 ### Testing
 
 Run unittest to verify `keggtools` installation
 
 ```bash
-# TODO: implement unittest
+# Install pytest
+python3 -m pip install pytest
+
+# Run unittest for package
+pytest -p keggtools --show-capture=log
+```
+
+Alternatively, the `Makefile` can be used:
+
+```bash
+make unittest
 ```
 
 ### Static code analysis
 
-Static code analysis using mypy
+Static code analysis using `mypy`
 
 ```bash
 # Install mypy
-pip install mypy
+python3 -m pip install mypy
 
-# Or
+# Or install full development requirements
 pip install -r dev_requirements.txt
 ```
 
-Windows
-
-```bash
-# Testing setup.py and package
-mypy setup.py
-python setup.py install
-# mypy --python-executable E:\Github\keggtools\venv\Scripts\python.exe -p keggtools --ignore-missing-imports
-mypy -p keggtools
-```
-
-Linux
+Run static code analysis with `mypy`
 
 ```bash
 mypy setup.py
 python3 setup.py install
 mypy -p keggtools
-```
-
-
-## Build process
-
-Build package
-
-```bash
-# Build .egg, .whl and .tar
-python setup.py sdist bdist_wheel
 ```
 

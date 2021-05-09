@@ -1,3 +1,5 @@
+.DEFAULT_GOAL := check
+
 
 # Dependency handling
 

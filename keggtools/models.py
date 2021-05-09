@@ -1,23 +1,28 @@
 """ KEGG pathway models to parse object relational """
+# pylint: disable=invalid-name,too-few-public-methods
+# Ignore linting to keep object-relational parsing
 
 import logging
-from xml.etree import ElementTree as ElementTree
-from xml.etree.ElementTree import Element, SubElement
-from typing import Type, Union
-import pydot
+from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
+from typing import Union
 
 
 class Relation:
     """
-
+    Relation model
     """
+
     def __init__(self):
-        # REQUIRED
+        """
+        Init Relation model
+        """
+
         self.entry1 = None
         self.entry2 = None
         self.type = None
-
         self.subtypes = {}
+
 
     @staticmethod
     def parse(item: Element):
@@ -26,6 +31,7 @@ class Relation:
         :param item: ElementTree
         :return: Relation
         """
+
         relation = Relation()
         relation.entry1 = item.attrib["entry1"]
         relation.entry2 = item.attrib["entry2"]
@@ -38,19 +44,27 @@ class Relation:
         return relation
 
     def __str__(self):
-        return "<Relation {ENTRY1}->{ENTRY2} type='{TYPE}'".format(ENTRY1=self.entry1, ENTRY2=self.entry2,
+        return "<Relation {ENTRY1}->{ENTRY2} type='{TYPE}'".format(ENTRY1=self.entry1,
+                                                                   ENTRY2=self.entry2,
                                                                    TYPE=self.type)
 
 
 class Component:
     """
-    The component element is a subelement of the entry element, and is used when the entry element is a complex node;
-    namely, when the type attribute value of the entry element is "group". The nodes that constitute the complex are
-    specified by recurrent calls. For example, when the complex is composed of two nodes, two component elements are
-    specified. The attribute of this element is as follows.
+    The component element is a subelement of the entry element, and is used when the entry
+    element is a complex node; namely, when the type attribute value of the entry element
+    is "group". The nodes that constitute the complex are specified by recurrent calls. For
+    example, when the complex is composed of two nodes, two component elements are specified.
+    The attribute of this element is as follows.
     """
+
     def __init__(self):
+        """
+        Init Component model
+        """
+
         self.id = ""
+
 
     @staticmethod
     def parse(item: Element):
@@ -59,9 +73,10 @@ class Component:
         :param item: ElementTree
         :return: Component
         """
-        c = Component()
-        c.id = item.attrib["id"]
-        return c
+
+        component = Component()
+        component.id = item.attrib["id"]
+        return component
 
 
 class Graphics:
@@ -69,6 +84,10 @@ class Graphics:
     Graphics information for rendering
     """
     def __init__(self):
+        """
+        Init Graphics model
+        """
+
         self.attrib = {"x": 0,
                        "y": 0,
                        "width": 0,
@@ -78,11 +97,26 @@ class Graphics:
                        "fgcolor": "",
                        "bgcolor": ""}
 
-    def __str__(self):
-        return "<Graphics {STR}".format(STR=" ".join(["%s='%s'" % (key, val) for key, val in self.attrib.items()]))
 
-    def __getattr__(self, item):
+    def __str__(self):
+        """
+        Build Graphics summary
+        :return: str
+        """
+
+        attrib_array = ["%s='%s'" % (key, val) for key, val in self.attrib.items()]
+        return "<Graphics {STR}".format(STR=" ".join(attrib_array))
+
+
+    def __getattr__(self, item: str):
+        """
+        Get Item by key
+        :param item: str
+        :return: Any
+        """
+
         return self.attrib[item]
+
 
     @staticmethod
     def parse(item: Element):
@@ -91,18 +125,24 @@ class Graphics:
         :param item: ElementTree
         :return: Graphics
         """
-        g = Graphics()
+
+        graphic = Graphics()
         for key, val in item.attrib.items():
-            if key in g.attrib:
-                g.attrib[key] = val
-        return g
+            if key in graphic.attrib:
+                graphic.attrib[key] = val
+        return graphic
 
 
 class Entry:
     """
-    KEGG Entry
+    Entry model
     """
+
     def __init__(self):
+        """
+        Init Entry model
+        """
+
         # REQUIRED
         self.id = ""
         self.name = ""
@@ -114,20 +154,24 @@ class Entry:
         self.graphics = None
         self.components = []
 
+
     def get_gene_id(self):
         """
         Parse variable 'name' into KEGG ID
         :return: int
         """
+
         return int(self.name.split(":")[1])
+
 
     def get_id(self):
         """
         Parse variable 'name' into KEGG ID
         :return: int
         """
-        # TODO : remove
+
         return int(self.name.split(":")[1])
+
 
     @staticmethod
     def parse(item: Element):
@@ -136,6 +180,7 @@ class Entry:
         :param item: ElementTree
         :return: Entry
         """
+
         entry = Entry()
         entry.id = item.attrib["id"]
         entry.name = item.attrib["name"].split(" ")[0]
@@ -152,15 +197,29 @@ class Entry:
 
         return entry
 
+
     def __str__(self):
-        return "<Entry id={ID} name='{NAME}' type='{TYPE}'>".format(ID=self.id, NAME=self.name, TYPE=self.type)
+        """
+        Build Entry summary string
+        :return: str
+        """
+
+        return "<Entry id={ID} name='{NAME}' type='{TYPE}'>".format(ID=self.id,
+                                                                    NAME=self.name,
+                                                                    TYPE=self.type)
 
 
 class KEGGPathway:
     """
     KEGG Pathway
     """
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self):
+        """
+        Init KEGG Pathway model
+        """
+
         # REQUIRED
         self.name = ""
         self.org = ""
@@ -176,11 +235,19 @@ class KEGGPathway:
         self.entries = []
         self.reactions = []
 
+
     def get_entry_by_id(self, entry_id: Union[str, int]):
+        """
+        Get pathway Entry by id
+        :param entry_id: Union[str, int]
+        :return: Any
+        """
+
         for item in self.entries:
             if int(item.id) == int(entry_id):
                 return item
         return None
+
 
     def matches(self, gene_id_list: list):
         """
@@ -188,39 +255,51 @@ class KEGGPathway:
         :param gene_id_list: list
         :return: float
         """
-        # run over entry:gene_id -> return count / len(entry)
 
+        # run over entry:gene_id -> return count / len(entry)
         count = 0
         for entry in self.entries:
             if entry in gene_id_list:
                 count += 1
         return count / len(self.entries)
 
+
     def get_genes(self):
         """
         List all genes from pathway {<gene_id>: <gene_name>}
         :return: dict
         """
+
         result = {}
         for entry in self.entries:
             if entry.type == "gene":
                 result[entry.get_id()] = entry.graphics.name
-        logging.debug("Get {N} unique genes from pathway".format(N=len(result.keys())))
+        logging.debug("Get %d unique genes from pathway", len(result.keys()))
         return result
 
+
     def __str__(self):
-        return "<KEGGPathway path:{ORG}{CODE} title='{TITLE}'>".format(ORG=self.org, CODE=self.number, TITLE=self.title)
+        """
+        Build string summary for KEGG pathway
+        :return: str
+        """
+
+        return "<KEGGPathway path:{ORG}{CODE} title='{TITLE}'>".format(ORG=self.org,
+                                                                       CODE=self.number,
+                                                                       TITLE=self.title)
+
 
     def summarize(self):
         """
         Verbose all components of pathway
-        :return: None
         """
+
         print(self.__str__())
         for r in self.relations:
             print(r)
         for e in self.entries:
             print(e)
+
 
     @staticmethod
     def parse(data: str):
@@ -229,6 +308,7 @@ class KEGGPathway:
         :param data: str
         :return: KEGGPathway
         """
+
         pathw = KEGGPathway()
 
         root = ElementTree.fromstring(data)
@@ -247,7 +327,7 @@ class KEGGPathway:
             elif child.tag == "relation":
                 pathw.relations.append(Relation.parse(child))
             elif child.tag == "reaction":
-                # TODO: implement parsing
+                # TODO: implement parsing, not needed for current use case
                 pass
             else:
                 logging.debug(child.tag)
@@ -257,4 +337,3 @@ class KEGGPathway:
 
 if __name__ == "__main__":
     pass
-

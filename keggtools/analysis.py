@@ -71,14 +71,14 @@ class KEGGPathwayAnalysisResult:
         :return: str
         """
         return f"<KEGGPathwayAnalysisResult {self.organism}:{self.pathway_id}" \
-                " ({pathway_name}) {self.found_genes}/{self.pathway_genes_count}>"
+                f" ({self.pathway_name}) {len(self.found_genes)}/{self.pathway_genes_count}>"
 
 
     def __repr__(self):
         """
         Print out string summary
         """
-        print(self.__str__())
+        return self.__str__()
 
 
     def set_pvalue(self, pval: float):

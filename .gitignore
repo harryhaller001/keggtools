@@ -140,3 +140,5 @@ dmypy.json
 # Ignore TODO list
 TODO.md
 CHANGELOG.md
+/.trash
+

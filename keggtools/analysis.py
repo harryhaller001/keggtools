@@ -333,6 +333,7 @@ class KEGGPathwayAnalysis:
                 raise RuntimeError(f"File {file} does already exist." \
                                     "To solve please set overwrite=True.")
 
+            # pylint: disable=consider-using-with
             csv_file = open(file, mode="w", encoding="utf-8")
         elif isinstance(file, TextIOWrapper):
             # file is TextIOWrapper (File object stream)

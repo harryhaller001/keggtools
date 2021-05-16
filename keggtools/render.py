@@ -50,10 +50,12 @@ class KEGGPathwayRenderer:
         self.exp_max = max(gene_dict.values())
 
         # Clip log fold expression
-        if self.exp_min > 0:
-            self.exp_min = 0
-        if self.exp_max < 0:
-            self.exp_max = 0
+        # if self.exp_min > 0:
+        #     self.exp_min = 0
+        # if self.exp_max < 0:
+        #     self.exp_max = 0
+        self.exp_min = min(self.exp_min, 0)
+        self.exp_max = max(self.exp_max, 0)
 
 
     def _get_gene_color(self, gene_id: int):

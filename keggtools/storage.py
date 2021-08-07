@@ -68,10 +68,16 @@ class KEGGDataStorage:
             for item in result:
                 if len(item) == 4 and item[0] != "":
                     organism_list[item[1]] = item[2]
-            pickle.dump(organism_list, open(path, "wb"))
+
+            with open(path, "wb") as output_file:
+                pickle.dump(organism_list, output_file)
+
             logging.debug("Request organism list and dump to %s", path)
         else:
-            organism_list = pickle.load(open(path, "rb"))
+
+            with open(path, "rb") as input_file:
+                organism_list = pickle.load(input_file)
+
             logging.debug("Load organism list from %s", path)
         return organism_list
 
@@ -209,7 +215,10 @@ class KEGGDataStorage:
 
         KEGGDataStorage._check_env()
         path = os.path.join(KEGG_DATA, filename)
-        pickle.dump(data, open(path, "wb"))
+
+        with open(path, "wb") as output_file:
+            pickle.dump(data, output_file)
+
         return path
 
 
@@ -242,7 +251,9 @@ class KEGGDataStorage:
         path = os.path.join(KEGG_DATA, filename)
         if not os.path.isfile(path):
             raise FileNotFoundError("File at path {PATH} does not exist".format(PATH=path))
-        return pickle.load(open(path, "rb"))
+
+        with open(path, "rb") as input_file:
+            return pickle.load(input_file)
 
 
 if __name__ == "__main__":

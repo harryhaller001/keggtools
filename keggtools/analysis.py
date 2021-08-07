@@ -5,7 +5,7 @@ import csv
 import os
 from typing import List, Any, Union
 from io import TextIOWrapper
-import scipy.stats as stats
+from scipy import stats
 from .resolver import KEGGPathwayResolver
 # from .models import KEGGPathway
 # from .storage import KEGGDataStorage

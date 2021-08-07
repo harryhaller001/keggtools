@@ -28,6 +28,7 @@ devfreeze:
 # Twine package upload and checks
 
 check: check-updates
+	mypy --install-types
 	mypy setup.py
 	python setup.py install
 	mypy -p keggtools

@@ -4,6 +4,10 @@
 *.log
 *.out
 *.pdf
+*.bcf
+*.xml
+*.bbl
+*.blg
 
 # Ignore latexmk outputs
 *.fdb_latexmk

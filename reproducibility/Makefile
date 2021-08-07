@@ -7,3 +7,9 @@ down:
 start:
 	docker-compose -f docker-compose.yml up
 
+
+pdf:
+	cd ./latex; \
+	biber paper; \
+	pdflatex paper.tex
+

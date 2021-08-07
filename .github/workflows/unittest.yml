@@ -43,7 +43,7 @@ jobs:
       # Install package from setup.py and static code analysis
       - name: Static code analysis
         run: |
-          mypy --install-types
+          pip install types-requests
           mypy setup.py
           python setup.py install
           mypy -p keggtools

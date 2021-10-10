@@ -1,0 +1,77 @@
+
+name: Package testing
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+
+    # Run action when pull request is opened
+    pull_request:
+        types:  [opened, reopened, synchronize]
+
+
+# Jobs
+jobs:
+
+    build:
+        # Run on ubuntu latest
+        runs-on: ubuntu-latest
+
+        # Matrix testing
+        strategy:
+            matrix:
+                # Check for all python versions >=3.6
+                python-version: [3.6, 3.7, 3.8, 3.9]
+
+        steps:
+          - uses: actions/checkout@v2
+          - name: Set up Python ${{ matrix.python-version }}
+            uses: actions/setup-python@v2
+            with:
+                python-version: ${{ matrix.python-version }}
+
+          # Install dependencies from freeze
+          - name: Install dependencies
+            run: |
+                python -m pip install --upgrade pip
+                pip install mypy wheel
+                pip install -r requirements.txt
+
+          # Install package from setup.py and static code analysis
+          - name: Static code analysis
+            run: |
+                mypy setup.py
+                python setup.py install
+                mypy -p keggtools
+
+          # Build whl and egg
+          - name: Build package
+            run: |
+                python setup.py sdist bdist_wheel
+                python -m pip install twine
+                twine check ./dist/*
+
+          # Linting package
+          - name: Lint
+            run: |
+                python -m pip install pylint
+                pylint ./setup.py
+                pylint keggtools
+
+          # Run unittest on installed package
+          - name: Unit testing with pytest
+            run: |
+                python -m mypy ./test/*.py
+                python -m pylint ./test/*.py
+                python -m pip install pytest
+                pytest -p keggtools
+
+          # Test and build the docs for keggtools
+          - name: test and build docs
+            run: |
+                python -m pip install Sphinx sphinx-rtd-theme
+                python -m mypy ./docs/conf.py
+                python -m pylint ./docs/conf.py
+                python -m sphinx ./docs ./docs/_build

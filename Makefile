@@ -8,13 +8,20 @@ PIP_OPT			= $(PYTHON_OPT) -m pip
 MYPY_OPT		= $(PYTHON_OPT) -m mypy
 LINT_OPT		= $(PYTHON_OPT) -m pylint
 TEST_OPT		= $(PYTHON_OPT) -m pytest
+TWINE_OPT		= $(PYTHON_OPT) -m twine
+BANDIT_OPT		= $(PYTHON_OPT) -m bandit
+
 
 # Run help by default
 
 .DEFAULT_GOAL := help
 
 
-.PHONY: help
+# Ignore all command with no target file
+
+.PHONY: clean, bandit, mypy check-updates, unittest, lint, check, devfreeze, freeze, devinstall, install, help, twine
+
+
 
 help: ## This help.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -41,14 +48,13 @@ devfreeze: ## Freeze all dependencies for development
 
 
 
-# Twine package upload and checks
 
-check: clean check-updates ## Full check of package
-	$(MYPY_OPT) setup.py
+
+
+twine: # Twine package upload and checks
 	$(PYTHON_OPT) setup.py install
-	$(MYPY_OPT) -p keggtools
 	$(PYTHON_OPT) setup.py sdist bdist_wheel
-	twine check ./dist/*
+	$(TWINE_OPT) check ./dist/*
 
 
 lint: ## Linting package
@@ -60,7 +66,12 @@ unittest: ## Unittest of package
 	$(LINT_OPT) ./test/test_package.py
 	$(TEST_OPT) -p keggtools --show-capture=log
 
+
 mypy: ## Run static code analysis
+	$(MYPY_OPT) setup.py
+	$(MYPY_OPT) ./test/test_package.py
+	$(MYPY_OPT) ./docs/conf.py
+	$(MYPY_OPT) -p keggtools
 
 
 check-updates: ## Check for updates of python pacakges
@@ -68,7 +79,6 @@ check-updates: ## Check for updates of python pacakges
 	$(PIP_OPT) install requests scipy pydot tqdm --upgrade
 
 
-.PHONY: clean
 
 clean: ## Clean all build and caching directories
 
@@ -86,3 +96,17 @@ clean: ## Clean all build and caching directories
 	rm -rf ./docs/dist
 	rm -rf ./docs/cloudflare-workers/node_modules
 	@echo "All build and caching folders removed"
+
+
+
+# TODO: fix all common vulnerabilies in package
+bandit: ## Run bandit analysis to find common security issues in code
+	$(BANDIT_OPT) -r ./keggtools
+	$(BANDIT_OPT) -r ./test
+	$(BANDIT_OPT) setup.py
+	$(BANDIT_OPT) -r ./docs/*.py
+
+
+
+# Run all checks (always before committing!)
+check: clean check-updates freeze devfreeze mypy lint unittest twine ## Full check of package

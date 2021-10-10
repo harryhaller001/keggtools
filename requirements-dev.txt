@@ -3,6 +3,7 @@ astroid==2.8.0
 atomicwrites==1.4.0
 attrs==20.3.0
 Babel==2.9.1
+bandit==1.7.0
 biothings-client==0.2.6
 bleach==3.3.0
 certifi==2020.12.5
@@ -13,6 +14,8 @@ colorama==0.4.4
 cryptography==3.4.7
 cycler==0.10.0
 docutils==0.17.1
+gitdb==4.0.7
+GitPython==3.1.18
 idna==2.10
 imagesize==1.2.0
 importlib-metadata==4.0.1
@@ -32,6 +35,7 @@ mypy-extensions==0.4.3
 numpy==1.19.5
 packaging==20.8
 pandas==1.1.5
+pbr==5.6.0
 Pillow==8.3.2
 pkginfo==1.7.0
 platformdirs==2.3.0
@@ -53,6 +57,7 @@ rfc3986==1.4.0
 scipy==1.5.4
 SecretStorage==3.3.1
 six==1.15.0
+smmap==4.0.0
 snowballstemmer==2.1.0
 Sphinx==4.1.2
 sphinx-autoapi==1.8.3
@@ -63,6 +68,7 @@ sphinxcontrib-htmlhelp==2.0.0
 sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.5
+stevedore==3.4.0
 toml==0.10.2
 tqdm==4.62.3
 twine==3.4.2

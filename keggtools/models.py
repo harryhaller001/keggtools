@@ -28,6 +28,7 @@ class Relation:
     def parse(item: Element):
         """
         Parse xml ElementTree into KEGG Relation
+
         :param item: ElementTree
         :return: Relation
         """
@@ -44,9 +45,7 @@ class Relation:
         return relation
 
     def __str__(self):
-        return "<Relation {ENTRY1}->{ENTRY2} type='{TYPE}'".format(ENTRY1=self.entry1,
-                                                                   ENTRY2=self.entry2,
-                                                                   TYPE=self.type)
+        return f"<Relation {self.entry1}->{self.entry2} type='{self.type}'>"
 
 
 class Component:
@@ -70,6 +69,7 @@ class Component:
     def parse(item: Element):
         """
         Parsing ElementTree into Component
+
         :param item: ElementTree
         :return: Component
         """
@@ -101,16 +101,22 @@ class Graphics:
     def __str__(self):
         """
         Build Graphics summary
+
         :return: str
         """
 
-        attrib_array = ["%s='%s'" % (key, val) for key, val in self.attrib.items()]
-        return "<Graphics {STR}".format(STR=" ".join(attrib_array))
+        attrib_array = " ".join(
+            [
+                f"{key}='{val}'" for key, val in self.attrib.items()
+            ]
+        )
+        return f"<Graphics {attrib_array}"
 
 
     def __getattr__(self, item: str):
         """
         Get Item by key
+
         :param item: str
         :return: Any
         """
@@ -122,6 +128,7 @@ class Graphics:
     def parse(item: Element):
         """
         Parse xml ElementTree into KEGG Graphics
+
         :param item: ElementTree
         :return: Graphics
         """
@@ -158,6 +165,7 @@ class Entry:
     def get_gene_id(self):
         """
         Parse variable 'name' into KEGG ID
+
         :return: int
         """
 
@@ -167,6 +175,7 @@ class Entry:
     def get_id(self):
         """
         Parse variable 'name' into KEGG ID
+
         :return: int
         """
 
@@ -177,6 +186,7 @@ class Entry:
     def parse(item: Element):
         """
         Parsing xml ElementTree into KEGG Entry
+
         :param item: ElementTree
         :return: Entry
         """
@@ -201,12 +211,11 @@ class Entry:
     def __str__(self):
         """
         Build Entry summary string
+
         :return: str
         """
 
-        return "<Entry id={ID} name='{NAME}' type='{TYPE}'>".format(ID=self.id,
-                                                                    NAME=self.name,
-                                                                    TYPE=self.type)
+        return f"<Entry id={self.id} name='{self.name}' type='{self.type}'>"
 
 
 class KEGGPathway:
@@ -239,6 +248,7 @@ class KEGGPathway:
     def get_entry_by_id(self, entry_id: Union[str, int]):
         """
         Get pathway Entry by id
+
         :param entry_id: Union[str, int]
         :return: Any
         """
@@ -252,6 +262,7 @@ class KEGGPathway:
     def matches(self, gene_id_list: list):
         """
         Return percent value for matching genes. [int(<gene_id>), ...]
+
         :param gene_id_list: list
         :return: float
         """
@@ -267,6 +278,7 @@ class KEGGPathway:
     def get_genes(self):
         """
         List all genes from pathway {<gene_id>: <gene_name>}
+
         :return: dict
         """
 
@@ -281,12 +293,11 @@ class KEGGPathway:
     def __str__(self):
         """
         Build string summary for KEGG pathway
+
         :return: str
         """
 
-        return "<KEGGPathway path:{ORG}{CODE} title='{TITLE}'>".format(ORG=self.org,
-                                                                       CODE=self.number,
-                                                                       TITLE=self.title)
+        return f"<KEGGPathway path:{self.org}{self.number} title='{self.title}'>"
 
 
     def summarize(self):
@@ -305,6 +316,7 @@ class KEGGPathway:
     def parse(data: str):
         """
         Parsing xml String in KEGG Pathway
+
         :param data: str
         :return: KEGGPathway
         """

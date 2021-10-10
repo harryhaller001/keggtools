@@ -50,7 +50,7 @@ class KEGGPathwayResolver:
         if store.pathway_list_exist(org=self.organism):
             # return pathway list dump
             logging.debug("Found pathway list for organism %s in cache.", self.organism)
-            data = store.load_dump(filename="pathway_{ORG}.dump".format(ORG=self.organism))
+            data = store.load_dump(filename=f"pathway_{self.organism}.dump")
             return data
 
 
@@ -60,7 +60,9 @@ class KEGGPathwayResolver:
 
         data = parse_tsv(
             KEGGPathwayResolver.request(
-                url="http://rest.kegg.jp/list/pathway/{ORG}".format(ORG=self.organism)))
+                url=f"http://rest.kegg.jp/list/pathway/{self.organism}"
+            )
+        )
 
         pathways = {}
         for line in data:
@@ -72,7 +74,7 @@ class KEGGPathwayResolver:
                       self.organism)
 
         # save dump
-        store.save_dump(filename="pathway_{ORG}.dump".format(ORG=self.organism), data=pathways)
+        store.save_dump(filename=f"pathway_{self.organism}.dump", data=pathways)
 
         # return pathway list
         return pathways
@@ -86,7 +88,7 @@ class KEGGPathwayResolver:
         :param code: str
         :return: str
         """
-        return "http://rest.kegg.jp/get/{ORG}{CODE}/kgml".format(ORG=org, CODE=code)
+        return f"http://rest.kegg.jp/get/{org}{code}/kgml"
 
     def get_pathway(self, code: str):
         """
@@ -97,8 +99,7 @@ class KEGGPathwayResolver:
         store = KEGGDataStorage()
         if store.pathway_file_exist(org=self.organism, code=code):
             # load from file
-            data = store.load(filename="{ORG}_path{CODE}.kgml".format(ORG=self.organism,
-                                                                      CODE=code))
+            data = store.load(filename=f"{self.organism}_path{code}.kgml")
 
             logging.debug("Load pathway path:%s%s from file", self.organism, code)
         else:
@@ -106,8 +107,7 @@ class KEGGPathwayResolver:
             data = KEGGPathwayResolver.request(
                 KEGGPathwayResolver.build_url(org=self.organism, code=code))
 
-            store.save(filename="{ORG}_path{CODE}.kgml".format(ORG=self.organism,
-                                                               CODE=code), data=data)
+            store.save(filename=f"{self.organism}_path{code}.kgml", data=data)
 
             logging.debug("Download pathway path:%s%s from rest.kegg.jp", self.organism, code)
         return KEGGPathway.parse(data)
@@ -120,7 +120,9 @@ class KEGGPathwayResolver:
         """
         data = parse_tsv(
             KEGGPathwayResolver.request(
-                "http://rest.kegg.jp/link/pathway/{ORG}:{ID}".format(ORG=self.organism, ID=geneid)))
+                f"http://rest.kegg.jp/link/pathway/{self.organism}:{geneid}"
+            )
+        )
 
         result = []
         for item in data:
@@ -140,8 +142,7 @@ class KEGGPathwayResolver:
                 url = KEGGPathwayResolver.build_url(org=self.organism, code=code)
 
                 logging.debug("Requesting path:%s%s %s...", self.organism, code, url)
-                KEGGDataStorage.save(filename="{ORG}_path{CODE}.kgml".format(ORG=self.organism,
-                                                                             CODE=code),
+                KEGGDataStorage.save(filename=f"{self.organism}_path{code}.kgml",
                                      data=KEGGPathwayResolver.request(url))
                 downloads += 1
         logging.debug("Download %d pathway KGML files from KEGG", downloads)

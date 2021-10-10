@@ -153,7 +153,7 @@ class ColorGradient:
         :param color: tuple
         :return: str
         """
-        return "rgb({R},{G},{B})".format(R=color[0], G=color[1], B=color[2])
+        return f"rgb({color[0]},{color[1]},{color[2]})"
 
 
     def get_list(self):
@@ -195,7 +195,7 @@ class ColorGradient:
         :param code: list
         :return: str
         """
-        return "#" + "".join(["{:02x}".format(int(num)) for num in code])
+        return "#" + "".join([f"{num:02x}" for num in code])
 
 
     def render_graphviz(self):
@@ -207,9 +207,7 @@ class ColorGradient:
         string = ["digraph G {"]
         for i in range(0, 20):
             # result[i]
-            string.append("\tnode[color = \"{COLOR}\" style = filled] {N};".format(
-                COLOR=result[i],
-                N=i))
+            string.append(f"\tnode[color = \"{result[i]}\" style = filled] {i};")
 
         string.append("\t" + " -> ".join([str(l) for l in range(0, 20)]))
         string.append("}")

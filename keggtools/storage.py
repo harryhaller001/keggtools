@@ -155,8 +155,7 @@ class KEGGDataStorage:
         :return: bool
         """
 
-        kgml_filename = os.path.join(KEGG_DATA, "{ORG}_path{CODE}.kgml".format(ORG=org,
-                                                                               CODE=code))
+        kgml_filename = os.path.join(KEGG_DATA, f"{org}_path{code}.kgml")
         return os.path.isfile(kgml_filename)
 
 
@@ -168,7 +167,7 @@ class KEGGDataStorage:
         :return bool
         """
 
-        return os.path.isfile(os.path.join(KEGG_DATA, "pathway_{ORG}.dump".format(ORG=org)))
+        return os.path.isfile(os.path.join(KEGG_DATA, f"pathway_{org}.dump"))
 
 
     @staticmethod
@@ -181,10 +180,11 @@ class KEGGDataStorage:
         """
 
         if KEGGDataStorage.pathway_file_exist(org=org, code=code):
-            return KEGGDataStorage.load("{ORG}_path{CODE}.kgml".format(ORG=org, CODE=code))
+            return KEGGDataStorage.load(f"{org}_path{code}.kgml")
 
         raise FileNotFoundError(
-            "Pathway path:{ORG}{CODE} not saved in local storage".format(ORG=org, CODE=code))
+            f"Pathway path:{org}{code} not saved in local storage"
+        )
 
 
     @staticmethod
@@ -198,7 +198,7 @@ class KEGGDataStorage:
 
         KEGGDataStorage._check_env()
         path = os.path.join(KEGG_DATA, filename)
-        with open(path, "w") as f_obj:
+        with open(path, "w", encoding="utf-8") as f_obj:
             f_obj.write(data)
             f_obj.close()
         return path
@@ -233,8 +233,8 @@ class KEGGDataStorage:
         KEGGDataStorage._check_env()
         path = os.path.join(KEGG_DATA, filename)
         if not os.path.isfile(path):
-            raise FileNotFoundError("File at path {PATH} does not exist".format(PATH=path))
-        with open(path, "r") as f_obj:
+            raise FileNotFoundError(f"File at path '{path}' does not exist")
+        with open(path, "r", encoding="utf-8") as f_obj:
             data = f_obj.read()
             f_obj.close()
         return data
@@ -250,7 +250,7 @@ class KEGGDataStorage:
         KEGGDataStorage._check_env()
         path = os.path.join(KEGG_DATA, filename)
         if not os.path.isfile(path):
-            raise FileNotFoundError("File at path {PATH} does not exist".format(PATH=path))
+            raise FileNotFoundError(f"File at path '{path}' does not exist")
 
         with open(path, "rb") as input_file:
             return pickle.load(input_file)

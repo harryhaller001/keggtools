@@ -1,0 +1,8 @@
+# #Ignore final build directory
+/_build
+/dist
+/wrangler.toml
+/wrangler.toml.example
+/cloudflare-workers
+
+/docker-compose.yml

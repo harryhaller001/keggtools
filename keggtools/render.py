@@ -84,9 +84,9 @@ class KEGGPathwayRenderer:
         # pylint: disable=too-many-branches
 
         string_builder = []
-        string_builder.append("digraph pathway{CODE} {{".format(CODE=self.pathway.number))
+        string_builder.append(f"digraph pathway{self.pathway.number} {{")
         string_builder.append("\tnode [shape=rectangle arrowhead=normal];")
-        string_builder.append("\tlabel=\"{TITLE}\";".format(TITLE=self.pathway.title))
+        string_builder.append(f"\tlabel=\"{self.pathway.title}\";")
         string_builder.append("\tfontsize=25;\n\tlabelloc=\"t\";")
 
         # search for "path:<...>"
@@ -123,7 +123,7 @@ class KEGGPathwayRenderer:
 
         # for n in range(0, len(entry_groups)):
         for entry_index, entry_item in enumerate(entry_groups):
-            string_builder.append("\tsubgraph cluster{N} {{".format(N=entry_index))
+            string_builder.append(f"\tsubgraph cluster{entry_index} {{")
             string_builder.append("\tlabel=\"\";\n\tcolor=blue;\n\tstyle=dashed;")
 
             for group_item in entry_item:
@@ -134,23 +134,25 @@ class KEGGPathwayRenderer:
                         #                      .format(LABEL=entry.graphics.name.split(", ")[0], ID=entry.id))
                         if entry.type == "gene":
                             # shape=rectangle, style=filled, fillcolor=\"#cccccc\"
-                            string_builder.append("\tnode [label=\"{LABEL}\", shape=rectangle,"
-                                                  " style=filled, fillcolor=\"#ffffff\"]; entry{ID};"
-                                                  .format(LABEL=entry.graphics.name.split(", ")[0], ID=entry.id))
+                            entry_label = entry.graphics.name.split(", ")[0]
+                            string_builder.append(f"\tnode [label=\"{entry_label}\", shape=rectangle,"
+                                                  f" style=filled, fillcolor=\"#ffffff\"]; entry{entry.id};")
+
                         elif entry.type == "group":
                             # shape=rectangle, color="black" label=<<table border='0' cellborder='1'>
                             # <tr><td>comp 1</td></tr><tr><td>comp 2</td></tr></table>>];
                             labels = [self.pathway.get_entry_by_id(comp.id).graphics.name.split(", ")[0] for comp in
                                       entry.components]
-                            s_label = ["<tr><td>{LABEL}</td></tr>".format(LABEL=l) for l in labels]
-                            string_builder.append("\tnode [label=<<table border='0' cellborder='1'>{LABELS}</table>>,"
+                            s_label = "".join([f"<tr><td>{l}</td></tr>" for l in labels])
+                            string_builder.append(f"\tnode [label=<<table border='0' cellborder='1'>{s_label}</table>>,"
                                                   " shape=rectangle,"
-                                                  " style=filled, color=black, fillcolor=\"#ffffff\"]; entry{ID};"
-                                                  .format(LABELS="".join(s_label), ID=entry.id))
+                                                  f" style=filled, color=black, fillcolor=\"#ffffff\"]; entry{entry.id};")
+
                         elif entry.type == "compound":
-                            string_builder.append("\tnode [label=\"{LABEL}\", shape=oval,"
-                                                  " style=filled, fillcolor=\"#ffffff\"]; entry{ID};"
-                                                  .format(LABEL=entry.graphics.name.split(", ")[0], ID=entry.id))
+
+                            entry_label = entry.graphics.name.split(", ")[0]
+                            string_builder.append(f"\tnode [label=\"{entry_label}\", shape=oval,"
+                                                  f" style=filled, fillcolor=\"#ffffff\"]; entry{entry.id};")
                         genes_of_interest.append(entry.id)
 
             string_builder.append("\t}")
@@ -158,7 +160,7 @@ class KEGGPathwayRenderer:
         for rel in self.pathway.relations:
             # TODO : adjust arrowhead
             if rel.entry1 in genes_of_interest and rel.entry2 in genes_of_interest:
-                string_builder.append("\tentry{ID1} -> entry{ID2};".format(ID1=rel.entry1, ID2=rel.entry2))
+                string_builder.append(f"\tentry{rel.entry1} -> entry{rel.entry2};")
 
         string_builder.append("}")
         self.render_string = "\n".join(string_builder)
@@ -180,9 +182,9 @@ class KEGGPathwayRenderer:
         }
         """
         string_builder = []
-        string_builder.append("digraph pathway{CODE} {{".format(CODE=self.pathway.number))
+        string_builder.append(f"digraph pathway{self.pathway.number} {{")
         string_builder.append("\tnode [shape=rectangle arrowhead=normal];")
-        string_builder.append("\tlabel=\"{TITLE}\";".format(TITLE=self.pathway.title))
+        string_builder.append(f"\tlabel=\"{self.pathway.title}\";")
         string_builder.append("\tfontsize=25;\n\tlabelloc=\"t\";")
 
         # TODO : specifiy for each node: shape=circle|rectangle|oval|ellipse, style=filled, fillcolor=red|green|#cccccc
@@ -200,26 +202,28 @@ class KEGGPathwayRenderer:
                 # case select for types gene, comp, group, ...
                 if entry.type == "gene":
                     # shape=rectangle, style=filled, fillcolor=\"#cccccc\"
-                    string_builder.append("\tnode [label=\"{LABEL}\", shape=rectangle,"
-                                          " style=filled, fillcolor=\"#ffffff\"]; entry{ID};"
-                                          .format(LABEL=entry.graphics.name.split(", ")[0], ID=entry.id))
+                    entry_label = entry.graphics.name.split(", ")[0]
+                    string_builder.append(f"\tnode [label=\"{entry_label}\", shape=rectangle,"
+                                          f" style=filled, fillcolor=\"#ffffff\"]; entry{entry.id};")
+
                 elif entry.type == "group":
                     # shape=rectangle, color="black" label=<<table border='0' cellborder='1'>
                     # <tr><td>comp 1</td></tr><tr><td>comp 2</td></tr></table>>];
                     labels = [self.pathway.get_entry_by_id(comp.id).graphics.name.split(", ")[0] for comp in entry.components]
-                    s_label = ["<tr><td>{LABEL}</td></tr>".format(LABEL=l) for l in labels]
-                    string_builder.append("\tnode [label=<<table border='0' cellborder='1'>{LABELS}</table>>,"
+                    s_label = "".join([f"<tr><td>{l}</td></tr>" for l in labels])
+                    string_builder.append(f"\tnode [label=<<table border='0' cellborder='1'>{s_label}</table>>,"
                                           " shape=rectangle,"
-                                          " style=filled, color=black, fillcolor=\"#ffffff\"]; entry{ID};"
-                                          .format(LABELS="".join(s_label), ID=entry.id))
+                                          f" style=filled, color=black, fillcolor=\"#ffffff\"]; entry{entry.id};")
+
                 elif entry.type == "compound":
-                    string_builder.append("\tnode [label=\"{LABEL}\", shape=oval,"
-                                          " style=filled, fillcolor=\"#ffffff\"]; entry{ID};"
-                                          .format(LABEL=entry.graphics.name.split(", ")[0], ID=entry.id))
+
+                    entry_label = entry.graphics.name.split(", ")[0]
+                    string_builder.append(f"\tnode [label=\"{entry_label}\", shape=oval,"
+                                          f" style=filled, fillcolor=\"#ffffff\"]; entry{entry.id};")
 
         for rel in self.pathway.relations:
             # TODO : adjust arrowhead
-            string_builder.append("\tentry{ID1} -> entry{ID2};".format(ID1=rel.entry1, ID2=rel.entry2))
+            string_builder.append(f"\tentry{rel.entry1} -> entry{rel.entry2};")
         string_builder.append("}")
 
         self.render_string = "\n".join(string_builder)
@@ -234,13 +238,13 @@ class KEGGPathwayRenderer:
         """
 
         string_builder = []
-        string_builder.append("digraph pathway{CODE} {{".format(CODE=self.pathway.number))
+        string_builder.append(f"digraph pathway{self.pathway.number} {{")
 
         string_builder.append("\tgraph [fontname = \"arial\"];\n\tnode [fontname = \"arial\"];")
         string_builder.append("\tedge [fontname = \"arial\"];")
 
         string_builder.append("\tnode [shape=rectangle arrowhead=normal];")
-        string_builder.append("\tlabel=\"{TITLE}\";".format(TITLE=self.pathway.title))
+        string_builder.append(f"\tlabel=\"{self.pathway.title}\";")
         string_builder.append("\tfontsize=25;\n\tlabelloc=\"t\";")
 
         related_entries = [int(p.entry1) for p in self.pathway.relations]
@@ -250,25 +254,24 @@ class KEGGPathwayRenderer:
             # only render genes with at least 1 relation
             if int(entry.id) in related_entries:
                 if entry.type == "gene":
-                    string_builder.append("\tnode [label=\"{LABEL}\", shape=rectangle,"
-                                          " style=filled, fillcolor=\"{COLOR}\"]; entry{ID};"
-                                          .format(LABEL=entry.graphics.name.split(", ")[0], ID=entry.id,
-                                                  COLOR=self._get_gene_color(entry.get_gene_id())))
+
+                    entry_label = entry.graphics.name.split(", ")[0]
+                    string_builder.append(f"\tnode [label=\"{entry_label}\", shape=rectangle,"
+                                          f" style=filled, fillcolor=\"{self._get_gene_color(entry.get_gene_id())}\"]; entry{entry.id};")
+
                 elif entry.type == "group":
                     labels = [self.pathway.get_entry_by_id(comp.id).graphics.name.split(", ")[0] for comp in
                               entry.components]
-                    s_label = ["<tr><td>{LABEL}</td></tr>".format(LABEL=l) for l in labels]
-                    string_builder.append("\tnode [label=<<table border='0' cellborder='1'>{LABELS}</table>>,"
+                    s_label = "".join([f"<tr><td>{l}</td></tr>" for l in labels])
+                    string_builder.append(f"\tnode [label=<<table border='0' cellborder='1'>{s_label}</table>>,"
                                           " shape=rectangle,"
-                                          " style=filled, color=black, fillcolor=\"#ffffff\"]; entry{ID};"
-                                          .format(LABELS="".join(s_label), ID=entry.id))
+                                          f" style=filled, color=black, fillcolor=\"#ffffff\"]; entry{entry.id};")
                 elif entry.type == "compound":
                     name = entry.graphics.name.split(", ")[0]
                     if name in self.components:
                         name = self.components.get(name)
-                    string_builder.append("\tnode [label=\"{LABEL}\", shape=oval,"
-                                          " style=filled, fillcolor=\"#ffffff\"]; entry{ID};"
-                                          .format(LABEL=name, ID=entry.id))
+                    string_builder.append(f"\tnode [label=\"{name}\", shape=oval,"
+                                          f" style=filled, fillcolor=\"#ffffff\"]; entry{entry.id};")
 
         for rel in self.pathway.relations:
             # adjust arrowhead
@@ -282,7 +285,7 @@ class KEGGPathwayRenderer:
             if "phosphorylation" in rel.subtypes:
                 label = "+p"
 
-            string_builder.append("\tentry{ID1} -> entry{ID2} [arrowhead=\"{ARROW}\" label=\"{LABEL}\"];".format(ID1=rel.entry1, ID2=rel.entry2, ARROW=arrowhead, LABEL=label))
+            string_builder.append(f"\tentry{rel.entry1} -> entry{rel.entry2} [arrowhead=\"{arrowhead}\" label=\"{label}\"];")
 
         string_builder.append("}")
         self.render_string = "\n".join(string_builder)
@@ -316,29 +319,27 @@ class KEGGPathwayRenderer:
         """
         # Dont fix linting here, maybe this function will be removed
         # pylint: disable=line-too-long
-        return """<?xml version="1.0" standalone="no"?>
+        return f"""<?xml version="1.0" standalone="no"?>
                     <svg height="200" width="300" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
                     <defs>
                         <linearGradient id="cmap" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" style="stop-color:{COLOR_UP};stop-opacity:1" />
+                            <stop offset="0%" style="stop-color:{ColorGradient.to_css(color=self.upper_color)};stop-opacity:1" />
                             <stop offset="50%" style="stop-color:rgb(255,255,255);stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:{COLOR_DOWN};stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:{ColorGradient.to_css(color=self.lower_color)};stop-opacity:1" />
                         </linearGradient>
                     </defs>
                     <g>
                         <rect x="20" y="50" width="20" height="100" fill="url(#cmap)" />
                         <rect x="20" y="50" width="20" height="100" style="stroke:black;stroke-width:2;fill-opacity:0;stroke-opacity:1" />
-                        <text x="55" y="150" fill="black" alignment-baseline="central">{LOWER}</text>
+                        <text x="55" y="150" fill="black" alignment-baseline="central">{self.exp_min}</text>
                         <text x="55" y="100" fill="black" alignment-baseline="central">0</text>
-                        <text x="55" y="50" fill="black" alignment-baseline="central">{UPPER}</text>
+                        <text x="55" y="50" fill="black" alignment-baseline="central">{self.exp_max}</text>
 
                         <line x1="40" y1="50" x2="50" y2="50" style="stroke:rgb(0,0,0);stroke-width:2" />
                         <line x1="40" y1="100" x2="50" y2="100" style="stroke:rgb(0,0,0);stroke-width:2" />
                         <line x1="40" y1="150" x2="50" y2="150" style="stroke:rgb(0,0,0);stroke-width:2" />
                     </g>
-                    </svg>""".format(LOWER=self.exp_min, UPPER=self.exp_max,
-                                     COLOR_UP=ColorGradient.to_css(color=self.upper_color),
-                                     COLOR_DOWN=ColorGradient.to_css(color=self.lower_color))
+                    </svg>"""
 
 
 if __name__ == "__main__":

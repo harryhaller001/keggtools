@@ -1,5 +1,5 @@
 pydot==1.4.2
 requests==2.26.0
-scipy==1.5.4
+scipy==1.7.1
 tqdm==4.62.3
 types-requests==2.25.2

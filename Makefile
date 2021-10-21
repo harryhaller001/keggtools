@@ -59,6 +59,8 @@ twine: # Twine package upload and checks
 
 lint: ## Linting package
 	$(LINT_OPT) keggtools
+	$(LINT_OPT) ./setup.py
+	$(LINT_OPT) ./test/*.py
 
 
 unittest: ## Unittest of package

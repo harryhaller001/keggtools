@@ -1,9 +1,14 @@
+""" Python Installation file """
 
 import os
-import setuptools
 from distutils.core import setup
+import setuptools
+
 
 def read(fname: str):
+    """
+        Read file content of given filename
+    """
     return open(os.path.join(os.path.dirname(__file__), fname), mode="r", encoding="utf-8").read()
 
 setup(
@@ -35,4 +40,3 @@ setup(
     ],
     # download_url="https://github.com/harryhaller001/keggtools" # TODO: add release
 )
-

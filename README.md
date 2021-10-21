@@ -14,7 +14,7 @@ Dependencies
 * `requests`
 * `tqdm`
 * `pydot`
-* `scipy`
+* `scipy>=1.5.4`
 
 Installation of `python` dependencies:
 

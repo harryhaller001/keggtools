@@ -10,6 +10,7 @@ LINT_OPT		= $(PYTHON_OPT) -m pylint
 TEST_OPT		= $(PYTHON_OPT) -m pytest
 TWINE_OPT		= $(PYTHON_OPT) -m twine
 BANDIT_OPT		= $(PYTHON_OPT) -m bandit
+SPHINX_OPT		= $(PYTHON_OPT) -m sphinx
 
 
 # Run help by default
@@ -19,7 +20,7 @@ BANDIT_OPT		= $(PYTHON_OPT) -m bandit
 
 # Ignore all command with no target file
 
-.PHONY: clean, bandit, mypy check-updates, unittest, lint, check, devfreeze, freeze, devinstall, install, help, twine
+.PHONY: clean, bandit, mypy check-updates, unittest, lint, check, devfreeze, freeze, devinstall, install, help, twine, docs
 
 
 
@@ -110,5 +111,12 @@ bandit: ## Run bandit analysis to find common security issues in code
 
 
 
+docs:
+	$(PIP_OPT) install Sphinx sphinx-rtd-theme --upgrade
+	$(MYPY_OPT) ./docs/conf.py
+	$(LINT_OPT) ./docs/conf.py
+	$(SPHINX_OPT) ./docs ./docs/_build
+
+
 # Run all checks (always before committing!)
-check: clean check-updates freeze devfreeze mypy lint unittest twine ## Full check of package
+check: clean check-updates freeze devfreeze mypy lint unittest twine docs ## Full check of package

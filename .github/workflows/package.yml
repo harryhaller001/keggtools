@@ -63,6 +63,7 @@ jobs:
           # Run unittest on installed package
           - name: Unit testing with pytest
             run: |
+                sudo apt-get install -y graphviz
                 python -m mypy ./test/*.py
                 python -m pylint ./test/*.py
                 python -m pip install pytest

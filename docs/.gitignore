@@ -2,7 +2,7 @@
 /_build
 /dist
 /wrangler.toml
-/wrangler.toml.example
+/wrangler-example.toml
 /cloudflare-workers
 
 /docker-compose.yml

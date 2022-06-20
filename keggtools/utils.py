@@ -7,10 +7,10 @@ import os
 from datetime import datetime
 import csv
 from io import StringIO
+from typing import List, Tuple
 from tqdm import tqdm
 import requests
 # from typing import Optional, Union, Any, Iterable
-
 
 
 def get_timestamp():
@@ -122,95 +122,76 @@ def request(url: str, encoding="utf-8"):
 
 class ColorGradient:
     """
-    Create color gradient
+    Create color gradient.
     """
 
-    def __init__(self, start: tuple, stop: tuple, steps: int):
+    def __init__(
+        self,
+        start: tuple,
+        stop: tuple,
+        steps: int
+    ) -> None:
         """
-        Init ColorGradient
-        :param start: tuple
-        :param stop: tuple
-        :param steps: int
+        Init ColorGradient instance.
+        :param start: Color tuple
+        :param stop: Color tuple
+        :param steps: Number of steps.
         """
-        self.start = start
-        self.stop = stop
-        self.steps = steps
+        self.start: tuple = start
+        self.stop: tuple = stop
+        self.steps: int = steps
 
 
     @staticmethod
-    def to_css(color: tuple):
+    def to_css(color: tuple) -> str:
         """
-        Convert color tuple to CSS rgb color string
-        :param color: tuple
+        Convert color tuple to CSS rgb color string.
+        :param color: Color tuple containing 3 integers
         :return: str
         """
-        return f"rgb({color[0]},{color[1]},{color[2]})"
+        if len(color) != 3 or not all([isinstance(value, int) for value in color]):
+            raise ValueError("Color must be a tuple of 3 integers.")
 
-
-    def get_list(self):
-        """
-        Get Gradient Color as list
-        :return: list
-        """
-        return [
-            ColorGradient.list_to_hex(code) for code in ColorGradient._gradient(
-                self.stop,
-                self.start,
-                self.steps)
-                ]
+        return f"rgb({color[0]},{color[1]},{color[2]})".lower()
 
 
     @staticmethod
-    def _intermediate(a_var, b_var, ratio):
+    def to_hex(color: tuple) -> str:
+        """
+        Convert color tuple to hex color string.
+        """
+
+        # TODO: check for int type.
+        # TODO: check for 0-255 range
+
+        return f"#{color[0]:02x}{color[1]:02x}{color[2]:02x}".lower()
+
+
+    def get_list(self) -> List[str]:
+        """
+        Get gradient color as list.
+        :return: list
+        """
+
+        step_list = [index / float(self.steps) for index in range(self.steps)]
+        result = [ColorGradient._intermediate(self.stop, self.start, step) for step in step_list]
+        result.append(self.stop)
+
+
+        return [
+            ColorGradient.to_hex(code) for code in result
+        ]
+
+
+    @staticmethod
+    def _intermediate(a_var: tuple, b_var: tuple, ratio: float) -> tuple:
         def _array_multiply(array, c_var):
             return [element * c_var for element in array]
 
         a_component = _array_multiply(a_var, ratio)
         b_component = _array_multiply(b_var, 1 - ratio)
-        return list(map(sum, zip(a_component, b_component)))
+        values: List[float] = list(map(sum, zip(a_component, b_component)))
+
+        return tuple([int(item) for item in values])
 
 
-    @staticmethod
-    def _gradient(a_var, b_var, steps):
-        steps -= 1
-        steps = [index / float(steps) for index in range(steps)]
-        result = [ColorGradient._intermediate(a_var, b_var, step) for step in steps]
-        result.append(a_var)
-        return result
-
-
-    @staticmethod
-    def list_to_hex(code: list):
-        """
-        Convert color list to CSS hex color string
-        :param code: list
-        :return: str
-        """
-        return "#" + "".join([f"{num:02x}" for num in code])
-
-
-    def render_graphviz(self):
-        """
-        Testing function using graphviz
-        :return: str
-        """
-        result = self.get_list()
-        string = ["digraph G {"]
-        for i in range(0, 20):
-            # result[i]
-            string.append(f"\tnode[color = \"{result[i]}\" style = filled] {i};")
-
-        string.append("\t" + " -> ".join([str(l) for l in range(0, 20)]))
-        string.append("}")
-        return "\n".join(string)
-
-
-if __name__ == "__main__":
-
-    logging.basicConfig(level=logging.DEBUG)
-
-    COLOR_GRADIENT = ColorGradient(start=(0, 179, 0), stop=(187, 0, 0), steps=20)
-    print(COLOR_GRADIENT.get_list())
-    print(COLOR_GRADIENT.render_graphviz())
-
-    request("http://example.com/")

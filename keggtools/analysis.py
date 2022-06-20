@@ -1,11 +1,15 @@
 """ KEGG Enrichment analysis core """
 
 import logging
-import csv
+from csv import DictWriter
 import os
-from typing import List, Any, Union
+from typing import Dict, List, Any, Union, Optional
 from io import TextIOWrapper
+
+
 from scipy import stats
+
+from keggtools.models import KEGGPathway
 from .resolver import KEGGPathwayResolver
 # from .models import KEGGPathway
 # from .storage import KEGGDataStorage
@@ -28,12 +32,14 @@ class KEGGPathwayAnalysisResult:
     """
 
     # pylint: disable=too-many-instance-attributes,too-many-arguments
-    def __init__(self,
-                 org: str,
-                 pathway_id: str,
-                 pathway_name: str,
-                 found_genes: list,
-                 pathway_genes: list):
+    def __init__(
+        self,
+        org: str,
+        pathway_id: str,
+        pathway_name: str,
+        found_genes: list,
+        pathway_genes: list
+    ) -> None:
 
         """
         Init Result of KEGG pathway enrichment analysis
@@ -44,30 +50,22 @@ class KEGGPathwayAnalysisResult:
         :param pathway_genes: list
         """
 
+        # Pathway descriptions
         self.organism: str = org
-        self.pathway_id = pathway_id
-        self.pathway_name = pathway_name
-        self.found_genes = found_genes
-        self.study_count = len(found_genes)
-        self.pathway_genes = pathway_genes
-        self.pathway_genes_count = len(pathway_genes)
+        self.pathway_id: str = pathway_id
+        self.pathway_name: str = pathway_name
+
+        # Results from enrichment analysis
+        self.found_genes: list = found_genes
+        self.study_count: int = len(found_genes)
+        self.pathway_genes: list = pathway_genes
+        self.pathway_genes_count: int = len(pathway_genes)
         self.pvalue: Union[float, None] = None
 
-        # self.args = {
-        #     "organism": org,
-        #     "pathway_id": pathway_id,
-        #     "pathway_name": pathway_name,
-        #     "found_genes": found_genes,
-        #     "study_count": len(found_genes),
-        #     "pathway_genes": pathway_genes,
-        #     "pathway_genes_count": len(pathway_genes),
-        #     "pvalue": "",
-        # }
 
-
-    def __str__(self):
+    def __str__(self) -> str:
         """
-        Build string summary
+        Build string summary of KEGG path analysis result instance.
         :return: str
         """
         return f"<KEGGPathwayAnalysisResult {self.organism}:{self.pathway_id}" \
@@ -81,16 +79,16 @@ class KEGGPathwayAnalysisResult:
         return self.__str__()
 
 
-    def set_pvalue(self, pval: float):
+    # TODO: needed function?
+    def set_pvalue(self, pval: float) -> None:
         """
-        Set p value for enrichment analysis
+        Set p value for enrichment analysis.
         :param pval: float
         """
-        # self.args["pvalue"] = pval
         self.pvalue = pval
 
 
-    def json_summary(self, gene_delimiter=","):
+    def json_summary(self, gene_delimiter: str = ",") -> Dict[str, Any]:
         """
         Build json summary for enrichment analysis
         :param gene_delimiter: str
@@ -119,19 +117,20 @@ class KEGGPathwayAnalysisResult:
         return result
 
     @staticmethod
-    def get_header():
+    def get_header() -> List[str]:
         """
-        Build default header for enrichment analysis
+        Build default header for enrichment analysis.
         :return: list
         """
 
-        # return list(self.args.keys())
-        return ["pathway_name",
-                "pathway_id",
-                "study_count",
-                "pathway_genes",
-                "pvalue",
-                "found_genes"]
+        return [
+            "pathway_name",
+            "pathway_id",
+            "study_count",
+            "pathway_genes",
+            "pvalue",
+            "found_genes"
+        ]
 
 
 
@@ -141,19 +140,24 @@ class KEGGPathwayAnalysis:
     KEGG pathway enrichment analysis
     """
 
-    def __init__(self, org: str, pathways: Any = None):
+    def __init__(
+        self,
+        org: str,
+        pathways: Optional[Union[Dict[str, KEGGPathway], List[str]]] = None
+    ) -> None:
         """
-        Init KEGG pathway enrichment analysis
-        :param org: str
+        Init KEGG pathway enrichment analysis.
+        :param org: Organism identifier used by KEGG database
+            (3 letter code, e.g. "mmu" for mus musculus or "hsa" for human).
         :param pathways: Any
         """
 
-        self.organism = org
-        self.summary: List[Any] = []
-        self.resolver = KEGGPathwayResolver(self.organism)
+        self.organism: str = org
+        self.summary: List[KEGGPathwayAnalysisResult] = []
+        self.resolver: KEGGPathwayResolver = KEGGPathwayResolver(self.organism)
 
-        # self.all_pathways = get_all_pathways(org=self.organism)
-        self.all_pathways = {}
+        # Create pathway lookup dict
+        self.all_pathways: dict = {}
 
         if pathways is None:
             # If pathways are not set use all pathways
@@ -185,7 +189,7 @@ class KEGGPathwayAnalysis:
             raise ValueError("need to 'run_summary' first")
 
 
-    def get_subset(self, subset: list, inplace=False):
+    def get_subset(self, subset: list, inplace: bool = False) -> List[KEGGPathwayAnalysisResult]:
         """
         Create subset of analysis result by list of pathway ids
         :param subset: list
@@ -199,13 +203,13 @@ class KEGGPathwayAnalysis:
             if str(item.pathway_id) in subset:
                 buffer.append(item)
 
-        if inplace:
+        if inplace is True:
             self.summary = buffer
 
         return buffer
 
 
-    def run_analysis(self, gene_list: list):
+    def run_analysis(self, gene_list: list) -> List[KEGGPathwayAnalysisResult]:
         """
         List of gene ids. Return list of KEGGPathwayAnalysisResult instances
         :param gene_list: list
@@ -213,10 +217,10 @@ class KEGGPathwayAnalysis:
         """
         # pylint: disable=too-many-locals
 
-        result = []
-        all_found_genes = 0
-        absolute_pathway_genes = 0
-        study_n = len(gene_list)
+        result: List[KEGGPathwayAnalysisResult] = []
+        all_found_genes: int = 0
+        absolute_pathway_genes: int = 0
+        study_n: int = len(gene_list)
 
         for pathway_id, name in self.all_pathways.items():
 
@@ -232,11 +236,15 @@ class KEGGPathwayAnalysis:
                     genes_found.append(gene_id)
 
             all_found_genes += len(genes_found)
-            pathway_result = KEGGPathwayAnalysisResult(org="mmu",
-                                                       pathway_id=pathway_id,
-                                                       pathway_name=name,
-                                                       found_genes=genes_found,
-                                                       pathway_genes=all_pathways_genes)
+
+            # Create analysis results instance and append to list of results
+            pathway_result: KEGGPathwayAnalysisResult = KEGGPathwayAnalysisResult(
+                org="mmu",
+                pathway_id=pathway_id,
+                pathway_name=name,
+                found_genes=genes_found,
+                pathway_genes=all_pathways_genes
+            )
             result.append(pathway_result)
 
         # Perform Fisher exact test
@@ -246,10 +254,10 @@ class KEGGPathwayAnalysis:
             # Skip p value calculation if no genes are found
             if analysis.study_count > 0:
 
-                a_var = analysis.study_count
-                b_var = study_n - analysis.study_count
-                c_var = analysis.pathway_genes_count - analysis.study_count
-                d_var = absolute_pathway_genes - analysis.pathway_genes_count - b_var
+                a_var: int = analysis.study_count
+                b_var: int = study_n - analysis.study_count
+                c_var: int = analysis.pathway_genes_count - analysis.study_count
+                d_var: int = absolute_pathway_genes - analysis.pathway_genes_count - b_var
 
                 # print(a_var, b_var, "\n", c_var, d_var,
                 # "\n" + str(absolute_pathway_genes) + "-" * 10)
@@ -278,27 +286,73 @@ class KEGGPathwayAnalysis:
         return result
 
 
-    # def export(self):
-
-    #     # Check if summary exists
-    #     if not self.summary:
-    #         raise ValueError("need to 'run_summary' first")
-
-    #     result = list()
-    #     result.append("\t".join(KEGGPathwayAnalysisResult.get_header()))
-
-    #     # export as file option
-    #     # use csv dict writer
-
-    #     for item in self.summary:
-    #         result.append(item.line_summary())
-    #     return "\n".join(result)
-
-
-    def to_dataframe(self):
+    def to_json(self) -> List[Dict[str, Any]]:
         """
-        Return analysis result as pandas DataFrame
+        Export to json dict.
         """
+
+        result: list = []
+
+        for item in self.summary:
+            result.append(item.json_summary())
+
+        return result
+
+
+    def to_csv(self, file: Union[str, TextIOWrapper], delimiter="\t", overwrite=False):
+        """
+        Save result summary as file
+        :param file: Union[str, TextIOWrapper]
+        :param delimiter: str
+        :param overwrite: bool
+        """
+
+        # Check if summary exists
+        self._check_analysis_result_exist()
+
+        if isinstance(file, str):
+            # file is str (Name of file)
+            if os.path.isfile(file) and not overwrite:
+                raise RuntimeError(
+                    f"File {file} does already exist." \
+                    "To solve please set overwrite=True."
+                )
+
+            # pylint: disable=consider-using-with
+            csv_file = open(file, mode="w", encoding="utf-8")
+        elif isinstance(file, TextIOWrapper):
+            # file is TextIOWrapper (File object stream)
+            csv_file = file
+
+        else:
+            raise TypeError("Argument 'file' must be either type String or TextIOWrapper.")
+
+
+        # Delimiter of gene names
+        child_delimiter = ","
+
+        # Change child delimiter to aviod csv conficts
+        if delimiter == child_delimiter:
+            child_delimiter = ";"
+
+        headers: List[str] = KEGGPathwayAnalysisResult.get_header()
+        writer: DictWriter = DictWriter(csv_file, fieldnames=headers)
+
+        for item in self.summary:
+            # Write lines
+            writer.writerow(item.json_summary(gene_delimiter=child_delimiter))
+
+        csv_file.close()
+
+
+
+
+
+    def to_dataframe(self) -> Any:
+        """
+        Return analysis result as pandas DataFrame. Required pandas dependency.
+        """
+
         try:
             # Ignore import lint at this place to keep pandas an optional dependency
             # pylint: disable=import-outside-toplevel
@@ -317,47 +371,3 @@ class KEGGPathwayAnalysis:
             )
             return None
 
-
-    def fexport(self, file: Union[str, TextIOWrapper], delimiter="\t", overwrite=False):
-        """
-        Save result summary as file
-        :param file: Union[str, TextIOWrapper]
-        :param delimiter: str
-        :param overwrite: bool
-        """
-
-        # Check if summary exists
-        self._check_analysis_result_exist()
-
-        if isinstance(file, str):
-            # file is str (Name of file)
-            if os.path.isfile(file) and not overwrite:
-                raise RuntimeError(f"File {file} does already exist." \
-                                    "To solve please set overwrite=True.")
-
-            # pylint: disable=consider-using-with
-            csv_file = open(file, mode="w", encoding="utf-8")
-        elif isinstance(file, TextIOWrapper):
-            # file is TextIOWrapper (File object stream)
-            csv_file = file
-
-
-        # Delimiter of gene names
-        child_delimiter = ","
-
-        # Change child delimiter to aviod csv conficts
-        if delimiter == child_delimiter:
-            child_delimiter = ";"
-
-        headers: List[str] = KEGGPathwayAnalysisResult.get_header()
-        writer = csv.DictWriter(csv_file, fieldnames=headers)
-
-        for item in self.summary:
-            # Write lines
-            writer.writerow(item.json_summary(gene_delimiter=child_delimiter))
-
-        csv_file.close()
-
-
-if __name__ == "__main__":
-    pass

@@ -3,6 +3,8 @@
 
 PACKAGE_NAME	= keggtools
 
+BASE_DIR		= ${PWD}
+
 PYTHON_OPT		= python3
 PIP_OPT			= $(PYTHON_OPT) -m pip
 MYPY_OPT		= $(PYTHON_OPT) -m mypy
@@ -11,7 +13,7 @@ TEST_OPT		= $(PYTHON_OPT) -m pytest
 TWINE_OPT		= $(PYTHON_OPT) -m twine
 BANDIT_OPT		= $(PYTHON_OPT) -m bandit
 SPHINX_OPT		= $(PYTHON_OPT) -m sphinx
-
+COVERAGE_OPT	= $(PYTHON_OPT) -m coverage
 
 # Run help by default
 
@@ -29,7 +31,7 @@ help: ## This help.
 
 .PHONY: install
 install: ## install all python dependencies
-	$(PIP_OPT) install mypy pylint pytest twine setuptools types-requests --upgrade
+	$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests --upgrade
 	$(PIP_OPT) install requests scipy pydot tqdm --upgrade
 	$(PYTHON_OPT) setup.py install
 

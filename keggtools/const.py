@@ -1,7 +1,5 @@
 """ Global constants """
 
-import os
-
 
 # Example list for immune system pathways
 
@@ -69,12 +67,3 @@ ENTRY_TYPE = [
 ]
 
 
-# KEGG cache folder name
-
-
-if os.environ.get("KEGG_DATA", None) is not None:
-    # if KEGG_DATA is set, overwrite caching dir
-    KEGG_DATA = os.environ["KEGG_DATA"]
-else:
-    # fallback to default caching dir
-    KEGG_DATA = os.path.join(os.path.dirname(__file__), ".cache")

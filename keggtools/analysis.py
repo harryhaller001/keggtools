@@ -311,8 +311,10 @@ class KEGGPathwayAnalysis:
                 summary_list.append(result.json_summary())
             return pandas.DataFrame(summary_list)
         except ImportError:
-            logging.error("Package 'pandas' is not installed." \
-                          "To use this function please 'pip install pandas'")
+            logging.error(
+                "Package 'pandas' is not installed." \
+                "To use this function please 'pip install pandas'"
+            )
             return None
 
 

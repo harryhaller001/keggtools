@@ -13,15 +13,6 @@ import requests
 
 
 
-def getcwd():
-    """
-    Return dirname of package file
-    :returnr: str
-    """
-    # return os.path.split(__file__)[0]
-    return os.path.dirname(__file__)
-
-
 def get_timestamp():
     """
     Return timestamp

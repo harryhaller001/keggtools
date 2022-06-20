@@ -163,3 +163,30 @@ def test_rendering():
 #     test_pathway_api_request()
 #     test_enrichment()
 #     test_rendering()
+
+
+
+
+# if __name__ == "__main__":
+
+#     logging.basicConfig(level=logging.DEBUG)
+
+#     # get all stored pathways files from folder
+#     PATHWAY_FILES = KEGGDataStorage.list_existing_pathways()
+#     logging.debug("Found %d kgml files in folder", len(PATHWAY_FILES))
+
+#     # convert pathway file string to pathway ids
+#     PATHWAY_IDS = [KEGGDataStorage.pathway_file_to_id(p) for p in PATHWAY_FILES]
+#     logging.debug("%d total pathway ids found.", len(PATHWAY_IDS))
+
+#     # load organism list
+#     logging.debug("%d organisms found.", len(KEGGDataStorage.get_organism_list().keys()))
+
+#     # check if pathway file exists
+#     logging.debug(KEGGDataStorage.pathway_file_exist(org="mmu", code="00010"))
+
+#     # check if organism 3 letter code exists
+#     logging.debug(KEGGDataStorage.check_organism("mmu"))
+
+#     # get name of organism from code
+#     logging.debug(KEGGDataStorage.get_organism_name(org_code="mmu"))

@@ -1,8 +1,10 @@
 """ Global constants """
+
 import os
 
 
 # Example list for immune system pathways
+
 IMMUNE_SYSTEM_PATHWAYS = {
     "04640": "Hematopoietic cell lineage",
     "04610": "Complement and coagulation cascades",
@@ -28,6 +30,7 @@ IMMUNE_SYSTEM_PATHWAYS = {
 
 
 # Constant element types in the KGML format
+# Details at KGML manual https://www.kegg.jp/kegg/xml/docs/
 
 RELATION_SUBTYPES = {
     "activation": "-->",

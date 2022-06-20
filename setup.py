@@ -7,7 +7,7 @@ import setuptools
 
 def read(fname: str):
     """
-        Read file content of given filename
+    Read file content of given filename
     """
     return open(os.path.join(os.path.dirname(__file__), fname), mode="r", encoding="utf-8").read()
 

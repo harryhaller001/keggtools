@@ -42,18 +42,18 @@ def test_env_variable():
     logging.info("Local overwrite of KEGG_DATA is working")
 
 
-def test_component_api_request():
-    logging.info("Check API request for compound")
+# def test_component_api_request():
+#     logging.info("Check API request for compound")
 
-    # Request compounds from API
-    components = KEGGPathwayResolver.get_components()
+#     # Request compounds from API
+#     components = KEGGPathwayResolver.get_components()
 
-    # Check if compounds are cached and have correct content
-    assert KEGGDataStorage.exist(filename="compound.dump") and \
-        isinstance(components, dict) and \
-        components["C22323"] == "alpha-N-Dichloroacetyl-p-aminophenylserinol"
+#     # Check if compounds are cached and have correct content
+#     assert KEGGDataStorage.exist(filename="compound.dump") and \
+#         isinstance(components, dict) and \
+#         components["C22323"] == "alpha-N-Dichloroacetyl-p-aminophenylserinol"
 
-    logging.info("compounds are requested, cached and have correct content")
+#     logging.info("compounds are requested, cached and have correct content")
 
 
 def test_organism_api_request():
@@ -156,10 +156,10 @@ def test_rendering():
     logging.info("Rendering of dot graph finished successful")
 
 
-if __name__ == "__main__":
-    test_env_variable()
-    test_component_api_request()
-    test_organism_api_request()
-    test_pathway_api_request()
-    test_enrichment()
-    test_rendering()
+# if __name__ == "__main__":
+#     test_env_variable()
+#     test_component_api_request()
+#     test_organism_api_request()
+#     test_pathway_api_request()
+#     test_enrichment()
+#     test_rendering()

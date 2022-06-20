@@ -5,47 +5,101 @@
 import logging
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
-from typing import Union
+from typing import Any, Dict, List, Union, Optional
+
+
+
+# class Subtype:
+#     """
+#     Subtype model class.
+#     """
+
+#     def __init__(
+#         self,
+#         name: str,
+#         value: str,
+#     ) -> None:
+#         """
+#         Init Subtype model instance.
+#         """
+#         self.name: str = name
+#         self.value: str = value
+
+
+#     @staticmethod
+#     def parse(item: Element) -> "Subtype":
+#         """
+#         Parse subtype XML Element.
+#         """
+
+#         if item.tag != "subtype":
+#             raise ValueError("Tag of XML element is not 'subtype'.")
+
+
+#         # Parse subtypes
+#         _name: Optional[str] = item.attrib.get("name")
+#         _value: Optional[str] = item.attrib.get("value")
+
+#         if _name is None or _value is None:
+#             raise TypeError("Attribute 'name' or 'value' is not type string.")
+
+#         return Subtype(name=_name, value=_value)
+
+
 
 
 class Relation:
     """
-    Relation model
+    Relation model class.
     """
 
-    def __init__(self):
+    def __init__(
+        self,
+        entry1: Any = None,
+        entry2: Any = None,
+        relation_type: Any = None,
+    ) -> None:
         """
-        Init Relation model
+        Init relation model instance.
         """
 
-        self.entry1 = None
-        self.entry2 = None
-        self.type = None
-        self.subtypes = {}
+        self.entry1: Any = entry1
+        self.entry2: Any = entry2
+        self.relation_type: Any = relation_type
+        self.subtypes: Dict[str, str] = {}
 
 
     @staticmethod
-    def parse(item: Element):
+    def parse(item: Element) -> "Relation":
         """
-        Parse xml ElementTree into KEGG Relation
-
+        Parse xml ElementTree into KEGG Relation.
         :param item: ElementTree
         :return: Relation
         """
 
-        relation = Relation()
-        relation.entry1 = item.attrib["entry1"]
-        relation.entry2 = item.attrib["entry2"]
-        relation.type = item.attrib["type"]
+        assert item.tag == "relation"
+
+        relation: Relation = Relation()
+        relation.entry1 = item.attrib.get("entry1")
+        relation.entry2 = item.attrib.get("entry2")
+        relation.relation_type = item.attrib.get("type")
 
         for child in item:
             if child.tag == "subtype":
-                relation.subtypes[child.attrib["name"]] = child.attrib["value"]
+                # Parse subtypes
+                _name: Any = child.attrib.get("name")
+                _value: Any = child.attrib.get("value")
+                if isinstance(_name, str) is True:
+                    relation.subtypes[_name] = _value
 
         return relation
 
-    def __str__(self):
-        return f"<Relation {self.entry1}->{self.entry2} type='{self.type}'>"
+
+    def __str__(self) -> str:
+        """
+        Generate string from relation instance.
+        """
+        return f"<Relation {self.entry1}->{self.entry2} type='{self.relation_type}'>"
 
 
 class Component:
@@ -57,12 +111,12 @@ class Component:
     The attribute of this element is as follows.
     """
 
-    def __init__(self):
+    def __init__(self, id: str) -> None:
         """
         Init Component model
         """
 
-        self.id = ""
+        self.id: str = id
 
 
     @staticmethod
@@ -74,58 +128,49 @@ class Component:
         :return: Component
         """
 
-        component = Component()
-        component.id = item.attrib["id"]
+        assert item.tag == "component"
+
+        # Get component id from xml
+        component_id: Optional[str] = item.attrib.get("id")
+        if component_id is None:
+            raise TypeError("Component id is not type string.")
+
+        # Create component instance
+        component: Component = Component(id=component_id)
         return component
 
 
 class Graphics:
     """
-    Graphics information for rendering
+    Graphics information for rendering.
     """
-    def __init__(self):
+
+    def __init__(self) -> None:
         """
-        Init Graphics model
+        Init Graphics model instance.
         """
 
-        self.attrib = {"x": 0,
-                       "y": 0,
-                       "width": 0,
-                       "height": 0,
-                       "name": "",
-                       "type": "",
-                       "fgcolor": "",
-                       "bgcolor": ""}
+        self.x: Optional[str] = None
+        self.y: Optional[str] = None
+        self.width: Optional[str] = None
+        self.height: Optional[str] = None
+        self.name: Optional[str] = None
+        self.type: Optional[str] = None
+        self.fgcolor: Optional[str] = None
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
-        Build Graphics summary
-
+        Build Graphics summary.
         :return: str
         """
 
-        attrib_array = " ".join(
-            [
-                f"{key}='{val}'" for key, val in self.attrib.items()
-            ]
-        )
-        return f"<Graphics {attrib_array}"
+        return f"<Graphics name='{self.name}'>"
 
-
-    def __getattr__(self, item: str):
-        """
-        Get Item by key
-
-        :param item: str
-        :return: Any
-        """
-
-        return self.attrib[item]
 
 
     @staticmethod
-    def parse(item: Element):
+    def parse(item: Element) -> "Graphics":
         """
         Parse xml ElementTree into KEGG Graphics
 
@@ -133,21 +178,31 @@ class Graphics:
         :return: Graphics
         """
 
-        graphic = Graphics()
-        for key, val in item.attrib.items():
-            if key in graphic.attrib:
-                graphic.attrib[key] = val
+        # Check xml tag
+        assert item.tag == "graphics"
+
+        graphic: Graphics = Graphics()
+
+        # Parse attributes from XML element
+        graphic.x = item.attrib.get("x")
+        graphic.y = item.attrib.get("y")
+        graphic.width = item.attrib.get("width")
+        graphic.height = item.attrib.get("height")
+        graphic.name = item.attrib.get("name")
+        graphic.type = item.attrib.get("type")
+        graphic.fgcolor = item.attrib.get("fgcolor")
+
         return graphic
 
 
 class Entry:
     """
-    Entry model
+    Entry model.
     """
 
     def __init__(self):
         """
-        Init Entry model
+        Init entry model instance.
         """
 
         # REQUIRED
@@ -158,8 +213,11 @@ class Entry:
         # IMPLIED
         self.link = ""
         self.reaction = ""
-        self.graphics = None
-        self.components = []
+
+
+        # Implied child instances
+        self.graphics: Optional[Graphics] = None
+        self.components: List[Component] = []
 
 
     def get_gene_id(self):
@@ -347,5 +405,3 @@ class KEGGPathway:
         return pathw
 
 
-if __name__ == "__main__":
-    pass

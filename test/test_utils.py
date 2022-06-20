@@ -1,7 +1,5 @@
 """ Testing utils module """
 
-import logging
-
 from typing import List
 
 from keggtools.utils import ColorGradient, parse_tsv

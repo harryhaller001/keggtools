@@ -342,13 +342,4 @@ class KEGGPathwayRenderer:
                     </svg>"""
 
 
-if __name__ == "__main__":
 
-    logging.basicConfig(level=logging.DEBUG)
-    logging.debug("Testing rendering...")
-    PATHWAY = KEGGPathwayResolver(org="mmu").get_pathway("04659")
-
-    RENDERER = KEGGPathwayRenderer(kegg_pathway=PATHWAY)
-    # print(renderer.group_render())
-    # print(renderer.render())
-    print(RENDERER.raw_render())

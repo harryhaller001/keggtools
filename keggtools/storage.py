@@ -1,13 +1,9 @@
 """ Storage of KEGG data. Caching downloaded files from API to local file system. """
 
-import logging
+# import logging
 import os
 import pickle
-# import re
-
 from typing import Any, Optional
-
-# from .utils import parse_tsv, request as request_url
 
 
 class KEGGDataStorage:
@@ -29,7 +25,7 @@ class KEGGDataStorage:
         if os.path.isdir(cachedir) is False:
             # Directory does not exist. Auto-generate diretory
             os.mkdir(cachedir)
-            logging.info("Cache folder '%s' does not exist. Auto-generating folder.", cachedir)
+            # logging.info("Cache folder '%s' does not exist. Auto-generating folder.", cachedir)
             # raise NotADirectoryError(f"Directory '{cachedir}' does not exist.")
 
 

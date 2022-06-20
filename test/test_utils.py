@@ -4,7 +4,7 @@ import logging
 
 from typing import List
 
-from keggtools.utils import ColorGradient
+from keggtools.utils import ColorGradient, parse_tsv
 
 
 def test_color_gradient() -> None:
@@ -36,4 +36,15 @@ def test_color_gradient() -> None:
 
     # Check for random gray scale color
     assert color_list[123] == ColorGradient.to_hex(color=(123, 123, 123))
+
+
+def test_parse_tsv() -> None:
+    """
+    Testing TSV parsing function.
+    """
+
+    parsed_data: list = parse_tsv(data="header1\theader2\nitem1\titem2\nitem3\titem4\n")
+
+    assert len(parsed_data) == 3
+    assert parsed_data[0][1] == "header2"
 

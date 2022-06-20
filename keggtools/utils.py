@@ -2,122 +2,105 @@
 
 
 import logging
-import math
-import os
-from datetime import datetime
+# import math
 import csv
 from io import StringIO
+
 from typing import List, Tuple
-from tqdm import tqdm
+# from tqdm import tqdm
+
 import requests
-# from typing import Optional, Union, Any, Iterable
-
-
-def get_timestamp():
-    """
-    Return timestamp
-    :return: datetime
-    """
-    return datetime.now().timestamp()
-
-
-# Code using from
-# https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks
-# Thanks to Ned Batchelder (https://stackoverflow.com/users/14343/ned-batchelder)
-def chunks(items: list, count: int):
-    """
-    Yield successive count-sized chunks from items.
-    """
-    for index in range(0, len(items), count):
-        yield items[index:index + count]
-
-
-class Downloader:
-    """
-    URL Downloader
-    """
-
-    def __init__(self, url: str):
-        """
-        Init Downloader
-        :param url: str
-        """
-        self.url = url
-        self.filename = ""
-
-
-    def set_filename(self, filename: str):
-        """
-        Set filename for output
-        :param filename: str
-        """
-        self.filename = filename
-
-    def run(self):
-        """
-        Run Downloader
-        """
-        if not self.filename:
-            raise ValueError("Output filename not set!")
-
-        if not self.url:
-            raise ValueError("Url not set.")
-
-        # Streaming, so we can iterate over the response.
-        response = requests.get(self.url, stream=True)
-
-        # Total size in bytes.
-        total_size = int(response.headers.get('content-length', 0))
-        block_size = 1024
-        wrote = 0
-
-        with open(self.filename, 'wb') as f_obj:
-            for data in tqdm(response.iter_content(block_size),
-                             total=math.ceil(total_size // block_size),
-                             unit='KB',
-                             unit_scale=True):
-
-                wrote = wrote + len(data)
-                f_obj.write(data)
-        # if total_size != 0 and wrote != total_size:
-        if total_size not in (0, wrote):
-            logging.error("ERROR, something went wrong")
 
 
 
 
-def parse_tsv(data: str):
+
+# class Downloader:
+#     """
+#     URL Downloader
+#     """
+
+#     def __init__(self, url: str):
+#         """
+#         Init Downloader
+#         :param url: str
+#         """
+#         self.url = url
+#         self.filename = ""
+
+
+#     def set_filename(self, filename: str):
+#         """
+#         Set filename for output
+#         :param filename: str
+#         """
+#         self.filename = filename
+
+#     def run(self):
+#         """
+#         Run Downloader
+#         """
+#         if not self.filename:
+#             raise ValueError("Output filename not set!")
+
+#         if not self.url:
+#             raise ValueError("Url not set.")
+
+#         # Streaming, so we can iterate over the response.
+#         response = requests.get(self.url, stream=True)
+
+#         # Total size in bytes.
+#         total_size = int(response.headers.get('content-length', 0))
+#         block_size = 1024
+#         wrote = 0
+
+#         with open(self.filename, 'wb') as f_obj:
+#             for data in tqdm(response.iter_content(block_size),
+#                              total=math.ceil(total_size // block_size),
+#                              unit='KB',
+#                              unit_scale=True):
+
+#                 wrote = wrote + len(data)
+#                 f_obj.write(data)
+#         # if total_size != 0 and wrote != total_size:
+#         if total_size not in (0, wrote):
+#             logging.error("ERROR, something went wrong")
+
+
+
+
+def parse_tsv(data: str) -> list:
     """
     Parse .tsv file from string
     :param data: str
     :return: list
     """
-    if isinstance(data, str):
-        fstream = StringIO(data)
-    else:
-        raise TypeError("Type of 'data' must be str or bytes.")
-
+    fstream = StringIO(data)
     return list(csv.reader(fstream, delimiter="\t"))
 
 
 
-def request(url: str, encoding="utf-8"):
+def request(url: str, encoding="utf-8") -> str:
     """
-    Small request GET method. Returns string.
+    Small request GET method. Returns content as string.
     :param url: str
     :param encoding: str
     :return: str
     """
-    logging.info("Requesting Url %s", url)
+    # logging.debug("Requesting Url %s", url)
     response = requests.get(url=url)
-    logging.info("Request finished with status code %d", response.status_code)
+    # logging.debug("Request finished with status code %d", response.status_code)
     response.raise_for_status()
-    content = response.content
+    return response.content.decode(encoding)
 
-    if isinstance(content, bytes):
-        return content.decode(encoding)
 
-    return content
+# TODO: add request_tsv function for GET request and TSV parsing
+def request_tsv(url: str) -> list:
+    """
+    Request and parse TSV file from url.
+    """
+    return parse_tsv(data=request(url=url))
+
 
 
 class ColorGradient:
@@ -149,8 +132,8 @@ class ColorGradient:
         :param color: Color tuple containing 3 integers
         :return: str
         """
-        if len(color) != 3 or not all([isinstance(value, int) for value in color]):
-            raise ValueError("Color must be a tuple of 3 integers.")
+        # if len(color) != 3 or not all([isinstance(value, int) for value in color]):
+        #     raise ValueError("Color must be a tuple of 3 integers.")
 
         return f"rgb({color[0]},{color[1]},{color[2]})".lower()
 

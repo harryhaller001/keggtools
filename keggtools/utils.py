@@ -5,14 +5,60 @@
 # import math
 import csv
 from io import StringIO
+from lib2to3.pgen2.token import OP
 
-from typing import List, Tuple
+from typing import Any, List, Optional, Tuple, Union
+from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
 # from tqdm import tqdm
 
 import requests
 
 
 
+# XML parsing helper functions
+
+def get_numeric_attribute(element: Element, key: str) -> str:
+    """
+    Get attribute from XML Element object. Raises KeyError is Attribute is not found or not valid.
+    """
+    if is_valid_numeric_attribute(element=element, key=key) is False:
+        raise KeyError(f"Value of attribute '{key}' is not a valid numeric string.")
+
+    value: Optional[str] = element.attrib.get(key)
+
+    # TODO: complete parsing function!!!
+
+    if value is None or isinstance(value, str) is False:
+        pass
+
+    return value
+
+def is_valid_attribute(element: Element, key: str) -> bool:
+    """
+    Check is attribute of XML element exist and is string.
+    """
+    return element.attrib.get(key) is not None and \
+        isinstance(element.attrib.get(key), str) is True
+
+
+def is_valid_numeric_attribute(element: Element, key: str) -> bool:
+    """
+    Check is attribute of XML element is numeric string.
+    """
+    return is_valid_attribute(element=element, key=key) and \
+        str.isnumeric(element.attrib.get(key)) is True
+
+
+
+
+def parse_xml(xml_object_or_string: Union[str, Element]) -> Element:
+    """
+    Returns XML Element object from string or XML Element.
+    """
+    if isinstance(xml_object_or_string, str):
+        return ElementTree.fromstring(xml_object_or_string)
+    return xml_object_or_string
 
 
 # class Downloader:

@@ -1,6 +1,5 @@
 """ KEGG pathway models to parse object relational """
 # pylint: disable=invalid-name,too-few-public-methods
-# Ignore linting to keep object-relational parsing
 
 import logging
 from xml.etree import ElementTree
@@ -8,43 +7,14 @@ from xml.etree.ElementTree import Element
 from typing import Any, Dict, List, Union, Optional
 
 
+from .const import (
+    RELATION_TYPES,
+    RELATION_SUBTYPES,
+    ENTRY_TYPE,
+    GRAPHICS_TYPE,
+)
 
-# class Subtype:
-#     """
-#     Subtype model class.
-#     """
-
-#     def __init__(
-#         self,
-#         name: str,
-#         value: str,
-#     ) -> None:
-#         """
-#         Init Subtype model instance.
-#         """
-#         self.name: str = name
-#         self.value: str = value
-
-
-#     @staticmethod
-#     def parse(item: Element) -> "Subtype":
-#         """
-#         Parse subtype XML Element.
-#         """
-
-#         if item.tag != "subtype":
-#             raise ValueError("Tag of XML element is not 'subtype'.")
-
-
-#         # Parse subtypes
-#         _name: Optional[str] = item.attrib.get("name")
-#         _value: Optional[str] = item.attrib.get("value")
-
-#         if _name is None or _value is None:
-#             raise TypeError("Attribute 'name' or 'value' is not type string.")
-
-#         return Subtype(name=_name, value=_value)
-
+from .utils import is_valid_numeric_attribute, is_valid_attribute
 
 
 
@@ -55,17 +25,17 @@ class Relation:
 
     def __init__(
         self,
-        entry1: Any = None,
-        entry2: Any = None,
-        relation_type: Any = None,
+        entry1: str,
+        entry2: str,
+        type: str,
     ) -> None:
         """
         Init relation model instance.
         """
 
-        self.entry1: Any = entry1
-        self.entry2: Any = entry2
-        self.relation_type: Any = relation_type
+        self.entry1: str = entry1
+        self.entry2: str = entry2
+        self.type: str = type
         self.subtypes: Dict[str, str] = {}
 
 
@@ -77,20 +47,52 @@ class Relation:
         :return: Relation
         """
 
+        # Check tag of relation is correct
         assert item.tag == "relation"
 
-        relation: Relation = Relation()
-        relation.entry1 = item.attrib.get("entry1")
-        relation.entry2 = item.attrib.get("entry2")
-        relation.relation_type = item.attrib.get("type")
 
-        for child in item:
-            if child.tag == "subtype":
-                # Parse subtypes
-                _name: Any = child.attrib.get("name")
-                _value: Any = child.attrib.get("value")
-                if isinstance(_name, str) is True:
-                    relation.subtypes[_name] = _value
+        # Create relation instance from attributes
+        relation: Relation = Relation()
+
+
+        # Check attributes
+        if is_valid_numeric_attribute(element=item, key="entry1"):
+
+            # Set entry1 attribute to relation instance
+            relation.entry1 = item.attrib.get("entry1")
+        else:
+            raise ValueError("Attribute 'entry1' from relation is not a string.")
+
+
+        if is_valid_numeric_attribute(element=item, key="entry2"):
+
+            # Set entry2 attribute to relation instance
+            relation.entry2 = item.attrib.get("entry2")
+        else:
+            raise ValueError("Attribute 'entry2' from relation is not a string.")
+
+
+
+        if is_valid_attribute(element=item, key="type"):
+
+            # Check relation type is list of allowed relation types
+            if item.attrib.get("type") not in RELATION_TYPES:
+                raise ValueError("Attribute 'type' has invalid value.")
+
+            # Set type attribute to relation instance
+            relation.type = item.attrib.get("type")
+        else:
+            raise ValueError("Attribute 'type' from relation is not a string.")
+
+
+
+        # for child in item:
+        #     if child.tag == "subtype":
+        #         # Parse subtypes
+        #         _name: Any = child.attrib.get("name")
+        #         _value: Any = child.attrib.get("value")
+        #         if isinstance(_name, str) is True:
+        #             relation.subtypes[_name] = _value
 
         return relation
 
@@ -99,7 +101,9 @@ class Relation:
         """
         Generate string from relation instance.
         """
-        return f"<Relation {self.entry1}->{self.entry2} type='{self.relation_type}'>"
+        return f"<Relation {self.entry1}->{self.entry2} type='{self.type}'>"
+
+
 
 
 class Component:
@@ -120,7 +124,7 @@ class Component:
 
 
     @staticmethod
-    def parse(item: Element):
+    def parse(item: Element) -> "Component":
         """
         Parsing ElementTree into Component
 
@@ -138,6 +142,7 @@ class Component:
         # Create component instance
         component: Component = Component(id=component_id)
         return component
+
 
 
 class Graphics:
@@ -200,7 +205,7 @@ class Entry:
     Entry model.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Init entry model instance.
         """
@@ -220,17 +225,18 @@ class Entry:
         self.components: List[Component] = []
 
 
-    def get_gene_id(self):
+    def get_gene_id(self) -> int:
         """
         Parse variable 'name' into KEGG ID
-
         :return: int
         """
+
+        # TODO: change entrez id to string !!
 
         return int(self.name.split(":")[1])
 
 
-    def get_id(self):
+    def get_id(self) -> int:
         """
         Parse variable 'name' into KEGG ID
 
@@ -241,7 +247,7 @@ class Entry:
 
 
     @staticmethod
-    def parse(item: Element):
+    def parse(item: Element) -> "Entry":
         """
         Parsing xml ElementTree into KEGG Entry
 
@@ -249,7 +255,7 @@ class Entry:
         :return: Entry
         """
 
-        entry = Entry()
+        entry: Entry = Entry()
         entry.id = item.attrib["id"]
         entry.name = item.attrib["name"].split(" ")[0]
         entry.type = item.attrib["type"]
@@ -266,7 +272,7 @@ class Entry:
         return entry
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Build Entry summary string
 
@@ -333,22 +339,24 @@ class KEGGPathway:
         return count / len(self.entries)
 
 
-    def get_genes(self):
+    def get_genes(self) -> dict:
         """
         List all genes from pathway {<gene_id>: <gene_name>}
 
         :return: dict
         """
 
-        result = {}
+        result: dict = {}
         for entry in self.entries:
             if entry.type == "gene":
                 result[entry.get_id()] = entry.graphics.name
-        logging.debug("Get %d unique genes from pathway", len(result.keys()))
+
+        # logging.debug("Get %d unique genes from pathway", len(result.keys()))
+
         return result
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Build string summary for KEGG pathway
 
@@ -358,20 +366,10 @@ class KEGGPathway:
         return f"<KEGGPathway path:{self.org}{self.number} title='{self.title}'>"
 
 
-    def summarize(self):
-        """
-        Verbose all components of pathway
-        """
-
-        print(self.__str__())
-        for r in self.relations:
-            print(r)
-        for e in self.entries:
-            print(e)
 
 
     @staticmethod
-    def parse(data: str):
+    def parse(data: str) -> "KEGGPathway":
         """
         Parsing xml String in KEGG Pathway
 
@@ -379,7 +377,7 @@ class KEGGPathway:
         :return: KEGGPathway
         """
 
-        pathw = KEGGPathway()
+        pathw: KEGGPathway = KEGGPathway()
 
         root = ElementTree.fromstring(data)
 
@@ -404,4 +402,44 @@ class KEGGPathway:
 
         return pathw
 
+
+
+
+
+
+# class Subtype:
+#     """
+#     Subtype model class.
+#     """
+
+#     def __init__(
+#         self,
+#         name: str,
+#         value: str,
+#     ) -> None:
+#         """
+#         Init Subtype model instance.
+#         """
+#         self.name: str = name
+#         self.value: str = value
+
+
+#     @staticmethod
+#     def parse(item: Element) -> "Subtype":
+#         """
+#         Parse subtype XML Element.
+#         """
+
+#         if item.tag != "subtype":
+#             raise ValueError("Tag of XML element is not 'subtype'.")
+
+
+#         # Parse subtypes
+#         _name: Optional[str] = item.attrib.get("name")
+#         _value: Optional[str] = item.attrib.get("value")
+
+#         if _name is None or _value is None:
+#             raise TypeError("Attribute 'name' or 'value' is not type string.")
+
+#         return Subtype(name=_name, value=_value)
 

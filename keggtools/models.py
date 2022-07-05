@@ -1,6 +1,10 @@
 """ KEGG pathway models to parse object relational """
 # pylint: disable=invalid-name,too-few-public-methods
 
+# TODO: add to_xml() method to all classes to generate KGML xml object/string from instances
+# TODO: add abstract parent class for all classes (KGMLElement)
+# containing .parse() -> @, .to_xml() -> Element
+
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 from typing import Any, Dict, List, Union, Optional
@@ -11,7 +15,7 @@ from .const import (
     RELATION_TYPES,
     RELATION_SUBTYPES,
     ENTRY_TYPE,
-    GRAPHICS_TYPE,
+    GRAPHIC_TYPE,
 )
 
 from .utils import (
@@ -22,8 +26,9 @@ from .utils import (
 
 
 
+# TODO: functions needed ???
 
-def is_valid_org(value: str) -> bool:
+def is_valid_pathway_org(value: str) -> bool:
     """
     Check if org identifier is valid.
     """
@@ -31,9 +36,31 @@ def is_valid_org(value: str) -> bool:
     # Organism must be 3 letter code
     # Identifier can also be KO or Enzyme identifer
     # TODO: validate with KEGG organism list
-    return value in ["ko", "ec"] or re.match(pattern=r"^([a-z]{3})$", string=value) is not None
+    return re.match(pattern=r"^(ko|ec|[a-z]{3})$", string=value) is not None
 
 
+def is_valid_pathway_number(value: str) -> bool:
+    """
+    Check if pathway number is valid.
+    """
+
+    # KEGG pathway number must be a 5 digit number
+    return re.match(pattern=r"^([0-9]{5})$", string=value) is not None
+
+
+def is_valid_pathway_name(value: str) -> bool:
+    """
+    Check if combined pathway identifer is valid. String must match "path:<org><number>".
+    """
+
+    return re.match(pattern=r"^path:(ko|ec|[a-z]{3})([0-9]{5})$", string=value) is not None
+
+
+def is_valid_hex_color(value: str) -> bool:
+    """
+    Check if string is a valid hex color.
+    """
+    return re.match(pattern=r"^\#([a-fA-F0-9]{6})$", string=value) is not None
 
 
 
@@ -70,6 +97,15 @@ class Subtype:
         # TODO: check for valid subtype names in RELATION_SUBTYPES
 
         return Subtype(name=name, value=value)
+
+
+    def __str__(self) -> str:
+        """
+        Generate string from Subtype instance.
+        """
+        return f"<Subtype name='{self.name}' value='{self.value}'>"
+
+
 
 
 
@@ -183,35 +219,57 @@ class Graphics:
     Graphics information for rendering.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        x: Optional[str] = None,
+        y: Optional[str] = None,
+        width: Optional[str] = None,
+        height: Optional[str] = None,
+        coords: Optional[str] = None,
+        name: Optional[str] = None,
+        type: Optional[str] = None,
+        fgcolor: Optional[str] = None,
+        bgcolor: Optional[str] = None,
+    ) -> None:
         """
         Init Graphics model instance.
         """
 
-        self.x: Optional[str] = None
-        self.y: Optional[str] = None
-        self.width: Optional[str] = None
-        self.height: Optional[str] = None
-        self.name: Optional[str] = None
-        self.type: Optional[str] = None
-        self.fgcolor: Optional[str] = None
+        # All parameter are implied (optional)
+        self.x: Optional[str] = x
+        self.y: Optional[str] = y
+        self.width: Optional[str] = width
+        self.height: Optional[str] = height
+        self.coords: Optional[str] = coords
+        self.name: Optional[str] = name
+        self.type: Optional[str] = type
+        self.fgcolor: Optional[str] = fgcolor
+        self.bgcolor: Optional[str] = bgcolor
 
 
-    def __str__(self) -> str:
-        """
-        Build Graphics summary.
-        :return: str
-        """
+        # Validate parameter if not None
 
-        return f"<Graphics name='{self.name}'>"
+        # Check type is in list of valid types
+        if self.type is not None and self.type not in GRAPHIC_TYPE:
+            raise ValueError(f"Type '{self.type}' is not a valid graphics type.")
 
+        # Check foreground and background color are hex format
+        if self.fgcolor is not None and is_valid_hex_color(value=self.fgcolor) is False:
+            raise ValueError("Fgcolor is not a valid hex color.")
+
+        if self.bgcolor is not None and is_valid_hex_color(value=self.bgcolor) is False:
+            raise ValueError("Bgcolor is not a valid hex color.")
+
+
+        # TODO Checkx,y,width and height are numeric
+        if self.x is not None and str.isdigit(self.x) is False:
+            raise ValueError("Value x is not a number.")
 
 
     @staticmethod
     def parse(item: Element) -> "Graphics":
         """
         Parse xml ElementTree into KEGG Graphics
-
         :param item: ElementTree
         :return: Graphics
         """
@@ -219,64 +277,70 @@ class Graphics:
         # Check xml tag
         assert item.tag == "graphics"
 
-        graphic: Graphics = Graphics()
-
         # Parse attributes from XML element
-        graphic.x = item.attrib.get("x")
-        graphic.y = item.attrib.get("y")
-        graphic.width = item.attrib.get("width")
-        graphic.height = item.attrib.get("height")
-        graphic.name = item.attrib.get("name")
-        graphic.type = item.attrib.get("type")
-        graphic.fgcolor = item.attrib.get("fgcolor")
+        graphic: Graphics = Graphics(
+            x = item.attrib.get("x"),
+            y = item.attrib.get("y"),
+            width = item.attrib.get("width"),
+            height = item.attrib.get("height"),
+            name = item.attrib.get("name"),
+            type = item.attrib.get("type"),
+            fgcolor = item.attrib.get("fgcolor"),
+        )
 
         return graphic
 
 
+
+    def __str__(self) -> str:
+        """
+        Return Graphics instance summary string.
+        :return: str
+        """
+        return f"<Graphics name='{self.name}'>"
+
+
+
 class Entry:
     """
-    Entry model.
+    Entry model class.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        type: str,
+        link: Optional[str] = None,
+        reaction: Optional[str] = None,
+    ) -> None:
         """
         Init entry model instance.
         """
 
-        # REQUIRED
-        self.id = ""
-        self.name = ""
-        self.type = ""
+        # required
+        self.id: str = id
+        self.name: str = name
+        self.type: str = type
 
-        # IMPLIED
-        self.link = ""
-        self.reaction = ""
+        # TODO: validate entry id and name
+
+
+        if self.type not in ENTRY_TYPE:
+            raise ValueError(f"Type '{self.type}' is not in list of valid entry types.")
+
+
+        # optional (implied)
+        self.link: Optional[str] = link
+        self.reaction: Optional[str] = reaction
+
+        # TODO: validate reaction if not None
 
 
         # Implied child instances
         self.graphics: Optional[Graphics] = None
         self.components: List[Component] = []
 
-
-    def get_gene_id(self) -> int:
-        """
-        Parse variable 'name' into KEGG ID
-        :return: int
-        """
-
-        # TODO: change entrez id to string !!
-
-        return int(self.name.split(":")[1])
-
-
-    def get_id(self) -> int:
-        """
-        Parse variable 'name' into KEGG ID
-
-        :return: int
-        """
-
-        return int(self.name.split(":")[1])
 
 
     @staticmethod
@@ -288,14 +352,20 @@ class Entry:
         :return: Entry
         """
 
-        entry: Entry = Entry()
-        entry.id = item.attrib["id"]
-        entry.name = item.attrib["name"].split(" ")[0]
-        entry.type = item.attrib["type"]
+        # Generate entry instance from required attributes
+        entry: Entry = Entry(
+            id=get_numeric_attribute(element=item, key="id"),
+            name=get_attribute(element=item, key="name"),
+            type=get_attribute(element=item, key="type"),
+        )
 
-        entry.link = item.attrib.get("link", "")
-        entry.reaction = item.attrib.get("reaction", "")
 
+        # Set optional parameter to entry instance
+        entry.link = item.attrib.get("link")
+        entry.reaction = item.attrib.get("reaction")
+
+
+        # Iterate over children and parse graphics, ...
         for child in item:
             if child.tag == "graphics":
                 entry.graphics = Graphics.parse(child)
@@ -308,11 +378,23 @@ class Entry:
     def __str__(self) -> str:
         """
         Build Entry summary string
+        :return: str
+        """
+        return f"<Entry id='{self.id}' name='{self.name}' type='{self.type}'>"
 
+
+
+    def get_gene_id(self) -> str:
+        """
+        Parse variable 'name' into KEGG ID
         :return: str
         """
 
-        return f"<Entry id={self.id} name='{self.name}' type='{self.type}'>"
+        # TODO: validate return valid !!
+
+        return self.name.split(":")[1]
+
+
 
 
 class Pathway:
@@ -327,6 +409,9 @@ class Pathway:
         name: str,
         org: str,
         number: str,
+        title: Optional[str] = None,
+        image: Optional[str] = None,
+        link: Optional[str] = None,
         ) -> None:
         """
         Init KEGG Pathway model.
@@ -337,10 +422,21 @@ class Pathway:
         self.org: str = org
         self.number: str = number
 
+        # Check all required parameter formats
+        if not is_valid_pathway_name(value=name):
+            raise ValueError(f"Pathway name '{name}' is not a valid value.")
+
+        if not is_valid_pathway_org(value=org):
+            raise ValueError(f"Pathway org '{org}' is not a valid value.")
+
+        if not is_valid_pathway_number(value=number):
+            raise ValueError(f"Pathway number '{number}' is not a valid value.")
+
+
         # IMPLIED
-        self.title: Optional[str] = None
-        self.image: Optional[str] = None
-        self.link: Optional[str] = None
+        self.title: Optional[str] = title
+        self.image: Optional[str] = image
+        self.link: Optional[str] = link
 
         # Children
         self.relations: List[Relation] = []
@@ -438,7 +534,7 @@ class Pathway:
         for entry in self.entries:
             if entry.type == "gene":
                 if entry.graphics is not None:
-                    result[entry.get_id()] = entry.graphics.name
+                    result[entry.id] = entry.graphics.name
 
         # logging.debug("Get %d unique genes from pathway", len(result.keys()))
 

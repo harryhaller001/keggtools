@@ -25,7 +25,7 @@ from .storage import Storage
 #         return pathways
 
 
-class KEGGPathwayAnalysisResult:
+class AnalysisResult:
     """
     Results of KEGG pathway enrichment analysis
     """
@@ -134,7 +134,7 @@ class KEGGPathwayAnalysisResult:
 
 
 
-class KEGGPathwayAnalysis:
+class Analysis:
     """
     KEGG pathway enrichment analysis
     """
@@ -152,7 +152,7 @@ class KEGGPathwayAnalysis:
         """
 
         self.organism: str = org
-        self.summary: List[KEGGPathwayAnalysisResult] = []
+        self.summary: List[AnalysisResult] = []
         self.resolver: Resolver = Resolver(self.organism)
 
         # Create pathway lookup dict
@@ -188,7 +188,7 @@ class KEGGPathwayAnalysis:
             raise ValueError("need to 'run_summary' first")
 
 
-    def get_subset(self, subset: list, inplace: bool = False) -> List[KEGGPathwayAnalysisResult]:
+    def get_subset(self, subset: list, inplace: bool = False) -> List[AnalysisResult]:
         """
         Create subset of analysis result by list of pathway ids
         :param subset: list
@@ -208,15 +208,15 @@ class KEGGPathwayAnalysis:
         return buffer
 
 
-    def run_analysis(self, gene_list: list) -> List[KEGGPathwayAnalysisResult]:
+    def run_analysis(self, gene_list: list) -> List[AnalysisResult]:
         """
-        List of gene ids. Return list of KEGGPathwayAnalysisResult instances
+        List of gene ids. Return list of AnalysisResult instances
         :param gene_list: list
-        :return: list(KEGGPathwayAnalysisResult)
+        :return: list(AnalysisResult)
         """
         # pylint: disable=too-many-locals
 
-        result: List[KEGGPathwayAnalysisResult] = []
+        result: List[AnalysisResult] = []
         all_found_genes: int = 0
         absolute_pathway_genes: int = 0
         study_n: int = len(gene_list)
@@ -237,7 +237,7 @@ class KEGGPathwayAnalysis:
             all_found_genes += len(genes_found)
 
             # Create analysis results instance and append to list of results
-            pathway_result: KEGGPathwayAnalysisResult = KEGGPathwayAnalysisResult(
+            pathway_result: AnalysisResult = AnalysisResult(
                 org="mmu",
                 pathway_id=pathway_id,
                 pathway_name=name,
@@ -335,7 +335,7 @@ class KEGGPathwayAnalysis:
         if delimiter == child_delimiter:
             child_delimiter = ";"
 
-        headers: List[str] = KEGGPathwayAnalysisResult.get_header()
+        headers: List[str] = AnalysisResult.get_header()
         writer: DictWriter = DictWriter(csv_file, fieldnames=headers)
 
         for item in self.summary:

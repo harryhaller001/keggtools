@@ -1,41 +1,33 @@
 """ Resolve requests to KEGG data Api """
 
-# import logging
+
+from typing import Optional
 from .utils import parse_tsv, request
 from .storage import Storage
 from .models import Pathway
 
-# import re
-# from .utils import parse_tsv, request as request_url
 
 class Resolver:
     """
-    KEGG pathway Resolver
+    KEGG pathway resolver class.
     Request interface for KEGG API endpoint
     """
 
-    def __init__(self, org: str) -> None:
+    def __init__(
+        self,
+        organism: str,
+        cachedir: Optional[str] = None
+    ) -> None:
         """
-        Need <org> 3 letter code for organism
-        :param org: str
-        """
-
-        if not isinstance(org, str):
-            # logging.error("Expect type str. Got type %s", type(org).__name__)
-            raise TypeError("Expect type str for organism.")
-
-        self.organism: str = org
-
-
-    @staticmethod
-    def request(url: str):
-        """
-        GET request to given Url
-        :param url: str
-        :return: byte
+        Need 3 letter code as organism identifier.
+        :param organism: str
+        :param cachedir: str
         """
 
-        return request(url=url)
+        self.organism: str = organism
+
+        # Internal storage instance
+        self.storage: Storage = Storage(cachedir=cachedir)
 
 
     def get_pathway_list(self):
@@ -64,7 +56,7 @@ class Resolver:
         # )
 
         data = parse_tsv(
-            Resolver.request(
+            request(
                 url=f"http://rest.kegg.jp/list/pathway/{self.organism}"
             )
         )
@@ -103,18 +95,17 @@ class Resolver:
         :param code: str
         :return: KEGGPathway
         """
-        store = Storage()
-        if store.pathway_file_exist(org=self.organism, code=code):
+        if self.storage.pathway_file_exist(org=self.organism, code=code):
             # load from file
-            data = store.load(filename=f"{self.organism}_path{code}.kgml")
+            data = self.storage.load(filename=f"{self.organism}_path{code}.kgml")
 
             # logging.debug("Load pathway path:%s%s from file", self.organism, code)
         else:
             # request pathway and store
-            data = Resolver.request(
+            data = request(
                 Resolver.build_url(org=self.organism, code=code))
 
-            store.save(filename=f"{self.organism}_path{code}.kgml", data=data)
+            self.storage.save(filename=f"{self.organism}_path{code}.kgml", data=data)
 
             # logging.debug("Download pathway path:%s%s from rest.kegg.jp", self.organism, code)
         return Pathway.parse(data)
@@ -126,7 +117,7 @@ class Resolver:
         :return: list
         """
         data = parse_tsv(
-            Resolver.request(
+            request(
                 f"http://rest.kegg.jp/link/pathway/{self.organism}:{geneid}"
             )
         )
@@ -145,12 +136,12 @@ class Resolver:
         """
         downloads = 0
         for code in pathways:
-            if not Storage.pathway_file_exist(org=self.organism, code=code):
+            if not self.storage.pathway_file_exist(org=self.organism, code=code):
                 url = Resolver.build_url(org=self.organism, code=code)
 
                 # logging.debug("Requesting path:%s%s %s...", self.organism, code, url)
-                Storage.save(filename=f"{self.organism}_path{code}.kgml",
-                                     data=Resolver.request(url))
+                self.storage.save(filename=f"{self.organism}_path{code}.kgml",
+                                     data=request(url))
                 downloads += 1
         # logging.debug("Download %d pathway KGML files from KEGG", downloads)
 
@@ -166,7 +157,7 @@ class Resolver:
             url = "http://rest.kegg.jp/list/compound/"
             # logging.debug("Requesting components %s...", url)
             result = {}
-            for items in parse_tsv(Resolver.request(url=url)):
+            for items in parse_tsv(request(url=url)):
                 if len(items) >= 2 and items[0] != "":
                     result[items[0].split(":")[1]] = items[1].split(";")[0]
             Storage.save_dump(filename=filename, data=result)

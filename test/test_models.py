@@ -5,24 +5,76 @@ from xml.etree.ElementTree import Element
 
 import pytest
 
-from keggtools.models import Relation, is_valid_org
+from keggtools.models import (
+    Relation,
+    is_valid_pathway_name,
+    is_valid_pathway_number,
+    is_valid_pathway_org,
+    is_valid_hex_color,
+)
 
 
 
-def test_valid_org() -> None:
+def test_valid_pathway_org() -> None:
     """
     Testing org code validation function.
     """
 
     # Testing valid cases
-    assert is_valid_org(value="ko")
-    assert is_valid_org(value="ec")
-    assert is_valid_org(value="hsa")
+    assert is_valid_pathway_org(value="ko")
+    assert is_valid_pathway_org(value="ec")
+    assert is_valid_pathway_org(value="hsa")
 
     # Test invalid cases
-    assert is_valid_org(value="hs2") is False
-    assert is_valid_org(value="") is False
-    assert is_valid_org(value="hsaa") is False
+    assert is_valid_pathway_org(value="hs2") is False
+    assert is_valid_pathway_org(value="") is False
+    assert is_valid_pathway_org(value="hsaa") is False
+
+
+
+def test_valid_pathway_name() -> None:
+    """
+    Testing validation for combined pathway name.
+    """
+
+    # testing valid cases
+    assert is_valid_pathway_name(value="path:ko12345")
+
+    # Testing invalid cases (wrong prefix, invalid org and name)
+    assert is_valid_pathway_name(value="prefix:ko12345") is False
+    assert is_valid_pathway_name(value="path:aaaa12345") is False
+    assert is_valid_pathway_name(value="path:ko123456") is False
+
+
+
+def test_valid_pathway_number() -> None:
+    """
+    Testing validation of pathway number.
+    """
+
+    # Testing valid cases
+    assert is_valid_pathway_number(value="12345")
+
+    # Testing invalid cases (not numeric, not 5 digit)
+    assert is_valid_pathway_number(value="1234a") is False
+    assert is_valid_pathway_number(value="1234") is False
+
+
+
+def test_valid_hex_color() -> None:
+    """
+    Testing validation of hex color.
+    """
+
+    # testing valid cases
+    assert is_valid_hex_color(value="#00af4e")
+    assert is_valid_hex_color(value="#00FFA4")
+
+    # Testing invalid cases
+
+    assert is_valid_hex_color(value="#00af4E00") is False
+    assert is_valid_hex_color(value="#00af4K") is False
+
 
 
 
@@ -66,6 +118,7 @@ def test_relation_model_parsing() -> None:
         Relation.parse(ElementTree.fromstring(
             """<relation entry1="44" entry2="50"></relation>"""
         ))
+
 
 
 def test_relation_with_subtype_parsing() -> None:

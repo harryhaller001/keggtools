@@ -48,7 +48,7 @@ RELATION_TYPES = {
     "maplink": "link to another map"
 }
 
-GRAPHICS_TYPE = [
+GRAPHIC_TYPE = [
     "rectangle",
     "circle",
     "roundrectangle",

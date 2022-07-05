@@ -9,7 +9,7 @@ from .resolver import Resolver
 from .utils import ColorGradient
 
 
-class KEGGPathwayRenderer:
+class Renderer:
     """
     Renderer for KEGG Pathway
     """

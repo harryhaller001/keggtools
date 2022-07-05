@@ -1,11 +1,11 @@
 """ KEGG pathway models to parse object relational """
 # pylint: disable=invalid-name,too-few-public-methods
 
-import logging
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 from typing import Any, Dict, List, Union, Optional
 
+import re
 
 from .const import (
     RELATION_TYPES,
@@ -14,7 +14,63 @@ from .const import (
     GRAPHICS_TYPE,
 )
 
-from .utils import is_valid_numeric_attribute, is_valid_attribute
+from .utils import (
+    get_attribute,
+    get_numeric_attribute,
+    parse_xml,
+)
+
+
+
+
+def is_valid_org(value: str) -> bool:
+    """
+    Check if org identifier is valid.
+    """
+
+    # Organism must be 3 letter code
+    # Identifier can also be KO or Enzyme identifer
+    # TODO: validate with KEGG organism list
+    return value in ["ko", "ec"] or re.match(pattern=r"^([a-z]{3})$", string=value) is not None
+
+
+
+
+
+class Subtype:
+    """
+    Subtype model class.
+    """
+
+    def __init__(
+        self,
+        name: str,
+        value: str,
+    ) -> None:
+        """
+        Init Subtype model instance.
+        """
+        self.name: str = name
+        self.value: str = value
+
+
+    @staticmethod
+    def parse(item: Element) -> "Subtype":
+        """
+        Parse subtype XML Element.
+        """
+
+        # check correct type
+        assert item.tag == "subtype"
+
+
+        name: str = get_attribute(element=item, key="name")
+        value: str = get_attribute(element=item, key="value")
+
+        # TODO: check for valid subtype names in RELATION_SUBTYPES
+
+        return Subtype(name=name, value=value)
+
 
 
 
@@ -36,7 +92,7 @@ class Relation:
         self.entry1: str = entry1
         self.entry2: str = entry2
         self.type: str = type
-        self.subtypes: Dict[str, str] = {}
+        self.subtypes: List[Subtype] = []
 
 
     @staticmethod
@@ -51,48 +107,26 @@ class Relation:
         assert item.tag == "relation"
 
 
+        entry1: str = get_numeric_attribute(element=item, key="entry1")
+        entry2: str = get_numeric_attribute(element=item, key="entry2")
+        type: str = get_attribute(element=item, key="type")
+
+        if type not in RELATION_TYPES:
+            raise ValueError(f"Relation type '{type}' not in list of valid types.")
+
+
         # Create relation instance from attributes
-        relation: Relation = Relation()
+        relation: Relation = Relation(
+            entry1=entry1,
+            entry2=entry2,
+            type=type,
+        )
 
 
-        # Check attributes
-        if is_valid_numeric_attribute(element=item, key="entry1"):
+        # Parse Child items of xml element by iterating of child elements
+        for child in item:
+            relation.subtypes.append(Subtype.parse(item=child))
 
-            # Set entry1 attribute to relation instance
-            relation.entry1 = item.attrib.get("entry1")
-        else:
-            raise ValueError("Attribute 'entry1' from relation is not a string.")
-
-
-        if is_valid_numeric_attribute(element=item, key="entry2"):
-
-            # Set entry2 attribute to relation instance
-            relation.entry2 = item.attrib.get("entry2")
-        else:
-            raise ValueError("Attribute 'entry2' from relation is not a string.")
-
-
-
-        if is_valid_attribute(element=item, key="type"):
-
-            # Check relation type is list of allowed relation types
-            if item.attrib.get("type") not in RELATION_TYPES:
-                raise ValueError("Attribute 'type' has invalid value.")
-
-            # Set type attribute to relation instance
-            relation.type = item.attrib.get("type")
-        else:
-            raise ValueError("Attribute 'type' from relation is not a string.")
-
-
-
-        # for child in item:
-        #     if child.tag == "subtype":
-        #         # Parse subtypes
-        #         _name: Any = child.attrib.get("name")
-        #         _value: Any = child.attrib.get("value")
-        #         if isinstance(_name, str) is True:
-        #             relation.subtypes[_name] = _value
 
         return relation
 
@@ -117,7 +151,7 @@ class Component:
 
     def __init__(self, id: str) -> None:
         """
-        Init Component model
+        Init Component model.
         """
 
         self.id: str = id
@@ -126,20 +160,19 @@ class Component:
     @staticmethod
     def parse(item: Element) -> "Component":
         """
-        Parsing ElementTree into Component
-
+        Parsing ElementTree into Component.
         :param item: ElementTree
         :return: Component
         """
 
+        # Check for correct xml tag
         assert item.tag == "component"
 
-        # Get component id from xml
-        component_id: Optional[str] = item.attrib.get("id")
-        if component_id is None:
-            raise TypeError("Component id is not type string.")
+        component_id: str = get_attribute(element=item, key="id")
 
-        # Create component instance
+        # Check pattern of component id
+
+        # Create component instance from id attribute
         component: Component = Component(id=component_id)
         return component
 
@@ -282,31 +315,86 @@ class Entry:
         return f"<Entry id={self.id} name='{self.name}' type='{self.type}'>"
 
 
-class KEGGPathway:
+class Pathway:
     """
-    KEGG Pathway
+    KEGG Pathway object.
+    The KEGG pathway object stores graphics information and related objects.
     """
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self):
+    def __init__(
+        self,
+        name: str,
+        org: str,
+        number: str,
+        ) -> None:
         """
-        Init KEGG Pathway model
+        Init KEGG Pathway model.
         """
 
-        # REQUIRED
-        self.name = ""
-        self.org = ""
-        self.number = ""
+        # REQUIRED parameter of pathway element
+        self.name: str = name
+        self.org: str = org
+        self.number: str = number
 
         # IMPLIED
-        self.title = ""
-        self.image = ""
-        self.link = ""
+        self.title: Optional[str] = None
+        self.image: Optional[str] = None
+        self.link: Optional[str] = None
 
         # Children
-        self.relations = []
-        self.entries = []
-        self.reactions = []
+        self.relations: List[Relation] = []
+        self.entries: List[Entry] = []
+        # self.reactions: List[Reaction] = []
+
+
+
+
+    @staticmethod
+    def parse(data: Union[Element, str]) -> "Pathway":
+        """
+        Parsing xml String in KEGG Pathway.
+        :param data: str
+        :return: Pathway
+        """
+
+        # Generate correct format from string or XML element object
+        item: Element = parse_xml(xml_object_or_string=data)
+
+
+        # Init pathway instance with all required attributes
+        pathway: Pathway = Pathway(
+            name=get_attribute(element=item, key="name"),
+            org=get_attribute(element=item, key="org"),
+            number=get_attribute(element=item, key="number"),
+        )
+
+
+        # Parse optional KGML pathway attributes
+        pathway.title = item.attrib.get("title")
+        pathway.image = item.attrib.get("image")
+        pathway.link = item.attrib.get("link")
+
+
+        # Parse child items of pathway
+        for child in item:
+            if child.tag == "entry":
+                pathway.entries.append(Entry.parse(child))
+            elif child.tag == "relation":
+                pathway.relations.append(Relation.parse(child))
+            # elif child.tag == "reaction":
+            #     # TODO: implement parsing, not needed for current use case
+            #     pass
+
+
+        return pathway
+
+
+
+
+
+
+
 
 
     def get_entry_by_id(self, entry_id: Union[str, int]):
@@ -349,7 +437,8 @@ class KEGGPathway:
         result: dict = {}
         for entry in self.entries:
             if entry.type == "gene":
-                result[entry.get_id()] = entry.graphics.name
+                if entry.graphics is not None:
+                    result[entry.get_id()] = entry.graphics.name
 
         # logging.debug("Get %d unique genes from pathway", len(result.keys()))
 
@@ -358,88 +447,9 @@ class KEGGPathway:
 
     def __str__(self) -> str:
         """
-        Build string summary for KEGG pathway
-
+        Build string summary for KEGG pathway.
         :return: str
         """
+        return f"<Pathway path:{self.org}{self.number} title='{self.title}'>"
 
-        return f"<KEGGPathway path:{self.org}{self.number} title='{self.title}'>"
-
-
-
-
-    @staticmethod
-    def parse(data: str) -> "KEGGPathway":
-        """
-        Parsing xml String in KEGG Pathway
-
-        :param data: str
-        :return: KEGGPathway
-        """
-
-        pathw: KEGGPathway = KEGGPathway()
-
-        root = ElementTree.fromstring(data)
-
-        pathw.name = root.attrib["name"]
-        pathw.org = root.attrib["org"]
-        pathw.number = root.attrib["number"]
-
-        pathw.title = root.attrib.get("title", "")
-        pathw.image = root.attrib.get("image", "")
-        pathw.link = root.attrib.get("link", "")
-
-        for child in root:
-            if child.tag == "entry":
-                pathw.entries.append(Entry.parse(child))
-            elif child.tag == "relation":
-                pathw.relations.append(Relation.parse(child))
-            elif child.tag == "reaction":
-                # TODO: implement parsing, not needed for current use case
-                pass
-            else:
-                logging.debug(child.tag)
-
-        return pathw
-
-
-
-
-
-
-# class Subtype:
-#     """
-#     Subtype model class.
-#     """
-
-#     def __init__(
-#         self,
-#         name: str,
-#         value: str,
-#     ) -> None:
-#         """
-#         Init Subtype model instance.
-#         """
-#         self.name: str = name
-#         self.value: str = value
-
-
-#     @staticmethod
-#     def parse(item: Element) -> "Subtype":
-#         """
-#         Parse subtype XML Element.
-#         """
-
-#         if item.tag != "subtype":
-#             raise ValueError("Tag of XML element is not 'subtype'.")
-
-
-#         # Parse subtypes
-#         _name: Optional[str] = item.attrib.get("name")
-#         _value: Optional[str] = item.attrib.get("value")
-
-#         if _name is None or _value is None:
-#             raise TypeError("Attribute 'name' or 'value' is not type string.")
-
-#         return Subtype(name=_name, value=_value)
 

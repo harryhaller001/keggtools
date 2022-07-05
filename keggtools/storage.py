@@ -6,14 +6,14 @@ import pickle
 from typing import Any, Optional
 
 
-class KEGGDataStorage:
+class Storage:
     """
     Storage handler class.
     """
 
     def __init__(self, cachedir: Optional[str] = None) -> None:
         """
-        Init KEGGDataStorage instance.
+        Init KEGG data storage instance.
         :param cachedir: str
         """
 

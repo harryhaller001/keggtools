@@ -11,8 +11,8 @@ from keggtools.utils import (
     ColorGradient,
     parse_tsv,
     parse_xml,
-    is_valid_attribute,
-    is_valid_numeric_attribute,
+    get_attribute,
+    get_numeric_attribute,
 )
 
 

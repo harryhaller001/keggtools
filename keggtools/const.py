@@ -2,6 +2,7 @@
 
 
 # Example list for immune system pathways
+# TODO: complete list of all pathways by groups
 
 IMMUNE_SYSTEM_PATHWAYS = {
     "04640": "Hematopoietic cell lineage",

@@ -1,6 +1,5 @@
 """ KEGG Enrichment analysis core """
 
-import logging
 from csv import DictWriter
 import os
 from typing import Dict, List, Any, Union, Optional
@@ -9,10 +8,10 @@ from io import TextIOWrapper
 
 from scipy import stats
 
-from keggtools.models import KEGGPathway
-from .resolver import KEGGPathwayResolver
-# from .models import KEGGPathway
-# from .storage import KEGGDataStorage
+from .models import Pathway
+from .resolver import Resolver
+from .models import Pathway
+from .storage import Storage
 
 
 # def get_all_pathways(org: str):
@@ -143,7 +142,7 @@ class KEGGPathwayAnalysis:
     def __init__(
         self,
         org: str,
-        pathways: Optional[Union[Dict[str, KEGGPathway], List[str]]] = None
+        pathways: Optional[Union[Dict[str, Pathway], List[str]]] = None
     ) -> None:
         """
         Init KEGG pathway enrichment analysis.
@@ -154,7 +153,7 @@ class KEGGPathwayAnalysis:
 
         self.organism: str = org
         self.summary: List[KEGGPathwayAnalysisResult] = []
-        self.resolver: KEGGPathwayResolver = KEGGPathwayResolver(self.organism)
+        self.resolver: Resolver = Resolver(self.organism)
 
         # Create pathway lookup dict
         self.all_pathways: dict = {}
@@ -277,10 +276,11 @@ class KEGGPathwayAnalysis:
 
                 analysis.set_pvalue(pval=pval)
             else:
-                logging.debug("No genes found for %s:%s." \
-                              " p value calculation skipped.",
-                              analysis.organism,
-                              analysis.pathway_id)
+                # logging.debug("No genes found for %s:%s." \
+                #               " p value calculation skipped.",
+                #               analysis.organism,
+                #               analysis.pathway_id)
+                pass
 
         self.summary = result
         return result
@@ -365,9 +365,9 @@ class KEGGPathwayAnalysis:
                 summary_list.append(result.json_summary())
             return pandas.DataFrame(summary_list)
         except ImportError:
-            logging.error(
-                "Package 'pandas' is not installed." \
-                "To use this function please 'pip install pandas'"
-            )
+            # logging.error(
+            #     "Package 'pandas' is not installed." \
+            #     "To use this function please 'pip install pandas'"
+            # )
             return None
 

@@ -5,7 +5,25 @@ from xml.etree.ElementTree import Element
 
 import pytest
 
-from keggtools.models import Relation
+from keggtools.models import Relation, is_valid_org
+
+
+
+def test_valid_org() -> None:
+    """
+    Testing org code validation function.
+    """
+
+    # Testing valid cases
+    assert is_valid_org(value="ko")
+    assert is_valid_org(value="ec")
+    assert is_valid_org(value="hsa")
+
+    # Test invalid cases
+    assert is_valid_org(value="hs2") is False
+    assert is_valid_org(value="") is False
+    assert is_valid_org(value="hsaa") is False
+
 
 
 def test_relation_model_parsing() -> None:
@@ -45,4 +63,25 @@ def test_relation_model_parsing() -> None:
 
     # Test missing type attribute
     with pytest.raises(ValueError):
-        Relation.parse(ElementTree.fromstring("""<relation entry1="44" entry2="50"></relation>"""))
+        Relation.parse(ElementTree.fromstring(
+            """<relation entry1="44" entry2="50"></relation>"""
+        ))
+
+
+def test_relation_with_subtype_parsing() -> None:
+    """
+    Test relation parsing function with one or more subtypes.
+    """
+
+
+    relation_parsed: Relation = Relation.parse(ElementTree.fromstring(
+        """<relation entry1="44" entry2="50" type="ECrel">
+            <subtype name="activation" value="--&gt;"/>
+            <subtype name="binding/association" value="---"/>
+        </relation>"""
+    ))
+
+    assert len(relation_parsed.subtypes) == 2
+
+
+

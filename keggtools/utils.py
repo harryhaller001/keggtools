@@ -18,37 +18,34 @@ import requests
 
 # XML parsing helper functions
 
+
+def get_attribute(element: Element, key: str) -> str:
+    """
+    Get attribute from XML Element object. Raises KeyError is Attribute is not found or not valid.
+    """
+
+    value: Optional[str] = element.attrib.get(key)
+
+    # Check if value is not none and is string
+    if value is None or isinstance(value, str) is False:
+        raise ValueError(f"Value of attribute '{key}' is not a string.")
+
+    return value
+
+
+
 def get_numeric_attribute(element: Element, key: str) -> str:
     """
     Get attribute from XML Element object. Raises KeyError is Attribute is not found or not valid.
     """
-    if is_valid_numeric_attribute(element=element, key=key) is False:
-        raise KeyError(f"Value of attribute '{key}' is not a valid numeric string.")
 
-    value: Optional[str] = element.attrib.get(key)
+    value: str = get_attribute(element=element, key=key)
 
-    # TODO: complete parsing function!!!
-
-    if value is None or isinstance(value, str) is False:
-        pass
+    # Check if string is numeric
+    if str.isnumeric(value) is False:
+        raise ValueError(f"Value of attribute '{key}' is not numeric.")
 
     return value
-
-def is_valid_attribute(element: Element, key: str) -> bool:
-    """
-    Check is attribute of XML element exist and is string.
-    """
-    return element.attrib.get(key) is not None and \
-        isinstance(element.attrib.get(key), str) is True
-
-
-def is_valid_numeric_attribute(element: Element, key: str) -> bool:
-    """
-    Check is attribute of XML element is numeric string.
-    """
-    return is_valid_attribute(element=element, key=key) and \
-        str.isnumeric(element.attrib.get(key)) is True
-
 
 
 

@@ -2,14 +2,14 @@
 
 import os
 
-from keggtools.storage import KEGGDataStorage
+from keggtools.storage import Storage
 
 def test_storage() -> None:
     """
     Testing storage
     """
 
-    storage: KEGGDataStorage = KEGGDataStorage()
+    storage: Storage = Storage()
 
     # check if directory exist
     assert os.path.isdir(storage.cachedir) is True

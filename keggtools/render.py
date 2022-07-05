@@ -1,11 +1,11 @@
 """ Render pipeline """
 # pylint: disable=line-too-long
 
-import logging
+# import logging
 from typing import Any, Dict, List
 import pydot
-from .models import KEGGPathway
-from .resolver import KEGGPathwayResolver
+from .models import Pathway
+from .resolver import Resolver
 from .utils import ColorGradient
 
 
@@ -15,7 +15,7 @@ class KEGGPathwayRenderer:
     """
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, kegg_pathway: KEGGPathway):
+    def __init__(self, kegg_pathway: Pathway):
         """
         Init renderer for KEGG Pathway
         :param kegg_pathway: KEGGPathway
@@ -34,7 +34,7 @@ class KEGGPathwayRenderer:
         self.upper_color = (255, 0, 0)
         self.lower_color = (0, 0, 255)
 
-        self.components = KEGGPathwayResolver.get_components()
+        self.components = Resolver.get_components()
 
 
     def set_overlay(self, gene_dict: dict):

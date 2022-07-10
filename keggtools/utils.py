@@ -1,13 +1,9 @@
 """ Basic utils for HTTP requests, parsing and rendering """
 
-
-# import logging
-# import math
 import csv
 from io import StringIO
-from lib2to3.pgen2.token import OP
 
-from typing import Any, List, Optional, Tuple, Union
+from typing import List, Optional, Union
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
@@ -165,6 +161,6 @@ class ColorGradient:
         b_component = _array_multiply(b_var, 1 - ratio)
         values: List[float] = list(map(sum, zip(a_component, b_component)))
 
-        return tuple([int(item) for item in values])
+        return tuple((int(item) for item in values))
 
 

@@ -1,19 +1,18 @@
 """ KEGG pathway models to parse object relational """
-# pylint: disable=invalid-name,too-few-public-methods,redefined-builtin
+# pylint: disable=invalid-name,too-few-public-methods,redefined-builtin,too-many-arguments
 
 # TODO: add to_xml() method to all classes to generate KGML xml object/string from instances
 # TODO: add abstract parent class for all classes (KGMLElement)
 # containing .parse() -> @, .to_xml() -> Element
 
-from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
-from typing import Any, Dict, List, Union, Optional
+from typing import List, Union, Optional
 
 import re
 
 from .const import (
     RELATION_TYPES,
-    RELATION_SUBTYPES,
+    # RELATION_SUBTYPES,
     ENTRY_TYPE,
     GRAPHIC_TYPE,
 )

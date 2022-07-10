@@ -15,7 +15,7 @@ class Renderer:
     """
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, kegg_pathway: Pathway):
+    def __init__(self, kegg_pathway: Pathway, resolver: Resolver) -> None:
         """
         Init renderer for KEGG Pathway
         :param kegg_pathway: KEGGPathway
@@ -34,7 +34,8 @@ class Renderer:
         self.upper_color = (255, 0, 0)
         self.lower_color = (0, 0, 255)
 
-        self.components = Resolver.get_components()
+        self.resolver: Resolver = resolver
+        self.components = resolver.get_components()
 
 
     def set_overlay(self, gene_dict: dict):

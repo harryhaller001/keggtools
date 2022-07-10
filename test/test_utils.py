@@ -1,8 +1,8 @@
 """ Testing utils module """
 
-from typing import Any, List
+from typing import List
 
-from xml.etree import ElementTree
+# from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
 
@@ -11,8 +11,8 @@ from keggtools.utils import (
     ColorGradient,
     parse_tsv,
     parse_xml,
-    get_attribute,
-    get_numeric_attribute,
+    # get_attribute,
+    # get_numeric_attribute,
 )
 
 

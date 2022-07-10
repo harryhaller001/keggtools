@@ -1,6 +1,5 @@
 """ Storage of KEGG data. Caching downloaded files from API to local file system. """
 
-# import logging
 import os
 import pickle
 from typing import Any, Optional

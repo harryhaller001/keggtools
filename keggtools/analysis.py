@@ -10,24 +10,14 @@ from scipy import stats
 
 from .models import Pathway
 from .resolver import Resolver
-from .models import Pathway
-from .storage import Storage
+# from .storage import Storage
 
-
-# def get_all_pathways(org: str):
-#     filename = "pathways_{ORG}.dump".format(ORG=org)
-#     if KEGGDataStorage.exist(filename=filename):
-#         return KEGGDataStorage.load_dump(filename=filename)
-#     else:
-#         resolve = KEGGPathwayResolver(org=org)
-#         pathways = resolve.get_pathway_list()
-#         KEGGDataStorage.save_dump(filename=filename, data=pathways)
-#         return pathways
+# TODO: rename to Enrichment/EnrichmentResult
 
 
 class AnalysisResult:
     """
-    Results of KEGG pathway enrichment analysis
+    Results of KEGG pathway enrichment analysis.
     """
 
     # pylint: disable=too-many-instance-attributes,too-many-arguments
@@ -94,16 +84,6 @@ class AnalysisResult:
         :return: dict
         """
 
-        # result = list()
-        # result.append(self.args["pathway_name"])
-        # result.append(self.args["pathway_id"])
-        # result.append(str(len(self.args["found_genes"])))
-        # result.append(str(len(self.args["pathway_genes"])))
-        # result.append(str(self.args["pvalue"]))
-        # result.append(",".join([str(a) for a in self.args["found_genes"]]))
-        # # result.append(",".join([str(a) for a in self.args["pathway_genes"]]))
-        # return "\t".join(result)
-
         result = {
             "pathway_name": self.pathway_name,
             "pathway_id": self.pathway_id,
@@ -136,7 +116,7 @@ class AnalysisResult:
 
 class Analysis:
     """
-    KEGG pathway enrichment analysis
+    KEGG pathway enrichment analysis.
     """
 
     def __init__(
@@ -227,7 +207,7 @@ class Analysis:
             # pathway = KEGGPathway.parse(KEGGDataStorage.load_pathway("mmu", pathway_id))
 
             genes_found = []
-            all_pathways_genes = pathway.get_genes().keys()
+            all_pathways_genes = list(pathway.get_genes().keys())
             absolute_pathway_genes += len(all_pathways_genes)
 
             for gene_id in all_pathways_genes:
@@ -263,19 +243,14 @@ class Analysis:
 
                 _, pval = stats.fisher_exact(
                     [
-                        [
-                            a_var,
-                            b_var
-                        ],
-                        [
-                            c_var,
-                            d_var
-                        ]
+                        [a_var, b_var],
+                        [c_var, d_var],
                     ]
                 )
 
                 analysis.set_pvalue(pval=pval)
             else:
+                # TODO: remove section
                 # logging.debug("No genes found for %s:%s." \
                 #               " p value calculation skipped.",
                 #               analysis.organism,

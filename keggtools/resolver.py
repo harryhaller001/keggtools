@@ -1,7 +1,7 @@
 """ Resolve requests to KEGG data Api """
 
+from typing import Any, Optional
 
-from typing import Optional
 from .utils import parse_tsv, request
 from .storage import Storage
 from .models import Pathway
@@ -10,7 +10,7 @@ from .models import Pathway
 class Resolver:
     """
     KEGG pathway resolver class.
-    Request interface for KEGG API endpoint
+    Request interface for KEGG API endpoint.
     """
 
     def __init__(
@@ -40,47 +40,39 @@ class Resolver:
         # path:<org><code>\t<name> - <org>
 
         # Request list of pathways from API
+        pathway_list_filename: str = f"pathway_{self.organism}.dump"
 
-        store = Storage()
-        if store.pathway_list_exist(org=self.organism):
+        if self.storage.exist(filename=pathway_list_filename):
+
             # return pathway list dump
-            # logging.debug("Found pathway list for organism %s in cache.", self.organism)
-            data = store.load_dump(filename=f"pathway_{self.organism}.dump")
+            data = self.storage.load_dump(filename=pathway_list_filename)
             return data
 
 
-        # request pathway list
-        # logging.debug(
-        #     "Not found pathway list for organism %s in cache." \
-        #     " Requesting from API", self.organism
-        # )
-
+        # Data not found in cache. Request from REST api
         data = parse_tsv(
             request(
                 url=f"http://rest.kegg.jp/list/pathway/{self.organism}"
             )
         )
 
+        # TODO: save as tsv not binary dump ?
+
+
         pathways = {}
         for line in data:
             if len(line) == 2 and line[0] != "":
                 pathways[line[0].split(":")[1].strip(self.organism)] = line[1].split(" - ")[0]
 
-        # logging.debug(
-        #     "Loading list of %d pathways for organism %s",
-        #     len(pathways.keys()),
-        #     self.organism
-        # )
-
-        # save dump
-        store.save_dump(filename=f"pathway_{self.organism}.dump", data=pathways)
+        # save as dump
+        self.storage.save_dump(filename=pathway_list_filename, data=pathways)
 
         # return pathway list
         return pathways
 
 
     @staticmethod
-    def build_url(org: str, code: str):
+    def build_url(org: str, code: str) -> str:
         """
         Build path to KGML File at KEGG API endpint
         :param org: str
@@ -89,72 +81,83 @@ class Resolver:
         """
         return f"http://rest.kegg.jp/get/{org}{code}/kgml"
 
-    def get_pathway(self, code: str):
+
+    def get_pathway(self, code: str) -> Pathway:
         """
         Request pathway by code
         :param code: str
         :return: KEGGPathway
         """
-        if self.storage.pathway_file_exist(org=self.organism, code=code):
-            # load from file
-            data = self.storage.load(filename=f"{self.organism}_path{code}.kgml")
 
-            # logging.debug("Load pathway path:%s%s from file", self.organism, code)
+        pathway_filename: str = f"{self.organism}_path{code}.kgml"
+        data: str = ""
+
+        # Check if file exist is storage
+        if self.storage.exist(filename=pathway_filename):
+            # load from file
+            data = self.storage.load(filename=pathway_filename)
+
         else:
             # request pathway and store
             data = request(
-                Resolver.build_url(org=self.organism, code=code))
+                Resolver.build_url(org=self.organism, code=code)
+            )
 
-            self.storage.save(filename=f"{self.organism}_path{code}.kgml", data=data)
+            self.storage.save(filename=pathway_filename, data=data)
 
-            # logging.debug("Download pathway path:%s%s from rest.kegg.jp", self.organism, code)
+        # Parse string
         return Pathway.parse(data)
 
-    def link_pathways(self, geneid: str):
-        """
-        Return all pathways linked to gene-id
-        :param geneid: str
-        :return: list
-        """
-        data = parse_tsv(
-            request(
-                f"http://rest.kegg.jp/link/pathway/{self.organism}:{geneid}"
-            )
-        )
 
-        result = []
-        for item in data:
-            if len(item) == 2 and item[0] != "":
-                result.append(item[1])
-        return result
+    # TODO: are these functions needed ???
+    # def link_pathways(self, geneid: str):
+    #     """
+    #     Return all pathways linked to gene-id
+    #     :param geneid: str
+    #     :return: list
+    #     """
+    #     data = parse_tsv(
+    #         request(
+    #             f"http://rest.kegg.jp/link/pathway/{self.organism}:{geneid}"
+    #         )
+    #     )
 
-    def download_pathways(self, pathways: list):
-        """
-        Download all pathways from list of pathway id's.
-        :param pathways:
-        :return: NoneType
-        """
-        downloads = 0
-        for code in pathways:
-            if not self.storage.pathway_file_exist(org=self.organism, code=code):
-                url = Resolver.build_url(org=self.organism, code=code)
+    #     result = []
+    #     for item in data:
+    #         if len(item) == 2 and item[0] != "":
+    #             result.append(item[1])
+    #     return result
 
-                # logging.debug("Requesting path:%s%s %s...", self.organism, code, url)
-                self.storage.save(filename=f"{self.organism}_path{code}.kgml",
-                                     data=request(url))
-                downloads += 1
-        # logging.debug("Download %d pathway KGML files from KEGG", downloads)
+    # def download_pathways(self, pathways: list):
+    #     """
+    #     Download all pathways from list of pathway id's.
+    #     :param pathways:
+    #     :return: NoneType
+    #     """
+    #     downloads = 0
+    #     for code in pathways:
+    #         if not self.storage.pathway_file_exist(org=self.organism, code=code):
+    #             url = Resolver.build_url(org=self.organism, code=code)
+
+    #             # logging.debug("Requesting path:%s%s %s...", self.organism, code, url)
+    #             self.storage.save(filename=f"{self.organism}_path{code}.kgml",
+    #                                  data=request(url))
+    #             downloads += 1
+    #     # logging.debug("Download %d pathway KGML files from KEGG", downloads)
 
 
-    def get_components(self):
+    def get_components(self) -> Any:
         """
         Get dict of components. Request if not in cache
         :return: dict
         """
+
+        # TODO: save as tsv not binary dump
+
         filename = "compound.dump"
         if not self.storage.exist(filename=filename):
             url = "http://rest.kegg.jp/list/compound/"
-            # logging.debug("Requesting components %s...", url)
+
             result = {}
             for items in parse_tsv(request(url=url)):
                 if len(items) >= 2 and items[0] != "":

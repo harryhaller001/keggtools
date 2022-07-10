@@ -33,7 +33,6 @@ setup(
     python_requires='>=3.6',
     url="https://github.com/harryhaller001/keggtools",
     install_requires=[
-        "tqdm",
         "requests",
         "pydot",
         "scipy"

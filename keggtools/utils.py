@@ -10,7 +10,6 @@ from lib2to3.pgen2.token import OP
 from typing import Any, List, Optional, Tuple, Union
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
-# from tqdm import tqdm
 
 import requests
 
@@ -56,58 +55,6 @@ def parse_xml(xml_object_or_string: Union[str, Element]) -> Element:
     if isinstance(xml_object_or_string, str):
         return ElementTree.fromstring(xml_object_or_string)
     return xml_object_or_string
-
-
-# class Downloader:
-#     """
-#     URL Downloader
-#     """
-
-#     def __init__(self, url: str):
-#         """
-#         Init Downloader
-#         :param url: str
-#         """
-#         self.url = url
-#         self.filename = ""
-
-
-#     def set_filename(self, filename: str):
-#         """
-#         Set filename for output
-#         :param filename: str
-#         """
-#         self.filename = filename
-
-#     def run(self):
-#         """
-#         Run Downloader
-#         """
-#         if not self.filename:
-#             raise ValueError("Output filename not set!")
-
-#         if not self.url:
-#             raise ValueError("Url not set.")
-
-#         # Streaming, so we can iterate over the response.
-#         response = requests.get(self.url, stream=True)
-
-#         # Total size in bytes.
-#         total_size = int(response.headers.get('content-length', 0))
-#         block_size = 1024
-#         wrote = 0
-
-#         with open(self.filename, 'wb') as f_obj:
-#             for data in tqdm(response.iter_content(block_size),
-#                              total=math.ceil(total_size // block_size),
-#                              unit='KB',
-#                              unit_scale=True):
-
-#                 wrote = wrote + len(data)
-#                 f_obj.write(data)
-#         # if total_size != 0 and wrote != total_size:
-#         if total_size not in (0, wrote):
-#             logging.error("ERROR, something went wrong")
 
 
 

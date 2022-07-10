@@ -11,7 +11,6 @@ MYPY_OPT		= $(PYTHON_OPT) -m mypy
 LINT_OPT		= $(PYTHON_OPT) -m pylint
 TEST_OPT		= $(PYTHON_OPT) -m pytest
 TWINE_OPT		= $(PYTHON_OPT) -m twine
-BANDIT_OPT		= $(PYTHON_OPT) -m bandit
 SPHINX_OPT		= $(PYTHON_OPT) -m sphinx
 COVERAGE_OPT	= $(PYTHON_OPT) -m coverage
 
@@ -32,13 +31,13 @@ help: ## This help.
 .PHONY: install
 install: ## install all python dependencies
 	$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests --upgrade
-	$(PIP_OPT) install requests scipy pydot tqdm --upgrade
+	$(PIP_OPT) install requests scipy pydot --upgrade
 	$(PYTHON_OPT) setup.py install
 
 
 .PHONY: freeze
 freeze: ## Freeze package dependencies
-	$(PIP_OPT) freeze | grep -E "requests==|tqdm==|pydot==|scipy==" > requirements.txt
+	$(PIP_OPT) freeze | grep -E "requests==|pydot==|scipy==" > requirements.txt
 	$(PIP_OPT) freeze --exclude keggtools > requirements-dev.txt
 
 
@@ -99,15 +98,6 @@ clean: ## Clean all build and caching directories
 	rm -rf ./docs/cloudflare-workers/node_modules
 	@echo "All build and caching folders removed"
 
-
-
-# TODO: fix all common vulnerabilies in package
-.PHONY: bandit
-bandit: ## Run bandit analysis to find common security issues in code
-	$(BANDIT_OPT) -r ./keggtools
-	$(BANDIT_OPT) -r ./test
-	$(BANDIT_OPT) setup.py
-	$(BANDIT_OPT) -r ./docs/*.py
 
 
 

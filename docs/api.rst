@@ -50,5 +50,6 @@ Models
 .. autoclass:: keggtools.models::Entry
     :members:
 
-.. autoclass:: keggtools.models::KEGGPathway
+.. autoclass:: keggtools.models::Pathway
     :members:
+

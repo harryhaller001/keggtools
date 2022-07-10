@@ -1,5 +1,5 @@
 """ KEGG pathway models to parse object relational """
-# pylint: disable=invalid-name,too-few-public-methods
+# pylint: disable=invalid-name,too-few-public-methods,redefined-builtin
 
 # TODO: add to_xml() method to all classes to generate KGML xml object/string from instances
 # TODO: add abstract parent class for all classes (KGMLElement)

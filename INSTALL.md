@@ -22,14 +22,13 @@ sudo apt install graphviz
 Python dependencies
 
 * `requests`
-* `tqdm`
 * `pydot`
 * `scipy`
 
 Installation of `python` dependencies:
 
 ```bash
-python3 -m pip install requests tqdm pydot scipy
+python3 -m pip install requests pydot scipy
 ```
 
 # Installation for `keggtools`

@@ -146,24 +146,23 @@ class Resolver:
         # logging.debug("Download %d pathway KGML files from KEGG", downloads)
 
 
-    @staticmethod
-    def get_components():
+    def get_components(self):
         """
         Get dict of components. Request if not in cache
         :return: dict
         """
         filename = "compound.dump"
-        if not Storage.exist(filename=filename):
+        if not self.storage.exist(filename=filename):
             url = "http://rest.kegg.jp/list/compound/"
             # logging.debug("Requesting components %s...", url)
             result = {}
             for items in parse_tsv(request(url=url)):
                 if len(items) >= 2 and items[0] != "":
                     result[items[0].split(":")[1]] = items[1].split(";")[0]
-            Storage.save_dump(filename=filename, data=result)
+            self.storage.save_dump(filename=filename, data=result)
             return result
 
-        return Storage.load_dump(filename=filename)
+        return self.storage.load_dump(filename=filename)
 
 
 

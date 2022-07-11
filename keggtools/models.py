@@ -1,5 +1,5 @@
 """ KEGG pathway models to parse object relational """
-# pylint: disable=invalid-name,too-few-public-methods,redefined-builtin,too-many-arguments
+# pylint: disable=invalid-name,redefined-builtin
 
 from xml.etree.ElementTree import Element
 from typing import List, Union, Optional
@@ -20,8 +20,6 @@ from .utils import (
 )
 
 
-
-# TODO: functions needed ???
 
 def is_valid_pathway_org(value: str) -> bool:
     """
@@ -208,6 +206,13 @@ class Component:
         # Create component instance from id attribute
         component: Component = Component(id=component_id)
         return component
+
+
+    def __str__(self) -> str:
+        """
+        Build string of component instance.
+        """
+        return f"<Component id='{self.id}'>"
 
 
 
@@ -414,7 +419,7 @@ class Pathway:
         Init KEGG Pathway model.
         """
 
-        # REQUIRED parameter of pathway element
+        # required parameter of pathway element
         self.name: str = name
         self.org: str = org
         self.number: str = number
@@ -430,15 +435,15 @@ class Pathway:
             raise ValueError(f"Pathway number '{number}' is not a valid value.")
 
 
-        # IMPLIED
+        # implied
         self.title: Optional[str] = title
         self.image: Optional[str] = image
         self.link: Optional[str] = link
 
-        # Children
+        # children
         self.relations: List[Relation] = []
         self.entries: List[Entry] = []
-        # self.reactions: List[Reaction] = []
+        # TODO self.reactions: List[Reaction] = []
 
 
 
@@ -484,54 +489,44 @@ class Pathway:
 
 
 
-
-
-
-
-
-
-    def get_entry_by_id(self, entry_id: Union[str, int]):
+    def get_entry_by_id(self, entry_id: str) -> Optional[Entry]:
         """
-        Get pathway Entry by id
-
-        :param entry_id: Union[str, int]
-        :return: Any
+        Get pathway Entry object by id.
+        :param entry_id: str
+        :return: Optional[Entry]
         """
 
         for item in self.entries:
-            if int(item.id) == int(entry_id):
+            if item.id == entry_id:
                 return item
         return None
 
 
-    def matches(self, gene_id_list: list):
+
+    def get_genes(self) -> List[str]:
         """
-        Return percent value for matching genes. [int(<gene_id>), ...]
-
-        :param gene_id_list: list
-        :return: float
-        """
-
-        # run over entry:gene_id -> return count / len(entry)
-        count = 0
-        for entry in self.entries:
-            if entry in gene_id_list:
-                count += 1
-        return count / len(self.entries)
-
-
-    def get_genes(self) -> dict:
-        """
-        List all genes from pathway {<gene_id>: <gene_name>}
-
-        :return: dict
+        List all genes from pathway.
+        :return: List of entry ids with type gene.
         """
 
-        result: dict = {}
+        result: List[str] = []
+
+        # Iterate of entries and get all gene type
+        # Keep list of genes unique
         for entry in self.entries:
             if entry.type == "gene":
-                if entry.graphics is not None:
-                    result[entry.id] = entry.graphics.name
+
+                # Get name of entry (KEGG identifier)
+                if " " in entry.name:
+                    # Check if name contains a space, which indicates list of multiple identifier
+                    splitted_entries: List[str] = entry.name.split(" ")
+                    for single_entry in splitted_entries:
+                        if single_entry not in result:
+                            result.append(single_entry)
+
+
+                elif entry.name not in result:
+                    result.append(entry.name)
 
         return result
 

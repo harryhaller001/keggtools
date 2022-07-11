@@ -1,18 +1,16 @@
 """ Testing utils module """
 
 from typing import List
-
-# from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
+# from requests.models import Response
 
 
 from keggtools.utils import (
     ColorGradient,
     parse_tsv,
     parse_xml,
-    # get_attribute,
-    # get_numeric_attribute,
+    # request,
 )
 
 
@@ -81,4 +79,12 @@ def test_parse_tsv() -> None:
 
     assert len(parsed_data) == 3
     assert parsed_data[0][1] == "header2"
+
+
+def test_request_function() -> None:
+    """
+    Testing function to request string from url endpoint.
+    """
+
+    # TODO mock response of http request
 

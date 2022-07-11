@@ -1,6 +1,6 @@
 """ Resolve requests to KEGG data Api """
 
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from .utils import parse_tsv, request
 from .storage import Storage
@@ -30,7 +30,7 @@ class Resolver:
         self.storage: Storage = Storage(cachedir=cachedir)
 
 
-    def get_pathway_list(self):
+    def get_pathway_list(self) -> Dict[str, str]:
         """
         Request list of pathways linked to organism. {<pathway-id>: <name>}
         :return: dict
@@ -45,12 +45,12 @@ class Resolver:
         if self.storage.exist(filename=pathway_list_filename):
 
             # return pathway list dump
-            data = self.storage.load_dump(filename=pathway_list_filename)
-            return data
+            loaded_data: Dict[str, str] = self.storage.load_dump(filename=pathway_list_filename)
+            return loaded_data
 
 
         # Data not found in cache. Request from REST api
-        data = parse_tsv(
+        data: list = parse_tsv(
             request(
                 url=f"http://rest.kegg.jp/list/pathway/{self.organism}"
             )
@@ -59,7 +59,7 @@ class Resolver:
         # TODO: save as tsv not binary dump ?
 
 
-        pathways = {}
+        pathways: Dict[str, str] = {}
         for line in data:
             if len(line) == 2 and line[0] != "":
                 pathways[line[0].split(":")[1].strip(self.organism)] = line[1].split(" - ")[0]

@@ -33,7 +33,7 @@ class EnrichmentResult:
         :param pathway_id: Identifier of KEGG pathway.
         :param pathway_name: Name of KEGG pathway.
         :param found_genes: List of found genes.
-        :param pathway_genes: list
+        :param pathway_genes: List of all genes in pathway.
         """
 
         # Pathway descriptions
@@ -117,41 +117,21 @@ class Enrichment:
     def __init__(
         self,
         org: str,
-        pathways: Optional[Union[Dict[str, Pathway], List[str]]] = None,
+        pathways: List[Pathway],
     ) -> None:
         """
         Init KEGG pathway enrichment analysis.
         :param org: Organism identifier used by KEGG database
             (3 letter code, e.g. "mmu" for mus musculus or "hsa" for human).
-        :param pathways: Any
+        :param pathways: (Optional) List of Pathway instances or list of KEGG pathway identifier.
         """
 
         self.organism: str = org
-        self.summary: List[EnrichmentResult] = []
+        self.result: List[EnrichmentResult] = []
         self.resolver: Resolver = Resolver(self.organism)
 
-        # Create pathway lookup dict
-        self.all_pathways: dict = {}
-
-        if pathways is None:
-            # If pathways are not set use all pathways
-            self.all_pathways = self.resolver.get_pathway_list()
-
-        elif isinstance(pathways, dict):
-            # Use given data when dict is passed
-            self.all_pathways = pathways
-
-        elif isinstance(pathways, list):
-            # Load all pathways and filter for pathways in list
-            for key, value in self.resolver.get_pathway_list().items():
-                if key in pathways:
-                    self.all_pathways[key] = value
-            if len(self.all_pathways.keys()) == 0:
-                raise ValueError("Pathways filter does not succeed. Still 0 pathways in list.")
-
-        else:
-            # still not pathways, raise error
-            raise ValueError("Pass list or dict of pathways to filter list.")
+        # Create pathway list
+        self.all_pathways: List[Pathway] = pathways
 
 
     def _check_analysis_result_exist(self) -> None:
@@ -159,7 +139,7 @@ class Enrichment:
         Check if summary exists
         :return: bool
         """
-        if not self.summary or len(self.summary) == 0:
+        if not self.result or len(self.result) == 0:
             raise ValueError("need to 'run_summary' first")
 
 
@@ -173,12 +153,12 @@ class Enrichment:
 
         buffer = []
         subset = [str(s) for s in subset]
-        for item in self.summary:
+        for item in self.result:
             if str(item.pathway_id) in subset:
                 buffer.append(item)
 
         if inplace is True:
-            self.summary = buffer
+            self.result = buffer
 
         return buffer
 
@@ -191,20 +171,21 @@ class Enrichment:
         """
         # pylint: disable=too-many-locals
 
-        result: List[EnrichmentResult] = []
         all_found_genes: int = 0
         absolute_pathway_genes: int = 0
         study_n: int = len(gene_list)
 
-        for pathway_id, name in self.all_pathways.items():
+        for pathway in self.all_pathways:
 
-            pathway = self.resolver.get_pathway(code=pathway_id)
-            # pathway = KEGGPathway.parse(KEGGDataStorage.load_pathway("mmu", pathway_id))
+            # Get pathway instance from resolver
+            # pathway: Pathway = self.resolver.get_pathway(code=pathway_id)
 
-            genes_found = []
-            all_pathways_genes = list(pathway.get_genes().keys())
+            genes_found: List[str] = []
+            all_pathways_genes = pathway.get_genes()
             absolute_pathway_genes += len(all_pathways_genes)
 
+
+            # Check for intersection between gene list and genes in pathway
             for gene_id in all_pathways_genes:
                 if gene_id in gene_list:
                     genes_found.append(gene_id)
@@ -214,16 +195,16 @@ class Enrichment:
             # Create analysis results instance and append to list of results
             pathway_result: EnrichmentResult = EnrichmentResult(
                 org="mmu",
-                pathway_id=pathway_id,
-                pathway_name=name,
+                pathway_id=pathway.number,
+                pathway_name=pathway.name,
                 found_genes=genes_found,
                 pathway_genes=all_pathways_genes
             )
-            result.append(pathway_result)
+            self.result.append(pathway_result)
 
         # Perform Fisher exact test
         # http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.stats.fisher_exact.html
-        for analysis in result:
+        for analysis in self.result:
 
             # Skip p value calculation if no genes are found
             if analysis.study_count > 0:
@@ -233,9 +214,8 @@ class Enrichment:
                 c_var: int = analysis.pathway_genes_count - analysis.study_count
                 d_var: int = absolute_pathway_genes - analysis.pathway_genes_count - b_var
 
-                # print(a_var, b_var, "\n", c_var, d_var,
-                # "\n" + str(absolute_pathway_genes) + "-" * 10)
 
+                # Calculate p value with Fisher exact test
                 _, pval = stats.fisher_exact(
                     [
                         [a_var, b_var],
@@ -244,16 +224,9 @@ class Enrichment:
                 )
 
                 analysis.pvalue = pval
-            else:
-                # TODO: remove section
-                # logging.debug("No genes found for %s:%s." \
-                #               " p value calculation skipped.",
-                #               analysis.organism,
-                #               analysis.pathway_id)
-                pass
 
-        self.summary = result
-        return result
+
+        return self.result
 
 
     def to_json(self) -> List[Dict[str, Any]]:
@@ -263,7 +236,7 @@ class Enrichment:
 
         result: list = []
 
-        for item in self.summary:
+        for item in self.result:
             result.append(item.json_summary())
 
         return result
@@ -308,7 +281,7 @@ class Enrichment:
         headers: List[str] = EnrichmentResult.get_header()
         writer: DictWriter = DictWriter(csv_file, fieldnames=headers)
 
-        for item in self.summary:
+        for item in self.result:
             # Write lines
             writer.writerow(item.json_summary(gene_delimiter=child_delimiter))
 
@@ -331,7 +304,7 @@ class Enrichment:
             # Check if summary exists
             self._check_analysis_result_exist()
             summary_list = []
-            for result in self.summary:
+            for result in self.result:
                 summary_list.append(result.json_summary())
             return pandas.DataFrame(summary_list)
         except ImportError:

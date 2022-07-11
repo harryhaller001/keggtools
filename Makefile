@@ -30,15 +30,15 @@ help: ## This help.
 
 .PHONY: install
 install: ## install all python dependencies
-	$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests --upgrade
-	$(PIP_OPT) install requests scipy pydot --upgrade
-	$(PYTHON_OPT) setup.py install
+	@$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests --upgrade
+	@$(PIP_OPT) install requests scipy pydot --upgrade
+	@$(PYTHON_OPT) setup.py install
 
 
 .PHONY: freeze
 freeze: ## Freeze package dependencies
-	$(PIP_OPT) freeze | grep -E "requests==|pydot==|scipy==" > requirements.txt
-	$(PIP_OPT) freeze --exclude keggtools > requirements-dev.txt
+	@$(PIP_OPT) freeze | grep -E "requests==|pydot==|scipy==" > requirements.txt
+	@$(PIP_OPT) freeze --exclude keggtools > requirements-dev.txt
 
 
 # .PHONY: devfreeze
@@ -51,23 +51,23 @@ freeze: ## Freeze package dependencies
 
 .PHONY: twine
 twine: ## Twine package upload and checks
-	$(PYTHON_OPT) setup.py install
-	$(PYTHON_OPT) setup.py sdist bdist_wheel
-	$(TWINE_OPT) check ./dist/*
+	@$(PYTHON_OPT) setup.py install
+	@$(PYTHON_OPT) setup.py sdist bdist_wheel
+	@$(TWINE_OPT) check ./dist/*
 
 
 .PHONY: pylint
 pylint: ## Linting package
-	$(LINT_OPT) keggtools
-	$(LINT_OPT) ./setup.py
-	$(LINT_OPT) ./test/*.py
+	@$(LINT_OPT) keggtools
+	@$(LINT_OPT) ./setup.py
+	@$(LINT_OPT) ./test/*.py
 
 
 .PHONY: pytest
 pytest: ## Unittest of package
-	$(MYPY_OPT) ./test/test_package.py
-	$(LINT_OPT) ./test/test_package.py
-	$(TEST_OPT) -p keggtools --show-capture=log
+	@$(MYPY_OPT) ./test/test_package.py
+	@$(LINT_OPT) ./test/test_package.py
+	@$(TEST_OPT) -p keggtools --show-capture=log
 
 
 .PHONY: mypy
@@ -103,10 +103,10 @@ clean: ## Clean all build and caching directories
 
 .PHONY: docs
 docs:
-	$(PIP_OPT) install Sphinx sphinx-rtd-theme --upgrade
-	$(MYPY_OPT) ./docs/conf.py
-	$(LINT_OPT) ./docs/conf.py
-	$(SPHINX_OPT) ./docs ./docs/_build
+	@$(PIP_OPT) install Sphinx sphinx-rtd-theme --upgrade
+	@$(MYPY_OPT) ./docs/conf.py
+	@$(LINT_OPT) ./docs/conf.py
+	@$(SPHINX_OPT) ./docs ./docs/_build
 
 
 # Run all checks (always before committing!)

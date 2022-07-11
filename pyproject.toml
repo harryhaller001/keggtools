@@ -1,0 +1,69 @@
+
+# Project details
+[project]
+dependencies = [
+    "pydot >= 1.4.2",
+    "requests >= 2.27.1",
+    "scipy >= 1.5.4",
+    "types-requests >= 2.27.30",
+]
+
+
+
+[project.optional-dependencies]
+tests = [
+    "pylint",
+    "pytest",
+    "coverage",
+    "mypy",
+]
+
+docs = [
+    "Sphinx",
+    "sphinx-rtd-theme",
+]
+
+
+# Pylint
+
+[tool.pylint.'MESSAGES CONTROL']
+max-line-length = 120
+disable = "fixme,trailing-newlines,too-many-instance-attributes,too-many-arguments"
+
+
+# Mypy config
+# https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
+
+[tool.mypy]
+python_version = "3.6"
+warn_return_any = true
+warn_unused_configs = true
+
+
+# Ignore libs which are not PEP 561 compliant
+[[tool.mypy.overrides]]
+module = [
+    "pandas",
+    "sphinx_rtd_theme",
+    "setuptools",
+    "scipy",
+    "pydot",
+
+]
+ignore_missing_imports = true
+
+
+# Pytest
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+
+log_format = "%(asctime)s %(levelname)s %(message)s"
+log_date_format = "%Y-%m-%d %H:%M:%S"
+log_level = "DEBUG"
+log_cli = true
+
+testpaths = [
+    "test",
+]
+

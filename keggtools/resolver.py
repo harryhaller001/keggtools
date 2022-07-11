@@ -1,6 +1,6 @@
 """ Resolve requests to KEGG data Api """
 
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
 from .utils import parse_tsv, request
 from .storage import Storage
@@ -20,8 +20,8 @@ class Resolver:
     ) -> None:
         """
         Need 3 letter code as organism identifier.
-        :param organism: str
-        :param cachedir: str
+        :param organism: 3 letter code of organism used by KEGG database.
+        :param cachedir: (Optional) Path to directory used as cache.
         """
 
         self.organism: str = organism
@@ -30,56 +30,45 @@ class Resolver:
         self.storage: Storage = Storage(cachedir=cachedir)
 
 
+
     def get_pathway_list(self) -> Dict[str, str]:
         """
         Request list of pathways linked to organism. {<pathway-id>: <name>}
         :return: dict
         """
 
+        # TODO: return as list of pathway identifier ?
+
         # path:mmu00010	Glycolysis / Gluconeogenesis - Mus musculus (mouse)
         # path:<org><code>\t<name> - <org>
 
         # Request list of pathways from API
-        pathway_list_filename: str = f"pathway_{self.organism}.dump"
+        pathway_list_filename: str = f"pathway_list_{self.organism}.tsv"
+
+        list_data: Optional[str] = None
 
         if self.storage.exist(filename=pathway_list_filename):
 
             # return pathway list dump
-            loaded_data: Dict[str, str] = self.storage.load_dump(filename=pathway_list_filename)
-            return loaded_data
+            list_data = self.storage.load(filename=pathway_list_filename)
 
+        else:
 
-        # Data not found in cache. Request from REST api
-        data: list = parse_tsv(
-            request(
-                url=f"http://rest.kegg.jp/list/pathway/{self.organism}"
-            )
-        )
+            # Data not found in cache. Request from REST api
+            list_data = request(url=f"http://rest.kegg.jp/list/pathway/{self.organism}")
 
-        # TODO: save as tsv not binary dump ?
+            # Save in storage
+            self.storage.save(filename=pathway_list_filename, data=list_data)
 
 
         pathways: Dict[str, str] = {}
-        for line in data:
+        for line in parse_tsv(data=list_data):
             if len(line) == 2 and line[0] != "":
                 pathways[line[0].split(":")[1].strip(self.organism)] = line[1].split(" - ")[0]
 
-        # save as dump
-        self.storage.save_dump(filename=pathway_list_filename, data=pathways)
 
         # return pathway list
         return pathways
-
-
-    @staticmethod
-    def build_url(org: str, code: str) -> str:
-        """
-        Build path to KGML File at KEGG API endpint
-        :param org: str
-        :param code: str
-        :return: str
-        """
-        return f"http://rest.kegg.jp/get/{org}{code}/kgml"
 
 
     def get_pathway(self, code: str) -> Pathway:
@@ -90,7 +79,7 @@ class Resolver:
         """
 
         pathway_filename: str = f"{self.organism}_path{code}.kgml"
-        data: str = ""
+        data: Optional[str] = None
 
         # Check if file exist is storage
         if self.storage.exist(filename=pathway_filename):
@@ -99,10 +88,7 @@ class Resolver:
 
         else:
             # request pathway and store
-            data = request(
-                Resolver.build_url(org=self.organism, code=code)
-            )
-
+            data = request(f"http://rest.kegg.jp/get/{self.organism}{code}/kgml")
             self.storage.save(filename=pathway_filename, data=data)
 
         # Parse string
@@ -146,7 +132,7 @@ class Resolver:
     #     # logging.debug("Download %d pathway KGML files from KEGG", downloads)
 
 
-    def get_components(self) -> Any:
+    def get_components(self) -> Dict[str, str]:
         """
         Get dict of components. Request if not in cache
         :return: dict
@@ -154,18 +140,35 @@ class Resolver:
 
         # TODO: save as tsv not binary dump
 
-        filename = "compound.dump"
-        if not self.storage.exist(filename=filename):
-            url = "http://rest.kegg.jp/list/compound/"
+        filename: str = "compound.tsv"
+        compound_data: Optional[str] = None
 
-            result = {}
-            for items in parse_tsv(request(url=url)):
-                if len(items) >= 2 and items[0] != "":
-                    result[items[0].split(":")[1]] = items[1].split(";")[0]
-            self.storage.save_dump(filename=filename, data=result)
-            return result
+        # Check if file exist is storage
+        if self.storage.exist(filename=filename):
 
-        return self.storage.load_dump(filename=filename)
+            # If file exist is storage load data
+            compound_data = self.storage.load(filename=filename)
+
+        else:
+            # Request tsv data from rest api
+            compound_data = request(url="http://rest.kegg.jp/list/compound/")
+
+            # Save compound data as raw tsv string
+            self.storage.save(filename=filename, data=compound_data)
+
+
+        # Check if compound data is not none
+        # if compound_data is None:
+        #     raise ValueError("Failed to load compound data.")
+
+        # Parse tsv string
+        result: Dict[str, str] = {}
+        for items in parse_tsv(compound_data):
+            if len(items) >= 2 and items[0] != "":
+                result[items[0].split(":")[1]] = items[1].split(";")[0]
+
+        return result
+
 
 
 

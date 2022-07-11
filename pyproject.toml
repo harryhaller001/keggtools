@@ -1,13 +1,41 @@
 
+
 # Project details
 [project]
+name = "keggtools"
+version = "0.5.0"
+description = "Enrichment analysis and visualisation toolkit for KEGG pathways"
+requires-python = '>=3.6'
+license="MIT"
+
+authors = [
+    {name="harryhaller001", email = "harryhaller001@gmail.com"}
+]
+
+readme = {file = "README.md", content-type="text/markdown"}
+
+classifiers=[
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 dependencies = [
     "pydot >= 1.4.2",
     "requests >= 2.27.1",
     "scipy >= 1.5.4",
-    "types-requests >= 2.27.30",
 ]
 
+
+
+
+[project.urls]
+# Documentation = ""
+Source = "https://github.com/harryhaller001/keggtools"
+# Home-page = ""
 
 
 [project.optional-dependencies]
@@ -16,12 +44,23 @@ tests = [
     "pytest",
     "coverage",
     "mypy",
+    "types-requests",
 ]
 
-docs = [
+doc = [
     "Sphinx",
     "sphinx-rtd-theme",
 ]
+
+
+# Package build system
+
+[build-system]
+requires = [
+    "setuptools >= 59.0"
+]
+build-backend = "setuptools.build_meta"
+
 
 
 # Pylint
@@ -63,7 +102,13 @@ log_date_format = "%Y-%m-%d %H:%M:%S"
 log_level = "DEBUG"
 log_cli = true
 
+python_files = "test_*.py"
 testpaths = [
     "test",
 ]
+
+
+[tool.coverage.run]
+source = ["keggtools"]
+omit = ["*/test/*"]
 

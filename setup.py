@@ -17,7 +17,7 @@ setup(
     license="MIT",
     author = "harryhaller001",
     author_email = "harryhaller001@gmail.com",
-    description = ("Enrichment analysis and visualisation toolkit for KEGG pathways"),
+    description = "Enrichment analysis and visualisation toolkit for KEGG pathways",
     packages=setuptools.find_packages(),
     long_description=read('README.md'),
     long_description_content_type="text/markdown",

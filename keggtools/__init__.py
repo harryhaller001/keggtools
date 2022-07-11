@@ -1,7 +1,7 @@
 """ Init keggtools module """
 
 
-from .analysis import EnrichmentResult, EnrichmentResult
+from .analysis import EnrichmentResult, Enrichment
 from .models import Pathway, Relation, Entry, Graphics, Subtype, Component
 from .resolver import Resolver
 from .render import Renderer

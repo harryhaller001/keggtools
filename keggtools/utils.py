@@ -61,8 +61,7 @@ def parse_tsv(data: str) -> list:
     :param data: str
     :return: list
     """
-    fstream = StringIO(data)
-    return list(csv.reader(fstream, delimiter="\t"))
+    return list(csv.reader(StringIO(data), delimiter="\t"))
 
 
 
@@ -73,19 +72,9 @@ def request(url: str, encoding="utf-8") -> str:
     :param encoding: str
     :return: str
     """
-    # logging.debug("Requesting Url %s", url)
     response = requests.get(url=url)
-    # logging.debug("Request finished with status code %d", response.status_code)
     response.raise_for_status()
     return response.content.decode(encoding)
-
-
-# TODO: add request_tsv function for GET request and TSV parsing
-def request_tsv(url: str) -> list:
-    """
-    Request and parse TSV file from url.
-    """
-    return parse_tsv(data=request(url=url))
 
 
 

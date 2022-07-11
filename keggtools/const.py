@@ -4,7 +4,10 @@
 # Example list for immune system pathways
 # TODO: complete list of all pathways by groups
 
-IMMUNE_SYSTEM_PATHWAYS = {
+from typing import Dict, List
+
+
+IMMUNE_SYSTEM_PATHWAYS: Dict[str, str] = {
     "04640": "Hematopoietic cell lineage",
     "04610": "Complement and coagulation cascades",
     "04611": "Platelet activation",
@@ -31,31 +34,58 @@ IMMUNE_SYSTEM_PATHWAYS = {
 # Constant element types in the KGML format
 # Details at KGML manual https://www.kegg.jp/kegg/xml/docs/
 
-RELATION_SUBTYPES = {
-    "activation": "-->",
-    "inhibition": "--|",
-    "expression": "-->",
-    "repression": "--|",
-    "indirect effect": "..>"
-}
+# RELATION_SUBTYPES = {
+#     "activation": "-->",
+#     "inhibition": "--|",
+#     "expression": "-->",
+#     "repression": "--|",
+#     "indirect effect": "..>"
+# }
+
+RELATION_SUBTYPES: List[str] = [
+    "compound",
+    "hidden compound",
+    "activation",
+    "inhibition",
+    "expression",
+    "repression",
+    "indirect effect",
+    "state change",
+    "binding/association",
+    "dissociation",
+    "missing interaction",
+    "phosphorylation",
+    "dephosphorylation",
+    "glycosylation",
+    "ubiquitination",
+    "methylation",
+]
 
 
-RELATION_TYPES = {
-    "ECrel": "enzyme-enzyme relation",
-    "PPrel": "protein-protein interaction",
-    "GErel": "gene expression interaction",
-    "PCrel": "protein-compound interaction",
-    "maplink": "link to another map"
-}
+# RELATION_TYPES = {
+#     "ECrel": "enzyme-enzyme relation",
+#     "PPrel": "protein-protein interaction",
+#     "GErel": "gene expression interaction",
+#     "PCrel": "protein-compound interaction",
+#     "maplink": "link to another map"
+# }
 
-GRAPHIC_TYPE = [
+RELATION_TYPES: List[str] = [
+    "ECrel",
+    "PPrel",
+    "GErel",
+    "PCrel",
+    "maplink",
+]
+
+GRAPHIC_TYPE: List[str] = [
     "rectangle",
     "circle",
     "roundrectangle",
     "line"
 ]
 
-ENTRY_TYPE = [
+ENTRY_TYPE: List[str] = [
     "ortholog",
     "enzyme",
     "reaction",

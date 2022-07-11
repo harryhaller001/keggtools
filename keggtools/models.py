@@ -1,10 +1,6 @@
 """ KEGG pathway models to parse object relational """
 # pylint: disable=invalid-name,too-few-public-methods,redefined-builtin,too-many-arguments
 
-# TODO: add to_xml() method to all classes to generate KGML xml object/string from instances
-# TODO: add abstract parent class for all classes (KGMLElement)
-# containing .parse() -> @, .to_xml() -> Element
-
 from xml.etree.ElementTree import Element
 from typing import List, Union, Optional
 
@@ -12,7 +8,7 @@ import re
 
 from .const import (
     RELATION_TYPES,
-    # RELATION_SUBTYPES,
+    RELATION_SUBTYPES,
     ENTRY_TYPE,
     GRAPHIC_TYPE,
 )
@@ -93,7 +89,9 @@ class Subtype:
         name: str = get_attribute(element=item, key="name")
         value: str = get_attribute(element=item, key="value")
 
-        # TODO: check for valid subtype names in RELATION_SUBTYPES
+        # check for valid subtype names in RELATION_SUBTYPES
+        if name not in RELATION_SUBTYPES:
+            raise ValueError(f"Name of relation subtype '{name}' is not in list of valid subtypes.")
 
         return Subtype(name=name, value=value)
 
@@ -534,8 +532,6 @@ class Pathway:
             if entry.type == "gene":
                 if entry.graphics is not None:
                     result[entry.id] = entry.graphics.name
-
-        # logging.debug("Get %d unique genes from pathway", len(result.keys()))
 
         return result
 

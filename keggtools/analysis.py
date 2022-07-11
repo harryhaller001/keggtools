@@ -43,10 +43,24 @@ class EnrichmentResult:
 
         # Results from enrichment analysis
         self.found_genes: list = found_genes
-        self.study_count: int = len(found_genes)
         self.pathway_genes: list = pathway_genes
-        self.pathway_genes_count: int = len(pathway_genes)
-        self.pvalue: Union[float, None] = None
+        self.pvalue: Optional[float] = None
+
+
+    @property
+    def pathway_genes_count(self) -> int:
+        """
+        Count of pathway genes.
+        """
+        return len(self.pathway_genes)
+
+
+    @property
+    def study_count(self) -> int:
+        """
+        Count of study genes.
+        """
+        return len(self.found_genes)
 
 
     def __str__(self) -> str:
@@ -58,30 +72,15 @@ class EnrichmentResult:
                 f" ({self.pathway_name}) {len(self.found_genes)}/{self.pathway_genes_count}>"
 
 
-    def __repr__(self):
-        """
-        Print out string summary
-        """
-        return self.__str__()
-
-
-    # TODO: needed function?
-    def set_pvalue(self, pval: float) -> None:
-        """
-        Set p value for enrichment analysis.
-        :param pval: float
-        """
-        self.pvalue = pval
-
 
     def json_summary(self, gene_delimiter: str = ",") -> Dict[str, Any]:
         """
-        Build json summary for enrichment analysis
+        Build json summary for enrichment analysis.
         :param gene_delimiter: str
         :return: dict
         """
 
-        result = {
+        return {
             "pathway_name": self.pathway_name,
             "pathway_id": self.pathway_id,
             "study_count": self.study_count,
@@ -90,7 +89,6 @@ class EnrichmentResult:
             "found_genes": gene_delimiter.join([str(a) for a in self.found_genes])
         }
 
-        return result
 
     @staticmethod
     def get_header() -> List[str]:
@@ -245,7 +243,7 @@ class Enrichment:
                     ]
                 )
 
-                analysis.set_pvalue(pval=pval)
+                analysis.pvalue = pval
             else:
                 # TODO: remove section
                 # logging.debug("No genes found for %s:%s." \

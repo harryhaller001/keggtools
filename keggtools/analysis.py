@@ -10,12 +10,9 @@ from scipy import stats
 
 from .models import Pathway
 from .resolver import Resolver
-# from .storage import Storage
-
-# TODO: rename to Enrichment/EnrichmentResult
 
 
-class AnalysisResult:
+class EnrichmentResult:
     """
     Results of KEGG pathway enrichment analysis.
     """
@@ -27,15 +24,15 @@ class AnalysisResult:
         pathway_id: str,
         pathway_name: str,
         found_genes: list,
-        pathway_genes: list
+        pathway_genes: list,
     ) -> None:
 
         """
-        Init Result of KEGG pathway enrichment analysis
-        :param org: str
-        :param pathway_id: str
-        :param pathway_name: str
-        :param found_genes: list
+        Init Result of KEGG pathway enrichment analysis.
+        :param org: 3 letter code of organism used by KEGG database.
+        :param pathway_id: Identifier of KEGG pathway.
+        :param pathway_name: Name of KEGG pathway.
+        :param found_genes: List of found genes.
         :param pathway_genes: list
         """
 
@@ -108,13 +105,13 @@ class AnalysisResult:
             "study_count",
             "pathway_genes",
             "pvalue",
-            "found_genes"
+            "found_genes",
         ]
 
 
 
 
-class Analysis:
+class Enrichment:
     """
     KEGG pathway enrichment analysis.
     """
@@ -122,7 +119,7 @@ class Analysis:
     def __init__(
         self,
         org: str,
-        pathways: Optional[Union[Dict[str, Pathway], List[str]]] = None
+        pathways: Optional[Union[Dict[str, Pathway], List[str]]] = None,
     ) -> None:
         """
         Init KEGG pathway enrichment analysis.
@@ -132,7 +129,7 @@ class Analysis:
         """
 
         self.organism: str = org
-        self.summary: List[AnalysisResult] = []
+        self.summary: List[EnrichmentResult] = []
         self.resolver: Resolver = Resolver(self.organism)
 
         # Create pathway lookup dict
@@ -159,7 +156,7 @@ class Analysis:
             raise ValueError("Pass list or dict of pathways to filter list.")
 
 
-    def _check_analysis_result_exist(self):
+    def _check_analysis_result_exist(self) -> None:
         """
         Check if summary exists
         :return: bool
@@ -168,7 +165,7 @@ class Analysis:
             raise ValueError("need to 'run_summary' first")
 
 
-    def get_subset(self, subset: list, inplace: bool = False) -> List[AnalysisResult]:
+    def get_subset(self, subset: list, inplace: bool = False) -> List[EnrichmentResult]:
         """
         Create subset of analysis result by list of pathway ids
         :param subset: list
@@ -188,15 +185,15 @@ class Analysis:
         return buffer
 
 
-    def run_analysis(self, gene_list: list) -> List[AnalysisResult]:
+    def run_analysis(self, gene_list: list) -> List[EnrichmentResult]:
         """
-        List of gene ids. Return list of AnalysisResult instances
+        List of gene ids. Return list of EnrichmentResult instances
         :param gene_list: list
-        :return: list(AnalysisResult)
+        :return: list(EnrichmentResult)
         """
         # pylint: disable=too-many-locals
 
-        result: List[AnalysisResult] = []
+        result: List[EnrichmentResult] = []
         all_found_genes: int = 0
         absolute_pathway_genes: int = 0
         study_n: int = len(gene_list)
@@ -217,7 +214,7 @@ class Analysis:
             all_found_genes += len(genes_found)
 
             # Create analysis results instance and append to list of results
-            pathway_result: AnalysisResult = AnalysisResult(
+            pathway_result: EnrichmentResult = EnrichmentResult(
                 org="mmu",
                 pathway_id=pathway_id,
                 pathway_name=name,
@@ -274,7 +271,7 @@ class Analysis:
         return result
 
 
-    def to_csv(self, file: Union[str, TextIOWrapper], delimiter="\t", overwrite=False):
+    def to_csv(self, file: Union[str, TextIOWrapper], delimiter="\t", overwrite=False) -> None:
         """
         Save result summary as file
         :param file: Union[str, TextIOWrapper]
@@ -310,7 +307,7 @@ class Analysis:
         if delimiter == child_delimiter:
             child_delimiter = ";"
 
-        headers: List[str] = AnalysisResult.get_header()
+        headers: List[str] = EnrichmentResult.get_header()
         writer: DictWriter = DictWriter(csv_file, fieldnames=headers)
 
         for item in self.summary:

@@ -27,6 +27,8 @@ def storage(cachedir: str) -> Generator[Storage, None, None]:
     generate storage instance. Fixtures helps cleanup cache dir after each function call.
     """
 
+    assert os.path.isdir(cachedir) is False
+
     storage: Storage = Storage(cachedir=cachedir)
 
     yield storage
@@ -37,6 +39,13 @@ def storage(cachedir: str) -> Generator[Storage, None, None]:
 
     os.rmdir(cachedir)
 
+    # try:
+    #     # Cleanup all files in cachedir and remove folder
+    #     for filename in os.listdir(path=cachedir):
+    #         os.remove(path=os.path.join(cachedir, filename))
+    #     os.rmdir(cachedir)
+    # except OSError:
+    #     pass
 
 
 

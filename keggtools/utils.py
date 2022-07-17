@@ -62,7 +62,7 @@ def parse_tsv(data: str) -> list:
 
 
 
-def parse_tsv_to_dict(data: str) -> Dict[str, str]:
+def parse_tsv_to_dict(data: str, col_keys: int = 0, col_values: int = 1) -> Dict[str, str]:
     """
     Parse .tsv file from string and build dict from first two columns. Other columns are ignored.
     """
@@ -71,8 +71,8 @@ def parse_tsv_to_dict(data: str) -> Dict[str, str]:
     result: Dict[str, str] = {}
 
     for row in list_data:
-        if len(row) >= 2 and row[0] != "":
-            result[row[0]] = row[1]
+        if len(row) >= 2 and row[col_keys] != "":
+            result[row[col_keys]] = row[col_values]
 
         # TODO: handle else cases or ignore silent ?
 

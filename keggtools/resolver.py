@@ -92,7 +92,9 @@ class Resolver:
         )
 
 
-        pathways: Dict[str, str] = parse_tsv_to_dict(data=list_data)
+        pathways: Dict[str, str] = parse_tsv_to_dict(
+            data=list_data,
+        )
 
         # return pathway list
         return pathways
@@ -115,7 +117,7 @@ class Resolver:
 
 
 
-    def get_components(self) -> Dict[str, str]:
+    def get_compounds(self) -> Dict[str, str]:
         """
         Get dict of components. Request if not in cache
         :return: dict
@@ -144,7 +146,11 @@ class Resolver:
             url="http://rest.kegg.jp/list/organism"
         )
 
-        result: Dict[str, str] = parse_tsv_to_dict(data=data)
+        result: Dict[str, str] = parse_tsv_to_dict(
+            data=data,
+            col_keys=1,
+            col_values=2,
+        )
 
         return result
 

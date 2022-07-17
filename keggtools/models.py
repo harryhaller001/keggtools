@@ -411,6 +411,7 @@ class Entry:
         """
 
         # TODO: validate return valid !!
+        # r"^([a-z]){3}([0-9]){5}$"
 
         return self.name.split(":")[1]
 

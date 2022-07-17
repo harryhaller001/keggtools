@@ -1,5 +1,7 @@
 """ Testing parsing models """
 
+import os
+from typing import List, Optional
 from xml.etree import ElementTree
 
 import pytest
@@ -98,6 +100,9 @@ def test_relation_model_parsing() -> None:
     assert relation_object.type == "ECrel"
 
 
+    assert isinstance(relation_object.__str__(), str)
+
+
     # Check for invalid type values
     with pytest.raises(ValueError):
         Relation.parse(ElementTree.fromstring(
@@ -152,6 +157,8 @@ def test_subtype_parsing() -> None:
 
     assert subtype_parsed.name == "activation"
 
+    assert isinstance(subtype_parsed.__str__(), str)
+
 
     # Test missing attribute
     with pytest.raises(ValueError):
@@ -181,6 +188,9 @@ def test_graphics_parsing() -> None:
     assert graphics_parsed.bgcolor == "#BFFFBF"
 
     assert graphics_parsed.coords is None
+
+
+    assert isinstance(graphics_parsed.__str__(), str)
 
 
     # test minimal attributes (no attributes are required)
@@ -233,6 +243,8 @@ def test_component_parsing() -> None:
 
     assert component_parsed.id == "123"
 
+    assert isinstance(component_parsed.__str__(), str)
+
     # Test invalid cases
 
     # Missing id attribute
@@ -251,14 +263,27 @@ def test_entry_parsing() -> None:
     Testing function to parse entry object.
     """
 
+    # Test valid cases
+
     entry_parsed: Entry = Entry.parse(ElementTree.fromstring(
-        """<entry id="123" name="entry name" type="gene"></entry>"""
+        """<entry id="123" name="mmu:12048" type="gene"></entry>"""
     ))
 
     assert entry_parsed.id == "123"
     assert entry_parsed.type == "gene"
 
     assert entry_parsed.graphics is None
+
+    assert isinstance(entry_parsed.__str__(), str)
+
+
+    assert entry_parsed.get_gene_id() == "12048"
+
+
+    # Test invalid cases
+
+    with pytest.raises(ValueError):
+        Entry(id="123", name="mmu:12048", type="invalid")
 
 
 
@@ -280,6 +305,8 @@ def test_pathway_parsing() -> None:
 
     assert pathway_parsed.link is None
     assert pathway_parsed.image is None
+
+    assert isinstance(pathway_parsed.__str__(), str)
 
 
     # Test invalid cases
@@ -325,4 +352,36 @@ def test_pathway_parsing() -> None:
     with pytest.raises(ValueError):
         Pathway(name="path:mmu12345", org="mmu", number="123456")
 
+
+
+def test_full_pathway_parsing() -> None:
+    """
+    Testing parsing functions by loading full KGML pathway.
+    """
+
+    basedir: str = os.path.dirname(__file__)
+
+    # Open pathway file and load content as string
+    with open(os.path.join(basedir, "pathway.kgml"), "r", encoding="utf-8") as file_obj:
+        pathway_parsed: Pathway = Pathway.parse(file_obj.read())
+
+
+    # Test search for entry in pathway
+
+    found_entry: Optional[Entry] = pathway_parsed.get_entry_by_id(entry_id="154")
+
+    assert found_entry is not None
+    assert found_entry.name == "mmu:19697"
+
+    # Test search of none existing entry in pathway
+
+    assert pathway_parsed.get_entry_by_id(entry_id="invalid") is None
+
+
+    # test get gene list function
+    # TODO: better checks (type, ...)
+
+    gene_list: List[str] = pathway_parsed.get_genes()
+
+    assert "mmu:19697" in gene_list
 

@@ -28,11 +28,12 @@ class EnrichmentResult:
 
         """
         Init Result of KEGG pathway enrichment analysis.
-        :param org: 3 letter code of organism used by KEGG database.
-        :param pathway_id: Identifier of KEGG pathway.
-        :param pathway_name: Name of KEGG pathway.
-        :param found_genes: List of found genes.
-        :param pathway_genes: List of all genes in pathway.
+
+        :param str org: 3 letter code of organism used by KEGG database.
+        :param str pathway_id: Identifier of KEGG pathway.
+        :param str pathway_name: Name of KEGG pathway.
+        :param list found_genes: List of found genes.
+        :param list pathway_genes: List of all genes in pathway.
         """
 
         # Pathway descriptions
@@ -50,6 +51,9 @@ class EnrichmentResult:
     def pathway_genes_count(self) -> int:
         """
         Count of pathway genes.
+
+        :rtype: int
+        :return: Number of genes in pathway.
         """
         return len(self.pathway_genes)
 
@@ -58,6 +62,9 @@ class EnrichmentResult:
     def study_count(self) -> int:
         """
         Count of study genes.
+
+        :rtype: int
+        :return: Number of genes found in analysis of pathway.
         """
         return len(self.found_genes)
 
@@ -65,9 +72,10 @@ class EnrichmentResult:
     def __str__(self) -> str:
         """
         Build string summary of KEGG path analysis result instance.
-        :return: str
+        :rtype: str
+        :return: Returns string that describes the enrichment result instance.
         """
-        return f"<KEGGPathwayAnalysisResult {self.organism}:{self.pathway_id}" \
+        return f"<EnrichmentResult {self.organism}:{self.pathway_id}" \
                 f" ({self.pathway_name}) {len(self.found_genes)}/{self.pathway_genes_count}>"
 
 
@@ -75,8 +83,10 @@ class EnrichmentResult:
     def json_summary(self, gene_delimiter: str = ",") -> Dict[str, Any]:
         """
         Build json summary for enrichment analysis.
-        :param gene_delimiter: str
-        :return: dict
+
+        :param str gene_delimiter: Delimiter to seperate genes in gene list.
+        :rtype: dict
+        :return: Dict
         """
 
         return {
@@ -93,6 +103,8 @@ class EnrichmentResult:
     def get_header() -> List[str]:
         """
         Build default header for enrichment analysis.
+
+        :rtype: list
         :return: list
         """
 

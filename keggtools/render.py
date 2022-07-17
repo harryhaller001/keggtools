@@ -70,7 +70,7 @@ class Renderer:
 
         # TODO: get compounds without a resolver instance ? or remove organism from resolver
         self.resolver: Resolver = resolver
-        self.components: Dict[str, str] = resolver.get_components()
+        self.components: Dict[str, str] = resolver.get_compounds()
 
 
 

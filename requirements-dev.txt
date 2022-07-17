@@ -28,6 +28,7 @@ mypy==0.961
 mypy-extensions==0.4.3
 numpy==1.19.5
 packaging==21.3
+pandas==1.1.5
 pep517==0.12.0
 pkginfo==1.8.3
 platformdirs==2.4.0
@@ -39,6 +40,7 @@ Pygments==2.12.0
 pylint==2.13.9
 pyparsing==3.0.9
 pytest==7.0.1
+python-dateutil==2.8.2
 pytz==2022.1
 readme-renderer==34.0
 requests==2.27.1

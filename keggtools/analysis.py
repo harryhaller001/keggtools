@@ -3,13 +3,12 @@
 from csv import DictWriter
 import os
 from typing import Dict, List, Any, Union, Optional
-from io import TextIOWrapper
+from io import IOBase
 
 
 from scipy import stats
 
 from .models import Pathway
-from .resolver import Resolver
 
 
 class EnrichmentResult:
@@ -116,7 +115,7 @@ class Enrichment:
 
     def __init__(
         self,
-        org: str,
+        # org: str,
         pathways: List[Pathway],
     ) -> None:
         """
@@ -126,12 +125,14 @@ class Enrichment:
         :param pathways: (Optional) List of Pathway instances or list of KEGG pathway identifier.
         """
 
-        self.organism: str = org
+        # self.organism: str = org
+        # self.resolver: Resolver = Resolver(self.organism)
+
         self.result: List[EnrichmentResult] = []
-        self.resolver: Resolver = Resolver(self.organism)
 
         # Create pathway list
         self.all_pathways: List[Pathway] = pathways
+
 
 
     def _check_analysis_result_exist(self) -> None:
@@ -140,7 +141,7 @@ class Enrichment:
         :return: bool
         """
         if not self.result or len(self.result) == 0:
-            raise ValueError("need to 'run_summary' first")
+            raise ValueError("need to 'run_analysis' first")
 
 
     def get_subset(self, subset: list, inplace: bool = False) -> List[EnrichmentResult]:
@@ -176,9 +177,6 @@ class Enrichment:
         study_n: int = len(gene_list)
 
         for pathway in self.all_pathways:
-
-            # Get pathway instance from resolver
-            # pathway: Pathway = self.resolver.get_pathway(code=pathway_id)
 
             genes_found: List[str] = []
             all_pathways_genes = pathway.get_genes()
@@ -234,6 +232,8 @@ class Enrichment:
         Export to json dict.
         """
 
+        self._check_analysis_result_exist()
+
         result: list = []
 
         for item in self.result:
@@ -242,10 +242,10 @@ class Enrichment:
         return result
 
 
-    def to_csv(self, file: Union[str, TextIOWrapper], delimiter="\t", overwrite=False) -> None:
+    def to_csv(self, file_obj: Union[str, IOBase, Any], delimiter="\t", overwrite=False) -> None:
         """
         Save result summary as file
-        :param file: Union[str, TextIOWrapper]
+        :param file: Union[str, IOBase] String to file or IOBase object
         :param delimiter: str
         :param overwrite: bool
         """
@@ -253,22 +253,25 @@ class Enrichment:
         # Check if summary exists
         self._check_analysis_result_exist()
 
-        if isinstance(file, str):
+        csv_file: Optional[IOBase] = None
+
+        if isinstance(file_obj, str):
             # file is str (Name of file)
-            if os.path.isfile(file) and not overwrite:
+            if os.path.isfile(file_obj) and not overwrite:
                 raise RuntimeError(
-                    f"File {file} does already exist." \
+                    f"File {file_obj} does already exist." \
                     "To solve please set overwrite=True."
                 )
 
             # pylint: disable=consider-using-with
-            csv_file = open(file, mode="w", encoding="utf-8")
-        elif isinstance(file, TextIOWrapper):
-            # file is TextIOWrapper (File object stream)
-            csv_file = file
+            csv_file = open(file_obj, mode="w", encoding="utf-8")
+        elif isinstance(file_obj, IOBase):
+            # file is IOBase (File object stream)
+            csv_file = file_obj
 
         else:
-            raise TypeError("Argument 'file' must be either type String or TextIOWrapper.")
+            raise TypeError("Argument 'file_obj' must be string or IOBase instance, like an open file object.")
+
 
 
         # Delimiter of gene names
@@ -296,21 +299,14 @@ class Enrichment:
         Return analysis result as pandas DataFrame. Required pandas dependency.
         """
 
-        try:
-            # Ignore import lint at this place to keep pandas an optional dependency
-            # pylint: disable=import-outside-toplevel
-            import pandas
+        # Ignore import lint at this place to keep pandas an optional dependency
+        # pylint: disable=import-outside-toplevel
+        import pandas
 
-            # Check if summary exists
-            self._check_analysis_result_exist()
-            summary_list = []
-            for result in self.result:
-                summary_list.append(result.json_summary())
-            return pandas.DataFrame(summary_list)
-        except ImportError:
-            # logging.error(
-            #     "Package 'pandas' is not installed." \
-            #     "To use this function please 'pip install pandas'"
-            # )
-            return None
+        # Check if summary exists
+        self._check_analysis_result_exist()
+        summary_list = []
+        for result in self.result:
+            summary_list.append(result.json_summary())
+        return pandas.DataFrame(summary_list)
 

@@ -135,6 +135,8 @@ dmypy.json
 
 # Ignore KGML pathway files and local caching
 *.kgml
+!/test/*.kgml
+
 *.dump
 /.cache
 
@@ -147,4 +149,3 @@ TODO.md
 CHANGELOG.md
 /.trash
 
-/keggtools/static/*

@@ -31,7 +31,7 @@ help: ## This help.
 .PHONY: install
 install: ## install all python dependencies
 	@$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests responses --upgrade
-	@$(PIP_OPT) install requests scipy pydot --upgrade
+	@$(PIP_OPT) install requests scipy pydot pandas --upgrade
 	@$(PYTHON_OPT) setup.py install
 
 

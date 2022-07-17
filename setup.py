@@ -18,7 +18,7 @@ setup(
     author = "harryhaller001",
     author_email = "harryhaller001@gmail.com",
     description = "Enrichment analysis and visualisation toolkit for KEGG pathways",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=["test"]),
     long_description=read('README.md'),
     long_description_content_type="text/markdown",
     classifiers=[
@@ -37,5 +37,5 @@ setup(
         "pydot",
         "scipy"
     ],
-    # download_url="https://github.com/harryhaller001/keggtools" # TODO: add release
+    download_url="https://github.com/harryhaller001/keggtools/archive/refs/tags/0.5.0.tar.gz"
 )

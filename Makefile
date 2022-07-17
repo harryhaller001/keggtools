@@ -53,7 +53,10 @@ freeze: ## Freeze package dependencies
 twine: ## Twine package upload and checks
 	@$(PYTHON_OPT) setup.py install
 	@$(PYTHON_OPT) setup.py sdist bdist_wheel
-	@$(TWINE_OPT) check ./dist/*
+	@$(TWINE_OPT) check --strict ./dist/*
+
+# TODO: remove legacy build and switch to build
+# python -m build --sdist --wheel
 
 
 .PHONY: pylint
@@ -83,6 +86,9 @@ mypy: ## Run static code analysis
 .PHONY: clean
 clean: ## Clean all build and caching directories
 
+# Remove old keggtools package
+	pip uninstall keggtools -y --quiet
+
 # Remove package build folders
 	rm -rf ./build
 	rm -rf ./dist
@@ -91,6 +97,8 @@ clean: ## Clean all build and caching directories
 # Remove mypy and pytest caching folders
 	rm -rf ./.mypy_cache
 	rm -rf ./.pytest_cache
+	rm -rf ./coverage
+	rm -f .coverage
 
 # Remove build folders for docs
 	rm -rf ./docs/_build

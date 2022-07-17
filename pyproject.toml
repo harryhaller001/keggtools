@@ -1,4 +1,16 @@
 
+# Package build system
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+# [options]
+# python_requires = ">=3.6"
+# py_modules = "keggtools"
+
+
 
 # Project details
 [project]
@@ -53,15 +65,6 @@ doc = [
 ]
 
 
-# Package build system
-
-[build-system]
-requires = [
-    "setuptools >= 59.0"
-]
-build-backend = "setuptools.build_meta"
-
-
 
 # Pylint
 
@@ -112,3 +115,6 @@ testpaths = [
 source = ["keggtools"]
 omit = ["*/test/*"]
 
+
+# [tool.setuptools]
+# packages = ["keggtools"]

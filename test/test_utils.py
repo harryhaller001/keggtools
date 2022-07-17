@@ -1,6 +1,6 @@
 """ Testing utils module """
 
-from typing import List
+from typing import Dict, List
 from xml.etree.ElementTree import Element
 
 # from requests.models import Response
@@ -10,7 +10,7 @@ from keggtools.utils import (
     ColorGradient,
     parse_tsv,
     parse_xml,
-    # request,
+    parse_tsv_to_dict,
 )
 
 
@@ -75,10 +75,21 @@ def test_parse_tsv() -> None:
     Testing TSV parsing function.
     """
 
-    parsed_data: list = parse_tsv(data="header1\theader2\nitem1\titem2\nitem3\titem4\n")
+    tsv_data: str = "header1\theader2\nitem1\titem2\nitem3\titem4\n"
+
+    parsed_data: list = parse_tsv(data=tsv_data)
 
     assert len(parsed_data) == 3
     assert parsed_data[0][1] == "header2"
+
+
+    # Test parse to dict function
+
+    parsed_dict: Dict[str, str] = parse_tsv_to_dict(data=tsv_data)
+
+    assert parsed_dict["header1"] == "header2"
+    assert parsed_dict["item3"] == "item4"
+
 
 
 def test_request_function() -> None:

@@ -3,7 +3,7 @@
 import csv
 from io import StringIO
 
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
@@ -63,6 +63,23 @@ def parse_tsv(data: str) -> list:
     """
     return list(csv.reader(StringIO(data), delimiter="\t"))
 
+
+
+def parse_tsv_to_dict(data: str) -> Dict[str, str]:
+    """
+    Parse .tsv file from string and build dict from first two columns. Other columns are ignored.
+    """
+    list_data: list = parse_tsv(data=data)
+
+    result: Dict[str, str] = {}
+
+    for row in list_data:
+        if len(row) >= 2 and row[0] != "":
+            result[row[0]] = row[1]
+
+        # TODO: handle else cases or ignore silent ?
+
+    return result
 
 
 def request(url: str, encoding="utf-8") -> str:

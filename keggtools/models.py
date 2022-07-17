@@ -201,7 +201,14 @@ class Component:
 
         component_id: str = get_attribute(element=item, key="id")
 
-        # Check pattern of component id
+        # id can't be empty
+        if component_id == "":
+            raise ValueError("Component id can't be empty.")
+
+
+        # TODO: Check pattern of component id
+        # TODO: component id should reference an existing entry !
+
 
         # Create component instance from id attribute
         component: Component = Component(id=component_id)
@@ -263,9 +270,18 @@ class Graphics:
             raise ValueError("Bgcolor is not a valid hex color.")
 
 
-        # TODO Checkx,y,width and height are numeric
+        # Check x,y,width and height are numeric (only if not None)
         if self.x is not None and str.isdigit(self.x) is False:
             raise ValueError("Value x is not a number.")
+
+        if self.y is not None and str.isdigit(self.y) is False:
+            raise ValueError("Value y is not a number.")
+
+        if self.width is not None and str.isdigit(self.width) is False:
+            raise ValueError("Value width is not a number.")
+
+        if self.height is not None and str.isdigit(self.height) is False:
+            raise ValueError("Value height is not a number.")
 
 
     @staticmethod
@@ -288,6 +304,8 @@ class Graphics:
             name = item.attrib.get("name"),
             type = item.attrib.get("type"),
             fgcolor = item.attrib.get("fgcolor"),
+            bgcolor = item.attrib.get("bgcolor"),
+            coords = item.attrib.get("coords"),
         )
 
         return graphic
@@ -433,6 +451,11 @@ class Pathway:
 
         if not is_valid_pathway_number(value=number):
             raise ValueError(f"Pathway number '{number}' is not a valid value.")
+
+
+        # Check match of number, org and name
+        if self.name != f"path:{self.org}{self.number}":
+            raise ValueError("Mismatch of arguments name, org and number.")
 
 
         # implied

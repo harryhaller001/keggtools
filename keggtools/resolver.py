@@ -1,8 +1,10 @@
 """ Resolve requests to KEGG data Api """
 
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
-from .utils import request, parse_tsv_to_dict
+import requests
+
+from .utils import parse_tsv_to_dict
 from .storage import Storage
 from .models import Pathway
 
@@ -16,18 +18,33 @@ class Resolver:
     def __init__(
         self,
         organism: str,
-        cachedir: Optional[str] = None
+        cache: Optional[Union[Storage, str]] = None
     ) -> None:
         """
         Need 3 letter code as organism identifier.
         :param organism: 3 letter code of organism used by KEGG database.
-        :param cachedir: (Optional) Path to directory used as cache.
+        :param cache: (Optional) Directory or Storage instance.
         """
+
 
         self.organism: str = organism
 
+        # Handle different types of argument for cache
+
+        _store: Optional[Storage] = None
+
+        if isinstance(cache, str):
+            _store = Storage(cachedir=cache)
+
+        elif isinstance(cache, Storage):
+            _store = cache
+        else:
+            # Fallback to default storage with hard coded folder name
+            _store = Storage()
+
+
         # Internal storage instance
-        self.storage: Storage = Storage(cachedir=cachedir)
+        self.storage: Storage = _store
 
 
     def _cache_or_request(self, filename: str, url: str) -> str:
@@ -45,7 +62,10 @@ class Resolver:
         else:
 
             # Data not found in cache. Request from REST api
-            file_data = request(url=url)
+
+            response = requests.get(url=url)
+            response.raise_for_status()
+            file_data = response.content.decode(encoding="utf-8")
 
             # Save in storage
             self.storage.save(filename=filename, data=file_data)

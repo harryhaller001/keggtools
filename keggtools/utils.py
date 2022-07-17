@@ -7,9 +7,6 @@ from typing import Dict, List, Optional, Union
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
-import requests
-
-
 
 # XML parsing helper functions
 
@@ -80,18 +77,6 @@ def parse_tsv_to_dict(data: str) -> Dict[str, str]:
         # TODO: handle else cases or ignore silent ?
 
     return result
-
-
-def request(url: str, encoding="utf-8") -> str:
-    """
-    Small request GET method. Returns content as string.
-    :param url: str
-    :param encoding: str
-    :return: str
-    """
-    response = requests.get(url=url)
-    response.raise_for_status()
-    return response.content.decode(encoding)
 
 
 

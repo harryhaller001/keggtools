@@ -83,7 +83,10 @@ def test_cache_readwrite() -> None:
     assert storage.load(filename=testing_filename) == testing_payload
 
     # testing binary file
-    assert storage.save_dump(filename=testing_filename, data=testing_payload) == os.path.join(cachedir, testing_filename)
+    assert storage.save_dump(
+        filename=testing_filename,
+        data=testing_payload
+    ) == os.path.join(cachedir, testing_filename)
     assert storage.load_dump(filename=testing_filename) == testing_payload
 
 

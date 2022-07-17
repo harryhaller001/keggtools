@@ -1,6 +1,11 @@
 """ KEGG pathway models to parse object relational """
 # pylint: disable=invalid-name,redefined-builtin
 
+
+# TODO: move checks to init function, not parse function !!!
+
+
+
 from xml.etree.ElementTree import Element
 from typing import List, Union, Optional
 

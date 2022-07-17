@@ -30,7 +30,7 @@ help: ## This help.
 
 .PHONY: install
 install: ## install all python dependencies
-	@$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests --upgrade
+	@$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests responses --upgrade
 	@$(PIP_OPT) install requests scipy pydot --upgrade
 	@$(PYTHON_OPT) setup.py install
 
@@ -64,12 +64,10 @@ pylint: ## Linting package
 	@$(LINT_OPT) keggtools
 	@$(LINT_OPT) ./setup.py
 	@$(LINT_OPT) ./test/*.py
-
+	@$(LINT_OPT) ./docs/conf.py
 
 .PHONY: pytest
 pytest: ## Unittest of package
-	@$(MYPY_OPT) ./test/test_package.py
-	@$(LINT_OPT) ./test/test_package.py
 	@$(TEST_OPT) -p keggtools --show-capture=log
 
 
@@ -77,7 +75,7 @@ pytest: ## Unittest of package
 mypy: ## Run static code analysis
 	@$(MYPY_OPT) setup.py
 	@$(MYPY_OPT) ./test
-	@$(MYPY_OPT) ./docs
+	@$(MYPY_OPT) ./docs/conf.py
 	@$(MYPY_OPT) -p keggtools
 
 
@@ -112,8 +110,6 @@ clean: ## Clean all build and caching directories
 .PHONY: docs
 docs:
 	@$(PIP_OPT) install Sphinx sphinx-rtd-theme --upgrade
-	@$(MYPY_OPT) ./docs/conf.py
-	@$(LINT_OPT) ./docs/conf.py
 	@$(SPHINX_OPT) ./docs ./docs/_build
 
 

@@ -23,6 +23,9 @@ release = version
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
+    "sphinx.ext.doctest",
+    # "sphinx.ext.autosummary",
+    # "sphinx.ext.intersphinx",
 ]
 
 
@@ -30,6 +33,8 @@ extensions = [
 source_suffix = '.rst'
 master_doc = "index"
 pygments_style = 'sphinx'
+
+
 exclude_trees = [
     "_build",
     "cloudflare-workers",
@@ -38,7 +43,10 @@ exclude_trees = [
 
 exclude_patterns = [
     "wrangler.toml",
-    "wrangler.toml.example"
+    "wrangler.toml.example",
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
 ]
 
 # Generate the API documentation when building
@@ -54,3 +62,13 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
     html_theme = "sphinx_rtd_theme"
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+
+html_show_sphinx = False
+html_context = dict(
+    display_github=True,
+    github_user='harryhaller001',
+    github_repo='keggtools',
+    github_version='main',
+    conf_py_path='/docs/',
+)

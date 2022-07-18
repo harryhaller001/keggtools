@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 from pydot import Dot, Node, Edge
 
 from .models import Pathway, Entry
-from .resolver import Resolver
+# from .resolver import Resolver
 from .utils import ColorGradient
 
 
@@ -18,7 +18,7 @@ class Renderer:
         self,
         kegg_pathway: Pathway,
         gene_dict: Dict[str, float],
-        resolver: Resolver
+        # resolver: Resolver
     ) -> None:
         """
         Init renderer for KEGG Pathway.
@@ -60,34 +60,35 @@ class Renderer:
 
 
         # TODO check if broken ?
-        self.exp_min = min(gene_dict.values())
-        self.exp_max = max(gene_dict.values())
+        # self.exp_min = min(gene_dict.values())
+        # self.exp_max = max(gene_dict.values())
 
-        # Clip log fold expression
-        self.exp_min = min(self.exp_min, 0)
-        self.exp_max = max(self.exp_max, 0)
+        # # Clip log fold expression
+        # self.exp_min = min(self.exp_min, 0)
+        # self.exp_max = max(self.exp_max, 0)
 
 
         # TODO: get compounds without a resolver instance ? or remove organism from resolver
-        self.resolver: Resolver = resolver
-        self.components: Dict[str, str] = resolver.get_compounds()
+        # self.resolver: Resolver = resolver
+        # TODO: self.components: Dict[str, str] = resolver.get_compounds()
 
 
 
-    def _get_gene_color(self, gene_id: str) -> str:
-        """
-        Get overlay color
-        :param gene_id: int
-        :return: str
-        """
+    # TODO: fix because its broken
+    # def _get_gene_color(self, gene_id: str) -> str:
+    #     """
+    #     Get overlay color
+    #     :param gene_id: int
+    #     :return: str
+    #     """
 
-        if gene_id not in self.overlay:
-            return "#ffffff"
+    #     if gene_id not in self.overlay:
+    #         return "#ffffff"
 
-        if self.overlay[gene_id] < 0:
-            return self.cmap_downreg[abs(int(self.overlay[gene_id] / self.exp_min * 100))]
+    #     if self.overlay[gene_id] < 0:
+    #         return self.cmap_downreg[abs(int(self.overlay[gene_id] / self.exp_min * 100))]
 
-        return self.cmap_upreg[abs(int(self.overlay[gene_id] / self.exp_max * 100))]
+    #     return self.cmap_upreg[abs(int(self.overlay[gene_id] / self.exp_max * 100))]
 
 
 
@@ -174,7 +175,7 @@ class Renderer:
 
             # TODO: add arrowhead and label
 
-            self.graph.add_edge(Edge(src=rel.entry1, dest=rel.entry2))
+            self.graph.add_edge(Edge(src=rel.entry1, dst=rel.entry2))
 
             # label = ""
             # arrowhead = "normal"

@@ -86,24 +86,23 @@ mypy: ## Run static code analysis
 clean: ## Clean all build and caching directories
 
 # Remove old keggtools package
-	pip uninstall keggtools -y --quiet
+	@pip uninstall keggtools -y --quiet
 
 # Remove package build folders
-	rm -rf ./build
-	rm -rf ./dist
-	rm -rf ./$(PACKAGE_NAME).egg-info
+	@rm -rf ./build
+	@rm -rf ./dist
+	@rm -rf ./$(PACKAGE_NAME).egg-info
 
 # Remove mypy and pytest caching folders
-	rm -rf ./.mypy_cache
-	rm -rf ./.pytest_cache
-	rm -rf ./coverage
-	rm -f .coverage
+	@rm -rf ./.mypy_cache
+	@rm -rf ./.pytest_cache
+	@rm -rf ./coverage
+	@rm -f .coverage
 
 # Remove build folders for docs
-	rm -rf ./docs/_build
-	rm -rf ./docs/dist
-	rm -rf ./docs/cloudflare-workers/node_modules
-	@echo "All build and caching folders removed"
+	@rm -rf ./docs/_build
+	@rm -rf ./docs/dist
+	@rm -rf ./docs/cloudflare-workers/node_modules
 
 
 
@@ -112,6 +111,7 @@ clean: ## Clean all build and caching directories
 docs: ## Build sphinx docs
 	@rm -rf ./docs/_build
 	@$(SPHINX_OPT) -M html ./docs ./docs/_build
+	@$(SPHINX_OPT) -M doctest ./docs ./docs/_build
 	@$(SPHINX_OPT) -M coverage ./docs ./docs/_build
 
 # TODO: add latex pdf version of docs

@@ -32,6 +32,7 @@ help: ## This help.
 install: ## install all python dependencies
 	@$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests responses --upgrade
 	@$(PIP_OPT) install requests scipy pydot pandas --upgrade
+	@$(PIP_OPT) install Sphinx sphinx-rtd-theme --upgrade
 	@$(PYTHON_OPT) setup.py install
 
 
@@ -108,9 +109,13 @@ clean: ## Clean all build and caching directories
 
 
 .PHONY: docs
-docs:
-	@$(PIP_OPT) install Sphinx sphinx-rtd-theme --upgrade
-	@$(SPHINX_OPT) ./docs ./docs/_build
+docs: ## Build sphinx docs
+	@rm -rf ./docs/_build
+	@$(SPHINX_OPT) -M html ./docs ./docs/_build
+	@$(SPHINX_OPT) -M coverage ./docs ./docs/_build
+
+# TODO: add latex pdf version of docs
+#	@$(SPHINX_OPT) -M latexpdf ./docs ./docs/_build
 
 
 # Run all checks (always before committing!)

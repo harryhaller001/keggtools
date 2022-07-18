@@ -28,7 +28,11 @@ from .utils import (
 
 def is_valid_pathway_org(value: str) -> bool:
     """
-    Check if org identifier is valid.
+    Check if organism identifier is valid.
+
+    :param str value: String value to check.
+    :return: Returns True if value is a valid organism code.
+    :rtype: bool
     """
 
     # Organism must be 3 letter code
@@ -39,7 +43,11 @@ def is_valid_pathway_org(value: str) -> bool:
 
 def is_valid_pathway_number(value: str) -> bool:
     """
-    Check if pathway number is valid.
+    Check if pathway number has correct 5 digit format.
+
+    :param str value: String value to check.
+    :return: Returns True if value has the correct format of pathway number.
+    :rtype: bool
     """
 
     # KEGG pathway number must be a 5 digit number
@@ -49,6 +57,10 @@ def is_valid_pathway_number(value: str) -> bool:
 def is_valid_pathway_name(value: str) -> bool:
     """
     Check if combined pathway identifer is valid. String must match "path:<org><number>".
+
+    :param str value: String value to check.
+    :return: Returns True if value matches format of pathway name.
+    :rtype: bool
     """
 
     return re.match(pattern=r"^path:(ko|ec|[a-z]{3})([0-9]{5})$", string=value) is not None
@@ -57,6 +69,10 @@ def is_valid_pathway_name(value: str) -> bool:
 def is_valid_hex_color(value: str) -> bool:
     """
     Check if string is a valid hex color.
+
+    :param str value: String value to check.
+    :return: Returns True if value is valid hexadecimal color string.
+    :rtype: bool
     """
     return re.match(pattern=r"^\#([a-fA-F0-9]{6})$", string=value) is not None
 
@@ -74,34 +90,46 @@ class Subtype:
     ) -> None:
         """
         Init Subtype model instance.
+
+        :param str name: Name of subtype. Must match list of valid subtypes.
+        :param str value: Value of subtype.
         """
-        self.name: str = name
-        self.value: str = value
-
-
-    @staticmethod
-    def parse(item: Element) -> "Subtype":
-        """
-        Parse subtype XML Element.
-        """
-
-        # check correct type
-        assert item.tag == "subtype"
-
-
-        name: str = get_attribute(element=item, key="name")
-        value: str = get_attribute(element=item, key="value")
 
         # check for valid subtype names in RELATION_SUBTYPES
         if name not in RELATION_SUBTYPES:
             raise ValueError(f"Name of relation subtype '{name}' is not in list of valid subtypes.")
 
-        return Subtype(name=name, value=value)
+        self.name: str = name
+        self.value: str = value
+
+
+
+    @staticmethod
+    def parse(item: Element) -> "Subtype":
+        """
+        Parse Subtype XML element.
+
+        :param xml.etree.ElementTree.Element item: XML element.
+        :return: Parsed Subtype instance.
+        :rtype: Subtype
+        """
+
+        # check correct type
+        assert item.tag == "subtype"
+
+        # Generate and return subtype instance
+        return Subtype(
+            name=get_attribute(element=item, key="name"),
+            value=get_attribute(element=item, key="value")
+        )
 
 
     def __str__(self) -> str:
         """
         Generate string from Subtype instance.
+
+        :return: String of Subtype instance.
+        :rtype: str
         """
         return f"<Subtype name='{self.name}' value='{self.value}'>"
 
@@ -123,7 +151,15 @@ class Relation:
     ) -> None:
         """
         Init relation model instance.
+
+        :param str entry1: Source entry of relation.
+        :param str entry2: Destination entry of relation.
+        :param str type: Type of Relation. Must be contained in list of valid relation types.
         """
+
+        # Check if type is in valid relation types
+        if type not in RELATION_TYPES:
+            raise ValueError(f"Relation type '{type}' not in list of valid types.")
 
         self.entry1: str = entry1
         self.entry2: str = entry2
@@ -134,28 +170,22 @@ class Relation:
     @staticmethod
     def parse(item: Element) -> "Relation":
         """
-        Parse xml ElementTree into KEGG Relation.
-        :param item: ElementTree
-        :return: Relation
+        Parse XML element into Relation instance.
+
+        :param xml.etree.ElementTree.Element item: XML element to parse.
+        :return: Relation instance.
+        :rtype: Relation
         """
 
         # Check tag of relation is correct
         assert item.tag == "relation"
 
 
-        entry1: str = get_numeric_attribute(element=item, key="entry1")
-        entry2: str = get_numeric_attribute(element=item, key="entry2")
-        type: str = get_attribute(element=item, key="type")
-
-        if type not in RELATION_TYPES:
-            raise ValueError(f"Relation type '{type}' not in list of valid types.")
-
-
         # Create relation instance from attributes
         relation: Relation = Relation(
-            entry1=entry1,
-            entry2=entry2,
-            type=type,
+            entry1=get_numeric_attribute(element=item, key="entry1"),
+            entry2=get_numeric_attribute(element=item, key="entry2"),
+            type=get_attribute(element=item, key="type"),
         )
 
 
@@ -170,6 +200,9 @@ class Relation:
     def __str__(self) -> str:
         """
         Generate string from relation instance.
+
+        :return: String of Relation instance.
+        :rtype: str
         """
         return f"<Relation {self.entry1}->{self.entry2} type='{self.type}'>"
 
@@ -188,7 +221,17 @@ class Component:
     def __init__(self, id: str) -> None:
         """
         Init Component model.
+
+        :param str id: Id of component.
         """
+
+        # id can't be empty
+        if id == "":
+            raise ValueError("Component id can't be empty.")
+
+
+        # TODO: Check pattern of component id
+        # TODO: component id should reference an existing entry !
 
         self.id: str = id
 
@@ -197,32 +240,25 @@ class Component:
     def parse(item: Element) -> "Component":
         """
         Parsing ElementTree into Component.
-        :param item: ElementTree
-        :return: Component
+
+        :param xml.etree.ElementTree.Element item: XML element to parse.
+        :return: Parsed Component instance.
+        :rtype: Component
         """
 
         # Check for correct xml tag
         assert item.tag == "component"
 
-        component_id: str = get_attribute(element=item, key="id")
-
-        # id can't be empty
-        if component_id == "":
-            raise ValueError("Component id can't be empty.")
-
-
-        # TODO: Check pattern of component id
-        # TODO: component id should reference an existing entry !
-
-
         # Create component instance from id attribute
-        component: Component = Component(id=component_id)
-        return component
+        return Component(id=get_attribute(element=item, key="id"))
 
 
     def __str__(self) -> str:
         """
         Build string of component instance.
+
+        :return: String of Component instance.
+        :rtype: str
         """
         return f"<Component id='{self.id}'>"
 
@@ -247,6 +283,16 @@ class Graphics:
     ) -> None:
         """
         Init Graphics model instance.
+
+        :param Optional[str] x:
+        :param Optional[str] y:
+        :param Optional[str] width:
+        :param Optional[str] height:
+        :param Optional[str] coords:
+        :param Optional[str] name:
+        :param Optional[str] type:
+        :param Optional[str] fgcolor:
+        :param Optional[str] bgcolor:
         """
 
         # All parameter are implied (optional)
@@ -292,16 +338,18 @@ class Graphics:
     @staticmethod
     def parse(item: Element) -> "Graphics":
         """
-        Parse xml ElementTree into KEGG Graphics
-        :param item: ElementTree
-        :return: Graphics
+        Parse XML element into Graphics instance.
+
+        :param xml.etree.ElementTree.Element item: XML element to parse.
+        :return: Parsed Graphics instance.
+        :rtype: Graphics
         """
 
         # Check xml tag
         assert item.tag == "graphics"
 
         # Parse attributes from XML element
-        graphic: Graphics = Graphics(
+        return Graphics(
             x = item.attrib.get("x"),
             y = item.attrib.get("y"),
             width = item.attrib.get("width"),
@@ -313,14 +361,13 @@ class Graphics:
             coords = item.attrib.get("coords"),
         )
 
-        return graphic
-
-
 
     def __str__(self) -> str:
         """
         Return Graphics instance summary string.
-        :return: str
+
+        :return: String of Graphics instance.
+        :rtype: str
         """
         return f"<Graphics name='{self.name}'>"
 
@@ -341,6 +388,12 @@ class Entry:
     ) -> None:
         """
         Init entry model instance.
+
+        :param str id: Id of Entry.
+        :param str name: Name of Entry.
+        :param str type: Type of Entry. Must be contained in list of valid entry types.
+        :param Optional[str] link: Link to KEGG database with reference to entry.
+        :param Optional[str] reaction: Reaction TODO: specify. Is str format correct?
         """
 
         # required
@@ -371,10 +424,11 @@ class Entry:
     @staticmethod
     def parse(item: Element) -> "Entry":
         """
-        Parsing xml ElementTree into KEGG Entry
+        Parsing XML element into Entry instance.
 
-        :param item: ElementTree
-        :return: Entry
+        :param xml.etree.ElementTree.Element item: XML element to parse.
+        :return: Parsed Entry instance.
+        :rtype: Entry
         """
 
         # Generate entry instance from required attributes
@@ -382,15 +436,11 @@ class Entry:
             id=get_numeric_attribute(element=item, key="id"),
             name=get_attribute(element=item, key="name"),
             type=get_attribute(element=item, key="type"),
+            link=item.attrib.get("link"),
+            reaction=item.attrib.get("reaction"),
         )
 
-
-        # Set optional parameter to entry instance
-        entry.link = item.attrib.get("link")
-        entry.reaction = item.attrib.get("reaction")
-
-
-        # Iterate over children and parse graphics, ...
+        # Iterate over children and parse graphics, components, ...
         for child in item:
             if child.tag == "graphics":
                 entry.graphics = Graphics.parse(child)
@@ -402,8 +452,10 @@ class Entry:
 
     def __str__(self) -> str:
         """
-        Build Entry summary string
-        :return: str
+        Build Entry summary string.
+
+        :return: String of Entry instance.
+        :rtype: str
         """
         return f"<Entry id='{self.id}' name='{self.name}' type='{self.type}'>"
 
@@ -411,8 +463,10 @@ class Entry:
 
     def get_gene_id(self) -> str:
         """
-        Parse variable 'name' into KEGG ID
-        :return: str
+        Parse variable 'name' of Entry into KEGG id.
+
+        :return: KEGG id
+        :rtype: str
         """
 
         # TODO: validate return valid !!
@@ -441,6 +495,13 @@ class Pathway:
         ) -> None:
         """
         Init KEGG Pathway model.
+
+        :param str name: Name of pathway, which is the full KEGG identifier.
+        :param str org: Organism code.
+        :param str number: Number of pathway.
+        :param Optional[str] title: Title of pathway.
+        :param Optional[str] image: Image for pathway provided by KEGG database.
+        :param Optional[str] link: Link to pathway in KEGG database.
         """
 
         # required parameter of pathway element
@@ -480,9 +541,11 @@ class Pathway:
     @staticmethod
     def parse(data: Union[Element, str]) -> "Pathway":
         """
-        Parsing xml String in KEGG Pathway.
-        :param data: str
-        :return: Pathway
+        Parsing XML string or element in Pathway instance.
+
+        :param Union[Element, str] data: String or XML element to parse.
+        :return: Parsed Pathway instance.
+        :rtype: Pathway
         """
 
         # Generate correct format from string or XML element object
@@ -494,13 +557,10 @@ class Pathway:
             name=get_attribute(element=item, key="name"),
             org=get_attribute(element=item, key="org"),
             number=get_attribute(element=item, key="number"),
+            title=item.attrib.get("title"),
+            image=item.attrib.get("image"),
+            link=item.attrib.get("link"),
         )
-
-
-        # Parse optional KGML pathway attributes
-        pathway.title = item.attrib.get("title")
-        pathway.image = item.attrib.get("image")
-        pathway.link = item.attrib.get("link")
 
 
         # Parse child items of pathway
@@ -521,8 +581,10 @@ class Pathway:
     def get_entry_by_id(self, entry_id: str) -> Optional[Entry]:
         """
         Get pathway Entry object by id.
-        :param entry_id: str
-        :return: Optional[Entry]
+
+        :param str entry_id: Id of Entry.
+        :return: Returns Entry instance if id is found in Pathway. Otherwise returns None.
+        :rtype: Optional[Entry]
         """
 
         for item in self.entries:
@@ -535,7 +597,9 @@ class Pathway:
     def get_genes(self) -> List[str]:
         """
         List all genes from pathway.
+
         :return: List of entry ids with type gene.
+        :rtype: List[str]
         """
 
         result: List[str] = []
@@ -563,7 +627,9 @@ class Pathway:
     def __str__(self) -> str:
         """
         Build string summary for KEGG pathway.
-        :return: str
+
+        :return: String of Pathway instance.
+        :rtype: str
         """
         return f"<Pathway path:{self.org}{self.number} title='{self.title}'>"
 

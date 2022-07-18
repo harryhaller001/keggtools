@@ -132,9 +132,10 @@ class Enrichment:
     ) -> None:
         """
         Init KEGG pathway enrichment analysis.
-        :param org: Organism identifier used by KEGG database
+
+        :param str org: Organism identifier used by KEGG database \
             (3 letter code, e.g. "mmu" for mus musculus or "hsa" for human).
-        :param pathways: (Optional) List of Pathway instances or list of KEGG pathway identifier.
+        :param List[Pathway] pathways: (Optional) List of Pathway instances or list of KEGG pathway identifier.
         """
 
         # self.organism: str = org

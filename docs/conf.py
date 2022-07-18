@@ -8,10 +8,10 @@ from datetime import datetime
 
 # https://github.com/sphinx-doc/sphinx/issues/4317
 import sys
-sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath("../"))
 
 # on_rtd is whether we are on readthedocs.org
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+on_rtd = os.environ.get("READTHEDOCS", None) == 'True'
 
 
 project = "keggtools"
@@ -21,7 +21,8 @@ version = "0.5.0"
 release = version
 
 extensions = [
-    'sphinx.ext.autodoc',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.coverage",
 ]
 
 
@@ -30,7 +31,7 @@ source_suffix = '.rst'
 master_doc = "index"
 pygments_style = 'sphinx'
 exclude_trees = [
-    '_build',
+    "_build",
     "cloudflare-workers",
     "dist"
 ]
@@ -42,11 +43,14 @@ exclude_patterns = [
 
 # Generate the API documentation when building
 autosummary_generate = True
-autodoc_member_order = 'bysource'
+autodoc_member_order = "bysource"
 autoapi_dirs = ["../keggtools"]
+
+# Configuration of sphinx.ext.coverage
+coverage_show_missing_items = True
 
 
 if not on_rtd:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
+    html_theme = "sphinx_rtd_theme"
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]

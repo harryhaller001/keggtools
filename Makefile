@@ -38,8 +38,10 @@ install: ## install all python dependencies
 
 .PHONY: freeze
 freeze: ## Freeze package dependencies
-	@$(PIP_OPT) freeze | grep -E "^requests==|pydot==|scipy==" > requirements.txt
-	@$(PIP_OPT) freeze --exclude keggtools > requirements-dev.txt
+#	@$(PIP_OPT) freeze | grep -E "^requests==|pydot==|scipy==" > requirements.txt
+#	@$(PIP_OPT) freeze --exclude keggtools > requirements-dev.txt
+
+	@$(PIP_OPT) freeze --exclude keggtools > requirements.txt
 
 
 # .PHONY: devfreeze

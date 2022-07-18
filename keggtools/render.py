@@ -261,6 +261,3 @@ class Renderer:
     #                     <line x1="40" y1="150" x2="50" y2="150" style="stroke:rgb(0,0,0);stroke-width:2" />
     #                 </g>
     #                 </svg>"""
-
-
-

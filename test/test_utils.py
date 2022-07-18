@@ -117,6 +117,3 @@ def test_parse_tsv() -> None:
 
 #     with pytest.raises(HTTPError):
 #         request(url=url)
-
-
-

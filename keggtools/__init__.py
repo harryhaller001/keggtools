@@ -10,5 +10,3 @@ from .render import Renderer
 from .resolver import Resolver
 from .storage import Storage
 from .utils import ColorGradient
-
-

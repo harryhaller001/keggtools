@@ -113,5 +113,3 @@ def test_enrichment() -> None:
     # Testing invalid arguments
     with pytest.raises(TypeError):
         enrichment.to_csv(file_obj=None)
-
-

@@ -632,5 +632,3 @@ class Pathway:
         :rtype: str
         """
         return f"<Pathway path:{self.org}{self.number} title='{self.title}'>"
-
-

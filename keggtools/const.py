@@ -96,5 +96,3 @@ ENTRY_TYPE: List[str] = [
     "brite",
     "other"
 ]
-
-

@@ -322,4 +322,3 @@ class Enrichment:
         for result in self.result:
             summary_list.append(result.json_summary())
         return pandas.DataFrame(summary_list)
-

@@ -153,5 +153,3 @@ class ColorGradient:
         values: List[float] = list(map(sum, zip(a_component, b_component)))
 
         return tuple((int(item) for item in values))
-
-

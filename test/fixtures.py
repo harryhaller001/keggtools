@@ -58,5 +58,3 @@ def resolver(storage: Storage) -> Generator[Resolver, None, None]:
     test_resolver: Resolver = Resolver(organism="mmu", cache=storage)
 
     yield test_resolver
-
-

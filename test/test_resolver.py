@@ -151,4 +151,3 @@ def test_get_compounds(resolver: Resolver) -> None:
     result: Dict[str, str] = resolver.get_compounds()
 
     assert result["cpd:C00007"] == "Oxygen; O2"
-

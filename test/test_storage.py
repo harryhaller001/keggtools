@@ -104,4 +104,3 @@ def test_cache_readwrite() -> None:
     # Cleanup
     os.remove(storage.build_cache_path(testing_filename))
     os.rmdir(cachedir)
-

@@ -164,5 +164,3 @@ class Resolver:
 
         organism_list = self.get_organism_list()
         return organism_list.get(organism) is not None
-
-

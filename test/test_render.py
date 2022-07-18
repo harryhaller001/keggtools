@@ -23,5 +23,3 @@ def test_rendering_function() -> None:
     binary_data: Any = renderer.export(extension="png")
 
     assert isinstance(binary_data, bytes)
-
-

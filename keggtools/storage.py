@@ -132,5 +132,3 @@ class Storage:
 
         with open(path, "rb") as input_file:
             return pickle.load(input_file)
-
-

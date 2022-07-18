@@ -384,4 +384,3 @@ def test_full_pathway_parsing() -> None:
     gene_list: List[str] = pathway_parsed.get_genes()
 
     assert "mmu:19697" in gene_list
-

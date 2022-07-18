@@ -6,10 +6,10 @@ repos:
     rev: v3.2.0
     hooks:
     -   id: trailing-whitespace
-        files: ^keggtools/|^test/
+        files: ^keggtools/|^test/|^docs/(.*).py
 
     -   id: end-of-file-fixer
-        files: ^keggtools/|^test/
+        files: ^keggtools/|^test/|^docs/(.*).py
 
     -   id: check-yaml
     -   id: check-toml

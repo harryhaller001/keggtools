@@ -123,7 +123,7 @@ docs: ## Build sphinx docs
 
 # Run all checks (always before committing!)
 .PHONY: check
-check: clean freeze pylint mypy coverage twine docs ## Full check of package
+check: clean freeze pylint mypy coverage twine docs precommit ## Full check of package
 
 
 
@@ -135,4 +135,11 @@ coverage: ## Run Coverage
 
 # Long coverage report
 	@$(COVERAGE_OPT) report -m
+
+
+
+.PHONY : precommit
+precommit: ## Run precommit file
+	@pre-commit run --all-files
+
 

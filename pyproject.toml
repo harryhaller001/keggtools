@@ -1,10 +1,12 @@
 
 # Package build system
 
+# [build-system]
+# requires = ["setuptools", "wheel"]
+# build-backend = "setuptools.build_meta"
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
 
 # [options]
 # python_requires = ">=3.6"
@@ -15,10 +17,12 @@ build-backend = "setuptools.build_meta"
 # Project details
 [project]
 name = "keggtools"
-version = "0.5.0"
+# version = "0.5.0"
 description = "Enrichment analysis and visualisation toolkit for KEGG pathways"
 requires-python = '>=3.6'
-license="MIT"
+license = {file = "LICENSE"} # "MIT"
+
+dynamic = ["version"]
 
 authors = [
     {name="harryhaller001", email = "harryhaller001@gmail.com"}
@@ -51,7 +55,7 @@ Source = "https://github.com/harryhaller001/keggtools"
 
 
 [project.optional-dependencies]
-tests = [
+test = [
     "pylint",
     "pytest",
     "coverage",
@@ -65,6 +69,10 @@ doc = [
 ]
 
 
+# Entrypoints for flit
+# https://flit.pypa.io/en/latest/pyproject_toml.html#scripts-section
+[project.scripts]
+flit = "flit:main"
 
 # Pylint
 
@@ -118,3 +126,9 @@ omit = ["*/test/*"]
 
 # [tool.setuptools]
 # packages = ["keggtools"]
+
+
+[tool.flit.sdist]
+include = ["keggtools/"]
+exclude = ["docs", "test", "reproducibility",]
+

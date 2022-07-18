@@ -13,6 +13,7 @@ TEST_OPT		= $(PYTHON_OPT) -m pytest
 TWINE_OPT		= $(PYTHON_OPT) -m twine
 SPHINX_OPT		= $(PYTHON_OPT) -m sphinx
 COVERAGE_OPT	= $(PYTHON_OPT) -m coverage
+FLIT_OPT		= $(PYTHON_OPT) -m flit
 
 # Run help by default
 
@@ -30,10 +31,12 @@ help: ## This help.
 
 .PHONY: install
 install: ## install all python dependencies
-	@$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests responses --upgrade
+	@$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests responses flit --upgrade
 	@$(PIP_OPT) install requests scipy pydot pandas --upgrade
 	@$(PIP_OPT) install Sphinx sphinx-rtd-theme --upgrade
-	@$(PYTHON_OPT) setup.py install
+
+# Install package with flit
+	@$(FLIT_OPT) install
 
 
 .PHONY: freeze
@@ -44,19 +47,17 @@ freeze: ## Freeze package dependencies
 	@$(PIP_OPT) freeze --exclude keggtools > requirements.txt
 
 
-# .PHONY: devfreeze
-# devfreeze: ## Freeze all dependencies for development
-# 	$(PIP_OPT) freeze --exclude keggtools > requirements-dev.txt
-
-
-
-
 
 .PHONY: twine
 twine: ## Twine package upload and checks
-	@$(PYTHON_OPT) setup.py install
-	@$(PYTHON_OPT) setup.py sdist bdist_wheel
+
+#	@$(PYTHON_OPT) setup.py install
+#	@$(PYTHON_OPT) setup.py sdist bdist_wheel
+
+	@$(FLIT_OPT) build --setup-py
 	@$(TWINE_OPT) check --strict ./dist/*
+
+
 
 # TODO: remove legacy build and switch to build
 # python -m build --sdist --wheel
@@ -65,7 +66,7 @@ twine: ## Twine package upload and checks
 .PHONY: pylint
 pylint: ## Linting package
 	@$(LINT_OPT) keggtools
-	@$(LINT_OPT) ./setup.py
+#	@$(LINT_OPT) ./setup.py
 	@$(LINT_OPT) ./test/*.py
 	@$(LINT_OPT) ./docs/conf.py
 
@@ -76,7 +77,7 @@ pytest: ## Unittest of package
 
 .PHONY: mypy
 mypy: ## Run static code analysis
-	@$(MYPY_OPT) setup.py
+#	@$(MYPY_OPT) setup.py
 	@$(MYPY_OPT) ./test
 	@$(MYPY_OPT) ./docs/conf.py
 	@$(MYPY_OPT) -p keggtools

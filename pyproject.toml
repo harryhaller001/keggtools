@@ -1,30 +1,22 @@
 
 # Package build system
-
-# [build-system]
-# requires = ["setuptools", "wheel"]
-# build-backend = "setuptools.build_meta"
 [build-system]
 requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
-
-# [options]
-# python_requires = ">=3.6"
-# py_modules = "keggtools"
-
 
 
 # Project details
 [project]
 name = "keggtools"
-# version = "0.5.0"
 description = "Enrichment analysis and visualisation toolkit for KEGG pathways"
 requires-python = '>=3.6'
-license = {file = "LICENSE"} # "MIT"
-
-dynamic = ["version"]
+license = {file = "LICENSE"}
 
 authors = [
+    {name="harryhaller001", email = "harryhaller001@gmail.com"}
+]
+
+maintainers = [
     {name="harryhaller001", email = "harryhaller001@gmail.com"}
 ]
 
@@ -45,15 +37,17 @@ dependencies = [
     "scipy >= 1.5.4",
 ]
 
+dynamic = ["version"]
 
 
-
+# Project urls
 [project.urls]
-# Documentation = ""
+# Documentation = "TODO"
 Source = "https://github.com/harryhaller001/keggtools"
-# Home-page = ""
+# Home-page = "TODO"
 
 
+# Optional dependencies for testing and docs
 [project.optional-dependencies]
 test = [
     "pylint",
@@ -74,8 +68,8 @@ doc = [
 [project.scripts]
 flit = "flit:main"
 
-# Pylint
 
+# Pylint config
 [tool.pylint.'MESSAGES CONTROL']
 max-line-length = 120
 disable = "fixme,trailing-newlines,too-many-instance-attributes,too-many-arguments"
@@ -83,7 +77,6 @@ disable = "fixme,trailing-newlines,too-many-instance-attributes,too-many-argumen
 
 # Mypy config
 # https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
-
 [tool.mypy]
 python_version = "3.6"
 warn_return_any = true
@@ -103,8 +96,7 @@ module = [
 ignore_missing_imports = true
 
 
-# Pytest
-
+# Pytest config
 [tool.pytest.ini_options]
 minversion = "7.0"
 
@@ -119,15 +111,14 @@ testpaths = [
 ]
 
 
+# Coverage config
 [tool.coverage.run]
 source = ["keggtools"]
 omit = ["*/test/*"]
 
 
-# [tool.setuptools]
-# packages = ["keggtools"]
-
-
+# Flit sdist config
+# https://flit.pypa.io/en/latest/pyproject_toml.html#sdist-section
 [tool.flit.sdist]
 include = ["keggtools/"]
 exclude = ["docs", "test", "reproducibility",]

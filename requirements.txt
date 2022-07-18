@@ -12,6 +12,8 @@ coverage==6.2
 cryptography==37.0.4
 dill==0.3.4
 docutils==0.17.1
+flit==3.7.1
+flit_core==3.7.1
 idna==3.3
 imagesize==1.4.1
 importlib-metadata==4.8.3
@@ -60,6 +62,7 @@ sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.5
 tomli==1.2.3
+tomli_w==0.4.0
 tqdm==4.64.0
 twine==3.8.0
 typed-ast==1.5.4

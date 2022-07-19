@@ -8,6 +8,7 @@ import pytest
 
 from keggtools.storage import Storage
 from keggtools.resolver import Resolver
+from keggtools.models import Pathway
 
 
 
@@ -58,3 +59,15 @@ def resolver(storage: Storage) -> Generator[Resolver, None, None]:
     test_resolver: Resolver = Resolver(organism="mmu", cache=storage)
 
     yield test_resolver
+
+
+@pytest.fixture(scope="function")
+def pathway() -> Pathway:
+    """
+    Return loaded and parsed pathway instance.
+    """
+
+    with open(os.path.join(os.path.dirname(__file__), "pathway.kgml"), "r", encoding="utf-8") as file_obj:
+        loaded_pathway: Pathway = Pathway.parse(file_obj.read())
+
+    return loaded_pathway

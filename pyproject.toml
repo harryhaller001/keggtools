@@ -55,6 +55,8 @@ test = [
     "coverage",
     "mypy",
     "types-requests",
+    "responses",
+    "pandas",
 ]
 
 doc = [

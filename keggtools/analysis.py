@@ -288,14 +288,14 @@ class Enrichment:
 
 
         # Delimiter of gene names
-        child_delimiter = ","
+        child_delimiter = " "
 
         # Change child delimiter to aviod csv conficts
-        if delimiter == child_delimiter:
-            child_delimiter = ";"
+        if child_delimiter == delimiter:
+            raise ValueError("This delimiter is reserved to seperate list of genes.")
 
         headers: List[str] = EnrichmentResult.get_header()
-        writer: DictWriter = DictWriter(csv_file, fieldnames=headers)
+        writer: DictWriter = DictWriter(csv_file, fieldnames=headers, delimiter=delimiter)
 
         for item in self.result:
             # Write lines

@@ -1,4 +1,5 @@
 """ Testing keggtools analysis module """
+# pylint: disable=unused-import
 
 from io import StringIO
 import os
@@ -8,7 +9,9 @@ import pytest
 import pandas
 
 from keggtools import Enrichment, EnrichmentResult, Pathway
+from keggtools.storage import Storage
 
+from .fixtures import storage, cachedir
 
 
 def test_enrichment_result() -> None:
@@ -41,10 +44,12 @@ def test_enrichment_result() -> None:
 
 
 
-def test_enrichment() -> None:
+def test_enrichment(storage: Storage) -> None:
     """
     Testing enrichment analysis instance.
     """
+    # pylint: disable=redefined-outer-name
+
 
     # Load testing pathway
     with open(os.path.join(os.path.dirname(__file__), "pathway.kgml"), "r", encoding="utf-8") as file_obj:
@@ -79,7 +84,6 @@ def test_enrichment() -> None:
     assert len(enrichment.result) == 1
 
 
-
     # Test export functions
 
     # Testing json export
@@ -91,9 +95,7 @@ def test_enrichment() -> None:
     assert export_json[0]["pathway_id"] == "04064"
 
     # Testing pandas dataframe export
-    export_df: pandas.DataFrame = enrichment.to_dataframe()
-
-    assert isinstance(export_df, pandas.DataFrame)
+    assert isinstance(enrichment.to_dataframe(), pandas.DataFrame)
 
 
     # Testing export to csv
@@ -101,15 +103,33 @@ def test_enrichment() -> None:
     enrichment.to_csv(file_obj=buffer)
 
 
-    # TODO: testing export csv to file by path argument
-    # enrichment.to_csv(file_obj="")
-
-    # TODO: test delimiter char
-
-    # TODO: test if csv is valid
-
-
-
     # Testing invalid arguments
     with pytest.raises(TypeError):
         enrichment.to_csv(file_obj=None)
+
+
+    # Testing export to csv by path arument
+    # Use storage fixture to make sure generated files are removed savly
+    csv_filename: str = storage.build_cache_path(filename="export.csv")
+    enrichment.to_csv(file_obj=csv_filename, delimiter="\t")
+
+    assert os.path.isfile(csv_filename)
+
+    # Testing valid csv by reading exported csv
+    validate_df: pandas.DataFrame = pandas.read_csv(csv_filename, delimiter="\t", header=None)
+
+    # Check if gene list (5th column of csv file) contains seperated list of genes
+    assert len(str(validate_df.iat[0, 5]).split(" ")) == 4
+
+
+    # Check error of space is used as delimiter
+    with pytest.raises(ValueError):
+        enrichment.to_csv(file_obj=csv_filename, delimiter=" ", overwrite=True)
+
+
+    # Raises runtime error if file already exist
+    with pytest.raises(RuntimeError):
+        enrichment.to_csv(file_obj=csv_filename)
+
+    # Raises no error if overwrite is set to true
+    enrichment.to_csv(file_obj=csv_filename, overwrite=True)

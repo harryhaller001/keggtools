@@ -1,10 +1,11 @@
 """ Render object """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 from pydot import Dot, Node, Edge
 
-from .models import Pathway, Entry
-# from .resolver import Resolver
+from .storage import Storage
+from .models import Pathway, Entry, is_valid_hex_color
+from .resolver import Resolver
 from .utils import ColorGradient
 
 
@@ -12,18 +13,20 @@ class Renderer:
     """
     Renderer for KEGG Pathway.
     """
-    # pylint: disable=too-many-instance-attributes
 
     def __init__(
         self,
         kegg_pathway: Pathway,
-        gene_dict: Dict[str, float],
-        # resolver: Resolver
+        gene_dict: Optional[Dict[str, float]] = None,
+        cache: Optional[Union[Storage, str]] = None,
+        # resolve_compounds: bool = True # TODO: Specify if renderer should resolver compounds in human readable text
     ) -> None:
         """
-        Init renderer for KEGG Pathway.
-        :param kegg_pathway: Pathway
-        :param resolver: Resolver instance.
+        Init Renderer instance for KEGG Pathway.
+
+        :param Pathway kegg_pathway: Pathway instance to render.
+        :param Optional[Dict[str, float]] gene_dict: Dict to specify overlay color gradient to rendered entries.
+        :param Optional[Union[Storage, str]] cache: Specify cache to resolver compound data needed for rendering.
         """
 
         # Pathway instance to render
@@ -40,7 +43,10 @@ class Renderer:
         )
 
         # overlay vars
-        self.overlay: Dict[str, float] = gene_dict
+        self.overlay: Dict[str, float] = {}
+
+        if gene_dict is not None:
+            self.overlay = gene_dict
 
 
         # TODO: move to render function ??
@@ -59,42 +65,45 @@ class Renderer:
         ).get_list()
 
 
-        # TODO check if broken ?
-        # self.exp_min = min(gene_dict.values())
-        # self.exp_max = max(gene_dict.values())
-
-        # # Clip log fold expression
-        # self.exp_min = min(self.exp_min, 0)
-        # self.exp_max = max(self.exp_max, 0)
-
-
-        # TODO: get compounds without a resolver instance ? or remove organism from resolver
-        # self.resolver: Resolver = resolver
-        # TODO: self.components: Dict[str, str] = resolver.get_compounds()
-
+        # Init resolver instance from pathway org code.
+        self.resolver: Resolver = Resolver(organism=self.pathway.org, cache=cache)
 
 
     # TODO: fix because its broken
-    # def _get_gene_color(self, gene_id: str) -> str:
-    #     """
-    #     Get overlay color
-    #     :param gene_id: int
-    #     :return: str
-    #     """
+    def get_gene_color(self, gene_id: str, default_color: str = "#ffffff") -> str:
+        """
+        Get overlay color for given gene.
 
-    #     if gene_id not in self.overlay:
-    #         return "#ffffff"
+        :param str gene_id: Identify of gene.
+        :param str default_color: Default color to return if gene is not found in gene_dict.
+        :return: Color of gene by expression level specified in gene_dict.
+        :rtype: str
+        """
 
-    #     if self.overlay[gene_id] < 0:
-    #         return self.cmap_downreg[abs(int(self.overlay[gene_id] / self.exp_min * 100))]
+        if not is_valid_hex_color(default_color):
+            raise ValueError("Parameter default_color is not a valid hexadecimal color.")
 
-    #     return self.cmap_upreg[abs(int(self.overlay[gene_id] / self.exp_max * 100))]
+        # Return default color if gene is not found
+        if self.overlay.get(gene_id) in (None, 0.0):
+            return default_color
+
+
+
+        # Get expression limits
+        exp_min: float = min(self.overlay.values())
+        exp_max: float = max(self.overlay.values())
+
+        if self.overlay[gene_id] < 0:
+            # Expression below 0 (Downregulation)
+            return self.cmap_downreg[abs(int(self.overlay[gene_id] / exp_min * 100))]
+
+        # Expression above 0 (Upregulation)
+        return self.cmap_upreg[abs(int(self.overlay[gene_id] / exp_max * 100))]
 
 
 
     def render(
         self,
-        # with_overlay: bool = True,
     ) -> None:
         """
         Render KEGG pathway.
@@ -197,6 +206,9 @@ class Renderer:
     def to_string(self) -> str:
         """
         pydot graph instance to dot string.
+
+        :return: Generated dot string of pathway.
+        :rtype: str
         """
 
         # Generate dot string from pydot graph object
@@ -204,18 +216,20 @@ class Renderer:
 
 
         # Check correct type of dot string
-        if not isinstance(render_string, str):
+        if not isinstance(render_string, str): # pragma: no cover
             raise TypeError("Object returned from pydot graph object is not a string.")
 
         return render_string
 
 
 
-    def export(self, extension: str) -> bytes:
+    def to_binary(self, extension: str) -> bytes:
         """
-        Export pydot graph to file
-        :param extension: str
-        :return: Any
+        Export pydot graph to file.
+
+        :param str extension: Extension of file to export. Supported are "png", "svg", "pdf" and "jpeg".
+        :return: File content are bytes object.
+        :rtype: bytes
         """
 
         # TODO: direct save to file object
@@ -225,39 +239,7 @@ class Renderer:
         graph_data: Any = self.graph.create(prog="dot", format=extension)
 
         # Type check of return value
-        if not isinstance(graph_data, bytes):
+        if not isinstance(graph_data, bytes): # pragma: no cover
             raise TypeError("Failed to create binary file object from pydot graph instance.")
 
         return graph_data
-
-
-    # def render_legend(self):
-    #     """
-    #     Render svg label
-    #     :return: str
-    #     """
-    #     # Dont fix linting here, maybe this function will be removed
-    #     # pylint: disable=line-too-long
-    #     return f"""<?xml version="1.0" standalone="no"?>
-    #                 <svg height="200" width="300" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg"
-    # xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
-    #                 <defs>
-    # <linearGradient id="cmap" x1="0%" y1="0%" x2="0%" y2="100%">
-    #     <stop offset="0%" style="stop-color:{ColorGradient.to_css(color=self.upper_color)};stop-opacity:1" />
-    #     <stop offset="50%" style="stop-color:rgb(255,255,255);stop-opacity:1" />
-    #     <stop offset="100%" style="stop-color:{ColorGradient.to_css(color=self.lower_color)};stop-opacity:1" />
-    # </linearGradient>
-    #                 </defs>
-    #                 <g>
-    #                     <rect x="20" y="50" width="20" height="100" fill="url(#cmap)" />
-    #                     <rect x="20" y="50" width="20" height="100"
-    # style="stroke:black;stroke-width:2;fill-opacity:0;stroke-opacity:1" />
-    #                     <text x="55" y="150" fill="black" alignment-baseline="central">{self.exp_min}</text>
-    #                     <text x="55" y="100" fill="black" alignment-baseline="central">0</text>
-    #                     <text x="55" y="50" fill="black" alignment-baseline="central">{self.exp_max}</text>
-
-    #                     <line x1="40" y1="50" x2="50" y2="50" style="stroke:rgb(0,0,0);stroke-width:2" />
-    #                     <line x1="40" y1="100" x2="50" y2="100" style="stroke:rgb(0,0,0);stroke-width:2" />
-    #                     <line x1="40" y1="150" x2="50" y2="150" style="stroke:rgb(0,0,0);stroke-width:2" />
-    #                 </g>
-    #                 </svg>"""

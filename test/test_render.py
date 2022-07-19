@@ -55,9 +55,8 @@ def test_color_gradient_rendering(pathway: Pathway) -> None:
     # Check default color on 0.0 expression
     assert renderer.get_gene_color(gene_id="gene1") == "#ffffff"
 
-    # Testing invalid hex color as default_color
-    with pytest.raises(ValueError):
-        renderer.get_gene_color(gene_id="gene1", default_color="invalid")
+    # Testing custom default color from tuple
+    assert renderer.get_gene_color(gene_id="gene1", default_color=(0, 0, 0)) == "#000000"
 
 
     # Test maximum

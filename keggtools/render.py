@@ -1,12 +1,51 @@
 """ Render object """
 
 from typing import Any, Dict, List, Optional, Union
+
+from xml.etree.ElementTree import Element, SubElement
+from xml.etree import ElementTree
+
 from pydot import Dot, Node, Edge
 
 from .storage import Storage
-from .models import Pathway, Entry, is_valid_hex_color
+from .models import Pathway, Entry
 from .resolver import Resolver
 from .utils import ColorGradient
+
+
+
+def generate_embedded_html_table(
+    items: Dict[str, str],
+    border: int = 0,
+    cellborder: int = 1,
+    ) -> str:
+    """
+    Generate HTML table in insert into label of dot node.
+
+    `generate_embedded_html_table({"gene1": "#ffffff", "gene2": "#454545"})`
+
+    :param List[Dict[str, str]] items: Items are dicts with have format `{name: hex_color}`.
+    :param int border: Thickness of table border.
+    :param int cellborder: Thickness of cell border within the table.
+    :return: Returns html string of table.
+    :rtype: str
+    """
+
+    # TODO: implement more suppored html attributes in table, tr and td elements
+
+    element_table: Element = Element("table", attrib={"border": str(border), "cellborder": str(cellborder)})
+
+
+    # TODO: implement multiple cols for longer lists (square format)
+    for key, value in items.items():
+
+        element_row: Element = SubElement(element_table, "tr")
+        element_col: Element = SubElement(element_row, "td", attrib={"bgcolor": value})
+
+        # Set key as inner text of table cell
+        element_col.text = key
+
+    return ElementTree.tostring(element_table).decode("utf-8")
 
 
 class Renderer:
@@ -20,6 +59,9 @@ class Renderer:
         gene_dict: Optional[Dict[str, float]] = None,
         cache: Optional[Union[Storage, str]] = None,
         # resolve_compounds: bool = True # TODO: Specify if renderer should resolver compounds in human readable text
+
+        upper_color: tuple = (255, 0, 0),
+        lower_color: tuple = (0, 0, 255),
     ) -> None:
         """
         Init Renderer instance for KEGG Pathway.
@@ -27,6 +69,8 @@ class Renderer:
         :param Pathway kegg_pathway: Pathway instance to render.
         :param Optional[Dict[str, float]] gene_dict: Dict to specify overlay color gradient to rendered entries.
         :param Optional[Union[Storage, str]] cache: Specify cache to resolver compound data needed for rendering.
+        :param tuple upper_color: Color for upper bound of color gradient.
+        :param tuple lower_color: Color for lower bound of color gradient.
         """
 
         # Pathway instance to render
@@ -35,11 +79,14 @@ class Renderer:
         # Generate pydot Graph instance
         self.graph: Dot = Dot(
             'pathway',
-            graph_type='graph',
+            graph_type='digraph',
             bgcolor='#ffffff',
             labelloc="t",
             label=self.pathway.title,
             fontsize=25,
+            rankdir="TB",
+            splines="ortho", # "normal"
+            arrowhead="normal",
         )
 
         # overlay vars
@@ -51,8 +98,9 @@ class Renderer:
 
         # TODO: move to render function ??
         # Generate color map
-        self.upper_color: tuple = (255, 0, 0)
-        self.lower_color: tuple = (0, 0, 255)
+        self.upper_color: tuple = upper_color
+        self.lower_color: tuple = lower_color
+
         self.cmap_upreg: List[str] = ColorGradient(
             start=(255, 255, 255),
             stop=self.upper_color,
@@ -70,22 +118,19 @@ class Renderer:
 
 
     # TODO: fix because its broken
-    def get_gene_color(self, gene_id: str, default_color: str = "#ffffff") -> str:
+    def get_gene_color(self, gene_id: str, default_color: tuple = (255, 255, 255)) -> str:
         """
         Get overlay color for given gene.
 
         :param str gene_id: Identify of gene.
-        :param str default_color: Default color to return if gene is not found in gene_dict.
+        :param tuple default_color: Default color to return if gene is not found in gene_dict. Format in RGB tuple.
         :return: Color of gene by expression level specified in gene_dict.
         :rtype: str
         """
 
-        if not is_valid_hex_color(default_color):
-            raise ValueError("Parameter default_color is not a valid hexadecimal color.")
-
         # Return default color if gene is not found
         if self.overlay.get(gene_id) in (None, 0.0):
-            return default_color
+            return ColorGradient.to_hex(color=default_color)
 
 
 
@@ -109,28 +154,47 @@ class Renderer:
         Render KEGG pathway.
         """
 
+
+        # TODO: find all entries with multiple names (space-seperates)
+        # TODO: request the names of the entry names with .../find/gene1+gene2 -> parse list and use names as labels
+
         # add all nodes and edges
 
         related_entries = [int(p.entry1) for p in self.pathway.relations]
         related_entries.extend([int(p.entry2) for p in self.pathway.relations])
 
         for entry in self.pathway.entries:
+
+            # Use entry id as default label
+            # TODO: use different default label as fallback
+            entry_label: str = entry.id
+
             # only render genes with at least 1 relation
             if int(entry.id) in related_entries:
                 # case select for types gene, comp, group, ...
                 if entry.type == "gene":
 
+
                     # TODO: add node name
-                    # if entry.graphics is not None:
-                    #     entry_label = entry.graphics.name.split(", ")[0]
+                    if entry.graphics is not None and entry.graphics.name is not None:
+                        entry_label = entry.graphics.name.split(", ")[0]
+
+
+                    # TODO Check if node has multiple names
+                    # if len(entry.name.split(" ")) > 1:
+                    #     entry_label += " - " + str(len(entry.name.split(" ")))
+                    # TODO: generate list from entry name items
+                    # TODO: resolve all names "\l".join()
+
 
                     self.graph.add_node(Node(
                         name=entry.id,
-                        label=entry.id,
+                        label=entry_label,
                         shape="rectangle",
                         style="filled",
                         color="#000000",
                         fillcolor="#ffffff",
+                        # fillcolor="#ff00ff" if len(entry.name.split(" ")) > 1 else "#ffffff",
                     ))
 
 
@@ -150,22 +214,27 @@ class Renderer:
                             labels.append(component_entry.graphics.name.split(", ")[0])
 
 
-                    # TODO: update table rendering with bgcolor attr (use XML element)
-                    s_label = "".join([f"<tr><td>{l}</td></tr>" for l in labels])
+                    # Generate html table string from gene dict
+                    # TODO: add cell spacing/padding
+                    html_table_string: str = generate_embedded_html_table(
+                        items=dict(zip(labels, ["#ffffff"] * len(labels))),
+                    )
 
-
+                    # Add dot node to graph
                     self.graph.add_node(Node(
                         name=entry.id,
-                        label=f"<<table border='0' cellborder='1'>{s_label}</table>>",
-                        shape="rectangle",
+                        label=f"<{html_table_string}>",
+                        shape="rectangle", # plaintext
                         style="filled",
                         color="#000000",
                         fillcolor="#ffffff",
                     ))
 
+
                 elif entry.type == "compound":
 
-                    entry_label: str = ""
+                    # TODO: resolver compound with resolver
+
 
                     if entry.graphics is not None and entry.graphics.name is not None:
                         entry_label = entry.graphics.name.split(", ")[0]
@@ -184,7 +253,12 @@ class Renderer:
 
             # TODO: add arrowhead and label
 
-            self.graph.add_edge(Edge(src=rel.entry1, dst=rel.entry2))
+            self.graph.add_edge(Edge(
+                src=rel.entry1,
+                dst=rel.entry2,
+                arrowhead="tee",
+                label="+p",
+            ))
 
             # label = ""
             # arrowhead = "normal"
@@ -232,8 +306,11 @@ class Renderer:
         :rtype: bytes
         """
 
-        # TODO: direct save to file object
         # TODO: check supported file formats
+        # if extension not in ("png", "svg", "pdf", "jpeg"):
+        #     raise ValueError("Supported are only extensions 'png', 'svg', 'pdf' and 'jpeg'.")
+
+        # TODO: direct save to file object
 
         # render with pydot to binary
         graph_data: Any = self.graph.create(prog="dot", format=extension)

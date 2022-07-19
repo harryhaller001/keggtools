@@ -149,3 +149,8 @@ TODO.md
 CHANGELOG.md
 /.trash
 
+
+# Ignoring tmp testing files
+/main.py
+/plot.png
+

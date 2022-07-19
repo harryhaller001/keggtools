@@ -71,7 +71,7 @@ pytest: ## Unittest of package
 
 .PHONY: mypy
 mypy: ## Run static code analysis
-	@$(MYPY_OPT) ./test
+	@$(MYPY_OPT) ./test/*.py
 	@$(MYPY_OPT) ./docs/conf.py
 	@$(MYPY_OPT) -p keggtools
 

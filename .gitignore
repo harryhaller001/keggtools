@@ -154,3 +154,5 @@ CHANGELOG.md
 /main.py
 /plot.png
 
+Dockerfile.*
+.dockerignore

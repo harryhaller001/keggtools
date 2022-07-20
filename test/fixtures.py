@@ -40,14 +40,6 @@ def storage(cachedir: str) -> Generator[Storage, None, None]:
 
     os.rmdir(cachedir)
 
-    # try:
-    #     # Cleanup all files in cachedir and remove folder
-    #     for filename in os.listdir(path=cachedir):
-    #         os.remove(path=os.path.join(cachedir, filename))
-    #     os.rmdir(cachedir)
-    # except OSError:
-    #     pass
-
 
 
 @pytest.fixture(scope="function")

@@ -74,7 +74,7 @@ flit = "flit:main"
 # Pylint config
 [tool.pylint.'MESSAGES CONTROL']
 max-line-length = 120
-disable = "fixme,trailing-newlines,too-many-instance-attributes,too-many-arguments"
+disable = "fixme,trailing-newlines,too-many-instance-attributes,too-many-arguments,unnecessary-dunder-call"
 
 
 # Mypy config

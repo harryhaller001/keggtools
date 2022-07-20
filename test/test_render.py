@@ -1,22 +1,52 @@
 """ Testing keggtools rendering module """
-# pylint: disable=unused-import
 
-from typing import Any, Dict
+from typing import Dict
 
-import pytest
+from xml.etree.ElementTree import Element
+from xml.etree import ElementTree
 
-from keggtools import Renderer, Pathway
-from keggtools.models import is_valid_hex_color
+from keggtools.models import is_valid_hex_color, Pathway
+from keggtools.render import Renderer, generate_embedded_html_table
 
-from .fixtures import pathway
+from .fixtures import pathway # pylint: disable=unused-import
 
 
-def test_rendering_function(pathway: Pathway) -> None:
+def test_generate_html_table() -> None:
+    """
+    Testing function to generate html table.
+    """
+
+    items: Dict[str, str] = {
+        "gene1": "#ffffff",
+        "gene2": "#ff0000",
+        "gene3": "#ffffff",
+    }
+
+    # Testing table string generation
+    table_string: str = generate_embedded_html_table(items=items)
+
+    assert isinstance(table_string, str)
+
+    # test if string is valid html and contains all items
+    # Invalid xhtml should raise parsing error
+    parsed: Element = ElementTree.fromstring(table_string)
+
+    assert parsed.tag == "table"
+
+    for row_child in parsed:
+        assert row_child.tag == "tr"
+
+        # TODO: check if all items have table cells
+
+
+
+
+def test_rendering_function(
+    pathway: Pathway, # pylint: disable=redefined-outer-name
+    ) -> None:
     """
     testing rendering function with test KGML pathway.
     """
-
-    # pylint: disable=redefined-outer-name
 
     renderer: Renderer = Renderer(kegg_pathway=pathway)
 
@@ -31,12 +61,12 @@ def test_rendering_function(pathway: Pathway) -> None:
 
 
 
-def test_color_gradient_rendering(pathway: Pathway) -> None:
+def test_color_gradient_rendering(
+    pathway: Pathway, # pylint: disable=redefined-outer-name
+    ) -> None:
     """
     Testing color overlay from gene expression levels.
     """
-
-    # pylint: disable=redefined-outer-name
 
     # Init example gene dict to test color generation
     gene_dict: Dict[str, float] = {

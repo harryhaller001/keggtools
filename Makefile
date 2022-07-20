@@ -31,7 +31,7 @@ help: ## This help.
 
 .PHONY: install
 install: ## install all python dependencies
-	@$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests responses flit --upgrade
+	@$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests responses flit pre-commit --upgrade
 	@$(PIP_OPT) install requests scipy pydot pandas --upgrade
 	@$(PIP_OPT) install Sphinx sphinx-rtd-theme --upgrade
 

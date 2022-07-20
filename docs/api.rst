@@ -117,6 +117,8 @@ Renderer
     .. automethod:: __init__
 
 
+.. autofunction:: keggtools.render::generate_embedded_html_table
+
 
 Utils
 -----

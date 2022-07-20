@@ -1,5 +1,4 @@
 """ Testing keggtools analysis module """
-# pylint: disable=unused-import
 
 from io import StringIO
 import os
@@ -11,7 +10,7 @@ import pandas
 from keggtools import Enrichment, EnrichmentResult, Pathway
 from keggtools.storage import Storage
 
-from .fixtures import storage, cachedir
+from .fixtures import storage, cachedir # pylint: disable=unused-import
 
 
 def test_enrichment_result() -> None:
@@ -44,12 +43,12 @@ def test_enrichment_result() -> None:
 
 
 
-def test_enrichment(storage: Storage) -> None:
+def test_enrichment(
+    storage: Storage, # pylint: disable=redefined-outer-name
+    ) -> None:
     """
     Testing enrichment analysis instance.
     """
-    # pylint: disable=redefined-outer-name
-
 
     # Load testing pathway
     with open(os.path.join(os.path.dirname(__file__), "pathway.kgml"), "r", encoding="utf-8") as file_obj:

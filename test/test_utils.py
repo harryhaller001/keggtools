@@ -3,13 +3,6 @@
 from typing import Dict, List
 from xml.etree.ElementTree import Element
 
-# import pytest
-
-# from requests.exceptions import HTTPError
-
-# import responses
-# from responses import Response
-
 
 from keggtools.utils import (
     ColorGradient,
@@ -94,26 +87,3 @@ def test_parse_tsv() -> None:
 
     assert parsed_dict["header1"] == "header2"
     assert parsed_dict["item3"] == "item4"
-
-
-
-# @responses.activate
-# def test_request_function() -> None:
-#     """
-#     Testing function to request string from url endpoint.
-#     """
-
-#     url: str = "http://example.com"
-#     payload: str = "ok"
-
-#     # Test valid response
-#     test_response_1: Response = Response(method="GET", url=url, body=payload, status=200)
-#     responses.add(test_response_1)
-#     assert request(url=url) == payload
-
-#     # test invalid response
-#     test_response_2: Response = Response(method="GET", url=url, body=payload, status=400)
-#     responses.add(test_response_2)
-
-#     with pytest.raises(HTTPError):
-#         request(url=url)

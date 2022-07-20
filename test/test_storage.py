@@ -1,5 +1,4 @@
 """ Testing storage module """
-# pylint: disable=unused-import,redefined-outer-name
 
 import os
 
@@ -7,22 +6,26 @@ import pytest
 
 from keggtools.storage import Storage
 
-from .fixtures import cachedir, storage, resolver
+from .fixtures import cachedir, storage, resolver # pylint: disable=unused-import
 
 
-def test_storage(cachedir: str) -> None:
+def test_storage(
+    cachedir: str, # pylint: disable=redefined-outer-name
+    ) -> None:
     """
     Testing storage.
     """
+
+    # Check cachedir is not present before storage instance is created
     assert os.path.isdir(cachedir) is False
 
-    storage: Storage = Storage(cachedir=cachedir)
+    storage_instance: Storage = Storage(cachedir=cachedir)
 
     # check if directory exist
-    assert os.path.isdir(storage.cachedir) is True
+    assert os.path.isdir(storage_instance.cachedir) is True
 
     # Function raises error if dir does not exist
-    storage.check_cache_dir()
+    storage_instance.check_cache_dir()
 
     # Cleanup
     os.rmdir(cachedir)
@@ -33,12 +36,15 @@ def test_cachedir_default() -> None:
     Testing storage cachedir default fallback.
     """
 
-    test_storage: Storage = Storage()
-    assert os.path.isdir(test_storage.cachedir) is True
+    storage_instance: Storage = Storage()
+    assert os.path.isdir(storage_instance.cachedir) is True
 
 
 
-def test_folder_generation(cachedir: str, storage: Storage) -> None:
+def test_folder_generation( # pylint: disable=redefined-outer-name
+    cachedir: str,
+    storage: Storage,
+    ) -> None:
     """
     Testing generation of new cache folder.
     """
@@ -51,7 +57,10 @@ def test_folder_generation(cachedir: str, storage: Storage) -> None:
 
 
 
-def test_folder_check_fails(cachedir: str, storage: Storage) -> None:
+def test_folder_check_fails( # pylint: disable=redefined-outer-name
+    cachedir: str,
+    storage: Storage,
+    ) -> None:
     """
     Testing if check fails if cache folder does not exist.
     """
@@ -68,13 +77,13 @@ def test_folder_check_fails(cachedir: str, storage: Storage) -> None:
 
 
 
-def test_cache_readwrite() -> None:
+def test_cache_readwrite( # pylint: disable=redefined-outer-name
+    cachedir: str,
+    storage: Storage,
+    ) -> None:
     """
     Testing saving/loading of file to storage.
     """
-
-    cachedir: str = os.path.join(os.path.dirname(__file__), ".test_keggtools_cache")
-    storage: Storage = Storage(cachedir=cachedir)
 
     testing_filename: str = "test.txt"
     testing_payload: str = "hello world!"
@@ -99,8 +108,3 @@ def test_cache_readwrite() -> None:
 
     with pytest.raises(FileNotFoundError):
         storage.load_dump("invalid.txt")
-
-
-    # Cleanup
-    os.remove(storage.build_cache_path(testing_filename))
-    os.rmdir(cachedir)

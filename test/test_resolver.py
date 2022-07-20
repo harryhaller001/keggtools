@@ -1,24 +1,22 @@
 """ Testing keggtools resolver module """
 
-# pylint: disable=unused-import,redefined-outer-name
-
-
 import os
 from typing import Dict
 
 import responses
-import requests
 
 from keggtools import Resolver, Storage, Pathway
 
 
-from .fixtures import cachedir, storage, resolver
+from .fixtures import cachedir, storage, resolver # pylint: disable=unused-import
 
 
 def test_resolver_init(cachedir: str, storage: Storage) -> None:
     """
     Testing init function of resolver with different arugment types.
     """
+
+    # pylint: disable=redefined-outer-name
 
     assert Resolver(organism="mmu", cache=None).storage.cachedir == Storage().cachedir
 
@@ -29,7 +27,9 @@ def test_resolver_init(cachedir: str, storage: Storage) -> None:
 
 
 @responses.activate
-def test_resolver_cache_or_request(resolver: Resolver) -> None:
+def test_resolver_cache_or_request(
+    resolver: Resolver, # pylint: disable=redefined-outer-name
+    ) -> None:
     """
     Testing resolve cache or request function.
     """
@@ -63,10 +63,13 @@ def test_resolver_cache_or_request(resolver: Resolver) -> None:
 
 
 @responses.activate
-def test_get_pathway_list(resolver: Resolver) -> None:
+def test_get_pathway_list(
+    resolver: Resolver, # pylint: disable=redefined-outer-name
+    ) -> None:
     """
     Testing request of pathway list.
     """
+
 
     # Register response
     responses.add(
@@ -85,7 +88,9 @@ def test_get_pathway_list(resolver: Resolver) -> None:
 
 
 @responses.activate
-def test_get_pathway(resolver: Resolver) -> None:
+def test_get_pathway(
+    resolver: Resolver, # pylint: disable=redefined-outer-name
+    ) -> None:
     """
     Testing request of KGML pathway.
     """
@@ -105,7 +110,9 @@ def test_get_pathway(resolver: Resolver) -> None:
 
 
 @responses.activate
-def test_get_organism_list(resolver: Resolver) -> None:
+def test_get_organism_list(
+    resolver: Resolver, # pylint: disable=redefined-outer-name
+    ) -> None:
     """
     Testing request of org list.
     """
@@ -132,7 +139,9 @@ def test_get_organism_list(resolver: Resolver) -> None:
 
 
 @responses.activate
-def test_get_compounds(resolver: Resolver) -> None:
+def test_get_compounds(
+    resolver: Resolver, # pylint: disable=redefined-outer-name
+    ) -> None:
     """
     Testing get compund function.
     """

@@ -17,17 +17,13 @@ class Resolver:
 
     def __init__(
         self,
-        organism: str,
         cache: Optional[Union[Storage, str]] = None
     ) -> None:
         """
-        Need 3 letter code as organism identifier.
-        :param organism: 3 letter code of organism used by KEGG database.
-        :param cache: (Optional) Directory or Storage instance.
+        Init Resolver instance.
+
+        :param Optional[Union[Storage, str]] cache: Directory to use as cache storage or Storage instance.
         """
-
-
-        self.organism: str = organism
 
         # Handle different types of argument for cache
 
@@ -47,9 +43,18 @@ class Resolver:
         self.storage: Storage = _store
 
 
-    def _cache_or_request(self, filename: str, url: str) -> str:
+    def _cache_or_request(
+        self,
+        filename: str,
+        url: str,
+        ) -> str:
         """
         Load file from cache folder. If file does not exist, request from given url.
+
+        :param str filename: Filename to store in cache folder.
+        :param str url: Url to online resource to request if file is not present in cache folder.
+        :return: Returns content of file as string.
+        :rtype: str
         """
 
         file_data: Optional[str] = None
@@ -74,21 +79,29 @@ class Resolver:
 
 
 
-    def get_pathway_list(self) -> Dict[str, str]:
+    def get_pathway_list(
+        self,
+        organism: str,
+        ) -> Dict[str, str]:
         """
-        Request list of pathways linked to organism. {<pathway-id>: <name>}
-        :return: dict
+        Request list of pathways linked to organism.
+
+        :param str organism: 3 letter organism code used by KEGG database.
+        :return: Dict in format {<pathway-id>: <name>}.
+        :rtype: Dict[str, str]
         """
 
         # TODO: return as list of pathway identifier ?
+
+        # TODO: verify org code
 
         # path:mmu00010	Glycolysis / Gluconeogenesis - Mus musculus (mouse)
         # path:<org><code>\t<name> - <org>
 
 
         list_data: str = self._cache_or_request(
-            filename=f"pathway_list_{self.organism}.tsv",
-            url=f"http://rest.kegg.jp/list/pathway/{self.organism}"
+            filename=f"pathway_list_{organism}.tsv",
+            url=f"http://rest.kegg.jp/list/pathway/{organism}"
         )
 
 
@@ -100,16 +113,25 @@ class Resolver:
         return pathways
 
 
-    def get_pathway(self, code: str) -> Pathway:
+    def get_pathway(
+        self,
+        organism: str,
+        code: str,
+        ) -> Pathway:
         """
-        Request KGML pathway by identifier.
-        :param code: str
-        :return: Pathway
+        Load and parse KGML pathway by identifier.
+
+        :param str organism: 3 letter organism code used by KEGG database.
+        :param str code: Pathway identify used by KEGG database.
+        :return: Returns parsed Pathway instance.
+        :rtype: Pathway
         """
 
+        # TODO: verify org code
+
         data: str = self._cache_or_request(
-            filename=f"{self.organism}_path{code}.kgml",
-            url=f"http://rest.kegg.jp/get/{self.organism}{code}/kgml",
+            filename=f"{organism}_path{code}.kgml",
+            url=f"http://rest.kegg.jp/get/{organism}{code}/kgml",
         )
 
         # Parse string
@@ -119,7 +141,8 @@ class Resolver:
 
     def get_compounds(self) -> Dict[str, str]:
         """
-        Get dict of components. Request if not in cache
+        Get dict of components. Request from KEGG API if not in cache.
+
         :return: dict
         """
 
@@ -138,6 +161,7 @@ class Resolver:
     def get_organism_list(self) -> Dict[str, str]:
         """
         Get organism codes from file or KEGG API.
+
         :return: dict {<org>: <org-name>}
         """
 
@@ -158,6 +182,7 @@ class Resolver:
     def check_organism(self, organism: str) -> bool:
         """
         Check if organism code exist.
+
         :param organism: (str) 3 letter organism code used by KEGG database.
         :return: (bool) returns True if organism code is found in list of valid organisms.
         """

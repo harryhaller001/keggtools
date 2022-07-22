@@ -33,13 +33,21 @@ def generate_embedded_html_table(
 
     # TODO: implement more suppored html attributes in table, tr and td elements
 
-    element_table: Element = Element("table", attrib={"border": str(border), "cellborder": str(cellborder)})
+    element_table: Element = Element(
+        "table",
+        attrib={
+            "border": str(border),
+            "cellborder": str(cellborder),
+            "cellspacing": "0",
+            "cellpadding": "4",
+        },
+    )
 
 
     # TODO: implement multiple cols for longer lists (square format)
     for key, value in items.items():
 
-        element_row: Element = SubElement(element_table, "tr")
+        element_row: Element = SubElement(element_table, "tr", attrib={})
         element_col: Element = SubElement(element_row, "td", attrib={"bgcolor": value})
 
         # Set key as inner text of table cell
@@ -85,7 +93,7 @@ class Renderer:
             label=self.pathway.title,
             fontsize=25,
             rankdir="TB",
-            splines="ortho", # "normal"
+            splines="normal", # "ortho"/line
             arrowhead="normal",
         )
 
@@ -114,7 +122,7 @@ class Renderer:
 
 
         # Init resolver instance from pathway org code.
-        self.resolver: Resolver = Resolver(organism=self.pathway.org, cache=cache)
+        self.resolver: Resolver = Resolver(cache=cache)
 
 
     # TODO: fix because its broken
@@ -153,6 +161,8 @@ class Renderer:
         """
         Render KEGG pathway.
         """
+
+        # pylint: disable=too-many-branches
 
 
         # TODO: find all entries with multiple names (space-seperates)
@@ -224,7 +234,8 @@ class Renderer:
                     self.graph.add_node(Node(
                         name=entry.id,
                         label=f"<{html_table_string}>",
-                        shape="rectangle", # plaintext
+                        # shape="rectangle",
+                        shape="plaintext",
                         style="filled",
                         color="#000000",
                         fillcolor="#ffffff",
@@ -251,28 +262,84 @@ class Renderer:
 
         for rel in self.pathway.relations:
 
-            # TODO: add arrowhead and label
 
-            self.graph.add_edge(Edge(
+            relation_edge: Edge = Edge(
                 src=rel.entry1,
                 dst=rel.entry2,
-                arrowhead="tee",
-                label="+p",
-            ))
+            )
 
-            # label = ""
-            # arrowhead = "normal"
-            # if "inhibition" in rel.subtypes or "repression" in rel.subtypes:
-            #     arrowhead = "tee"
-            # elif "binding/association" in rel.subtypes:
-            #     arrowhead = "none"
+            line_style: str = "solid"
 
-            # if "phosphorylation" in rel.subtypes:
-            #     label = "+p"
 
-            # string_builder.append(
-            #     f"\tentry{rel.entry1} -> entry{rel.entry2} [arrowhead=\"{arrowhead}\" label=\"{label}\"];"
-            # )
+            # Check for type of interaction and set line style of edge
+            if rel.type == "GErel":
+                # Gene expression interaction gets a distinct line style
+                line_style = "dashed"
+
+
+
+            # molecular events:
+            # This relation subtype information is used for label of edge.
+            # --------------------
+            # phosphorylation   +p
+            # dephosphorylation -p
+            # glycosylation     +g
+            # ubiquitination    +u
+            # methylation	    +m
+
+            # TODO: move to const
+            molecular_event_dict: Dict[str, str] = {
+                "phosphorylation": "+p",
+                "dephosphorylation": "-p",
+                "glycosylation": "+g",
+                "ubiquitination": "+u",
+                "methylation": "+m",
+            }
+
+            # Iterate over relation subtypes and check if moleuclar event is present
+            edge_label: Optional[str] = None
+            arrowhead: str = "normal"
+
+            for subtype in rel.subtypes:
+
+                # Check if subtype is molecular event to set label of edge
+                if subtype.name in molecular_event_dict:
+
+                    # Check if label is none (no subtype found in prior iter steps)
+                    if edge_label is None:
+                        edge_label = molecular_event_dict[subtype.name]
+                    else:
+                        # TODO: is this event even possible ?
+                        # TODO: handle but call warning
+                        # A molecular event was already found. Append label to existing label
+                        edge_label += ", " + molecular_event_dict[subtype.name]
+
+
+                # Check for quality of interaction to set arrow head of edge
+                if subtype.name in ("activation", "expression", "indirect effect", "binding/association"):
+                    arrowhead = "normal"
+                elif subtype.name in ("inhibition", "repression", "dissociation"):
+                    arrowhead = "tee"
+                else:
+                    arrowhead = "none"
+
+                # Add special line type for state change interaction type
+                if subtype.name == "state change":
+                    line_style = "dotted"
+
+            # set arrowhead to edge instance
+            relation_edge.set(name="arrowhead", value=arrowhead)
+
+
+            # Set label if molecular event is found in relation subtypes
+            if edge_label is not None:
+                relation_edge.set(name="label", value=edge_label)
+
+            # Set line style to edge instance
+            relation_edge.set(name="style", value=line_style)
+
+
+            self.graph.add_edge(relation_edge)
 
 
 

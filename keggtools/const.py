@@ -62,14 +62,6 @@ RELATION_SUBTYPES: List[str] = [
 ]
 
 
-# RELATION_TYPES = {
-#     "ECrel": "enzyme-enzyme relation",
-#     "PPrel": "protein-protein interaction",
-#     "GErel": "gene expression interaction",
-#     "PCrel": "protein-compound interaction",
-#     "maplink": "link to another map"
-# }
-
 RELATION_TYPES: List[str] = [
     "ECrel",
     "PPrel",

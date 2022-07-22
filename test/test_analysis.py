@@ -10,7 +10,7 @@ import pandas
 from keggtools import Enrichment, EnrichmentResult, Pathway
 from keggtools.storage import Storage
 
-from .fixtures import storage, cachedir # pylint: disable=unused-import
+from .fixtures import storage # pylint: disable=unused-import
 
 
 def test_enrichment_result() -> None:

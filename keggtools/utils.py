@@ -1,5 +1,6 @@
 """ Basic utils for HTTP requests, parsing and rendering """
 
+import re
 import csv
 from io import StringIO
 
@@ -14,6 +15,12 @@ from xml.etree.ElementTree import Element
 def get_attribute(element: Element, key: str) -> str:
     """
     Get attribute from XML Element object. Raises KeyError is Attribute is not found or not valid.
+
+    :param Element element: XML element to get attribute from.
+    :param str key: Name of attribute.
+    :return: Value of attribute.
+    :rtype: str
+    :raises: ValueError
     """
 
     value: Optional[str] = element.attrib.get(key)
@@ -29,6 +36,12 @@ def get_attribute(element: Element, key: str) -> str:
 def get_numeric_attribute(element: Element, key: str) -> str:
     """
     Get attribute from XML Element object. Raises KeyError is Attribute is not found or not valid.
+
+    :param Element element: XML element to get attribute from.
+    :param str key: Name of attribute.
+    :return: Value of attribute. ValueError is raised if value is not a numeric string.
+    :rtype: str
+    :raises: ValueError
     """
 
     value: str = get_attribute(element=element, key=key)
@@ -44,6 +57,10 @@ def get_numeric_attribute(element: Element, key: str) -> str:
 def parse_xml(xml_object_or_string: Union[str, Element]) -> Element:
     """
     Returns XML Element object from string or XML Element.
+
+    :param Union[str, Element] xml_object_or_string: Input parameter to check.
+    :return: XML element instance.
+    :rtype: Element
     """
     if isinstance(xml_object_or_string, str):
         return ElementTree.fromstring(xml_object_or_string)
@@ -55,16 +72,28 @@ def parse_xml(xml_object_or_string: Union[str, Element]) -> Element:
 def parse_tsv(data: str) -> list:
     """
     Parse .tsv file from string
-    :param data: str
-    :return: list
+
+    :param str data: Tsv string to parse into list.
+    :return: List of items.
+    :rtype: list
     """
     return list(csv.reader(StringIO(data), delimiter="\t"))
 
 
 
-def parse_tsv_to_dict(data: str, col_keys: int = 0, col_values: int = 1) -> Dict[str, str]:
+def parse_tsv_to_dict(
+    data: str,
+    col_keys: int = 0,
+    col_values: int = 1,
+    ) -> Dict[str, str]:
     """
     Parse .tsv file from string and build dict from first two columns. Other columns are ignored.
+
+    :param str data: Tsv string to parse.
+    :param int col_keys: Number of colum to parse as dict keys (0-index).
+    :param int col_values: Number of colum to parse as dict values (0-index).
+    :return: Dict of two tsv columns.
+    :rtype: Dict[str, str]
     """
     list_data: list = parse_tsv(data=data)
 
@@ -89,13 +118,14 @@ class ColorGradient:
         self,
         start: tuple,
         stop: tuple,
-        steps: int
+        steps: int = 100
     ) -> None:
         """
         Init ColorGradient instance.
-        :param start: Color tuple
-        :param stop: Color tuple
-        :param steps: Number of steps.
+
+        :param tuple start: Color tuple
+        :param tuple stop: Color tuple
+        :param int steps: Number of steps.
         """
         self.start: tuple = start
         self.stop: tuple = stop
@@ -106,8 +136,10 @@ class ColorGradient:
     def to_css(color: tuple) -> str:
         """
         Convert color tuple to CSS rgb color string.
-        :param color: Color tuple containing 3 integers
-        :return: str
+
+        :param tuple color: RGB color tuple containing 3 integers
+        :return: Color as CSS string (e.g. "rgb(0, 0, 0)").
+        :rtype: str
         """
         # if len(color) != 3 or not all([isinstance(value, int) for value in color]):
         #     raise ValueError("Color must be a tuple of 3 integers.")
@@ -119,6 +151,10 @@ class ColorGradient:
     def to_hex(color: tuple) -> str:
         """
         Convert color tuple to hex color string.
+
+        :param tuple color: RGB color tuple containing 3 integers.
+        :return: Hexadecimal color string (e.g. "#000000").
+        :rtype: str
         """
 
         # TODO: check for int type.
@@ -130,7 +166,9 @@ class ColorGradient:
     def get_list(self) -> List[str]:
         """
         Get gradient color as list.
-        :return: list
+
+        :return: Returns list of hexadecimal color strings with a gradient.
+        :rtype: List[str]
         """
 
         step_list = [index / float(self.steps) for index in range(self.steps)]
@@ -153,3 +191,57 @@ class ColorGradient:
         values: List[float] = list(map(sum, zip(a_component, b_component)))
 
         return tuple((int(item) for item in values))
+
+
+
+
+
+def is_valid_pathway_org(value: str) -> bool:
+    """
+    Check if organism identifier is valid.
+
+    :param str value: String value to check.
+    :return: Returns True if value is a valid organism code.
+    :rtype: bool
+    """
+
+    # Organism must be 3 letter code
+    # Identifier can also be KO or Enzyme identifer
+    # TODO: validate with KEGG organism list
+    return re.match(pattern=r"^(ko|ec|[a-z]{3})$", string=value) is not None
+
+
+def is_valid_pathway_number(value: str) -> bool:
+    """
+    Check if pathway number has correct 5 digit format.
+
+    :param str value: String value to check.
+    :return: Returns True if value has the correct format of pathway number.
+    :rtype: bool
+    """
+
+    # KEGG pathway number must be a 5 digit number
+    return re.match(pattern=r"^([0-9]{5})$", string=value) is not None
+
+
+def is_valid_pathway_name(value: str) -> bool:
+    """
+    Check if combined pathway identifer is valid. String must match "path:<org><number>".
+
+    :param str value: String value to check.
+    :return: Returns True if value matches format of pathway name.
+    :rtype: bool
+    """
+
+    return re.match(pattern=r"^path:(ko|ec|[a-z]{3})([0-9]{5})$", string=value) is not None
+
+
+def is_valid_hex_color(value: str) -> bool:
+    """
+    Check if string is a valid hex color.
+
+    :param str value: String value to check.
+    :return: Returns True if value is valid hexadecimal color string.
+    :rtype: bool
+    """
+    return re.match(pattern=r"^\#([a-fA-F0-9]{6})$", string=value) is not None

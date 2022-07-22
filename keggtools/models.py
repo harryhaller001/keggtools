@@ -2,14 +2,8 @@
 # pylint: disable=invalid-name,redefined-builtin
 
 
-# TODO: move checks to init function, not parse function !!!
-
-
-
 from xml.etree.ElementTree import Element
 from typing import List, Union, Optional
-
-import re
 
 from .const import (
     RELATION_TYPES,
@@ -22,59 +16,12 @@ from .utils import (
     get_attribute,
     get_numeric_attribute,
     parse_xml,
+    is_valid_pathway_number,
+    is_valid_hex_color,
+    is_valid_pathway_name,
+    is_valid_pathway_org,
 )
 
-
-
-def is_valid_pathway_org(value: str) -> bool:
-    """
-    Check if organism identifier is valid.
-
-    :param str value: String value to check.
-    :return: Returns True if value is a valid organism code.
-    :rtype: bool
-    """
-
-    # Organism must be 3 letter code
-    # Identifier can also be KO or Enzyme identifer
-    # TODO: validate with KEGG organism list
-    return re.match(pattern=r"^(ko|ec|[a-z]{3})$", string=value) is not None
-
-
-def is_valid_pathway_number(value: str) -> bool:
-    """
-    Check if pathway number has correct 5 digit format.
-
-    :param str value: String value to check.
-    :return: Returns True if value has the correct format of pathway number.
-    :rtype: bool
-    """
-
-    # KEGG pathway number must be a 5 digit number
-    return re.match(pattern=r"^([0-9]{5})$", string=value) is not None
-
-
-def is_valid_pathway_name(value: str) -> bool:
-    """
-    Check if combined pathway identifer is valid. String must match "path:<org><number>".
-
-    :param str value: String value to check.
-    :return: Returns True if value matches format of pathway name.
-    :rtype: bool
-    """
-
-    return re.match(pattern=r"^path:(ko|ec|[a-z]{3})([0-9]{5})$", string=value) is not None
-
-
-def is_valid_hex_color(value: str) -> bool:
-    """
-    Check if string is a valid hex color.
-
-    :param str value: String value to check.
-    :return: Returns True if value is valid hexadecimal color string.
-    :rtype: bool
-    """
-    return re.match(pattern=r"^\#([a-fA-F0-9]{6})$", string=value) is not None
 
 
 

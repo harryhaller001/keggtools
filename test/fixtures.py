@@ -10,35 +10,29 @@ from keggtools.storage import Storage
 from keggtools.resolver import Resolver
 from keggtools.models import Pathway
 
-
-
-@pytest.fixture(scope="module")
-def cachedir() -> str:
-    """
-    Static cachedir string.
-    """
-
-    return os.path.join(os.path.dirname(__file__), ".test_keggtools_cache")
-
+# Const values
+ORGANISM: str = "mmu"
+CACHEDIR: str = os.path.join(os.path.dirname(__file__), ".test_keggtools_cache")
 
 
 @pytest.fixture(scope="function")
-def storage(cachedir: str) -> Generator[Storage, None, None]:
+def storage() -> Generator[Storage, None, None]:
     """
     generate storage instance. Fixtures helps cleanup cache dir after each function call.
     """
 
-    assert os.path.isdir(cachedir) is False
+    assert os.path.isdir(CACHEDIR) is False
 
-    storage: Storage = Storage(cachedir=cachedir)
+    storage: Storage = Storage(cachedir=CACHEDIR)
 
     yield storage
 
     # Cleanup all files in cachedir and remove folder
-    for filename in os.listdir(path=cachedir):
-        os.remove(path=os.path.join(cachedir, filename))
+    for filename in os.listdir(path=CACHEDIR):
+        os.remove(path=os.path.join(CACHEDIR, filename))
 
-    os.rmdir(cachedir)
+    # Remove cache dir folder
+    os.rmdir(CACHEDIR)
 
 
 
@@ -48,7 +42,7 @@ def resolver(storage: Storage) -> Generator[Resolver, None, None]:
     generate resolver instance on top of storage fixtures.
     """
 
-    test_resolver: Resolver = Resolver(organism="mmu", cache=storage)
+    test_resolver: Resolver = Resolver(cache=storage)
 
     yield test_resolver
 

@@ -6,20 +6,23 @@ import pytest
 
 from keggtools.storage import Storage
 
-from .fixtures import cachedir, storage, resolver # pylint: disable=unused-import
+from .fixtures import ( # pylint: disable=unused-import
+    storage,
+    resolver,
+    CACHEDIR,
+)
 
 
-def test_storage(
-    cachedir: str, # pylint: disable=redefined-outer-name
-    ) -> None:
+
+def test_storage() -> None:
     """
     Testing storage.
     """
 
     # Check cachedir is not present before storage instance is created
-    assert os.path.isdir(cachedir) is False
+    assert os.path.isdir(CACHEDIR) is False
 
-    storage_instance: Storage = Storage(cachedir=cachedir)
+    storage_instance: Storage = Storage(cachedir=CACHEDIR)
 
     # check if directory exist
     assert os.path.isdir(storage_instance.cachedir) is True
@@ -28,7 +31,7 @@ def test_storage(
     storage_instance.check_cache_dir()
 
     # Cleanup
-    os.rmdir(cachedir)
+    os.rmdir(CACHEDIR)
 
 
 def test_cachedir_default() -> None:
@@ -42,7 +45,6 @@ def test_cachedir_default() -> None:
 
 
 def test_folder_generation( # pylint: disable=redefined-outer-name
-    cachedir: str,
     storage: Storage,
     ) -> None:
     """
@@ -53,12 +55,11 @@ def test_folder_generation( # pylint: disable=redefined-outer-name
     storage.check_cache_dir()
 
     # Test correct folder generation
-    assert storage.build_cache_path("test.txt") == os.path.join(cachedir, "test.txt")
+    assert storage.build_cache_path("test.txt") == os.path.join(CACHEDIR, "test.txt")
 
 
 
 def test_folder_check_fails( # pylint: disable=redefined-outer-name
-    cachedir: str,
     storage: Storage,
     ) -> None:
     """
@@ -66,19 +67,18 @@ def test_folder_check_fails( # pylint: disable=redefined-outer-name
     """
 
     # Remove dir before accessing it with storage
-    os.rmdir(cachedir)
+    os.rmdir(CACHEDIR)
 
     with pytest.raises(NotADirectoryError):
         storage.check_cache_dir()
 
 
     # Regenerate folder to revent failing of fixture
-    os.mkdir(cachedir)
+    os.mkdir(CACHEDIR)
 
 
 
 def test_cache_readwrite( # pylint: disable=redefined-outer-name
-    cachedir: str,
     storage: Storage,
     ) -> None:
     """
@@ -90,14 +90,14 @@ def test_cache_readwrite( # pylint: disable=redefined-outer-name
 
     # Testing string file
     assert storage.exist(testing_filename) is False
-    assert storage.save(filename=testing_filename, data=testing_payload) == os.path.join(cachedir, testing_filename)
+    assert storage.save(filename=testing_filename, data=testing_payload) == os.path.join(CACHEDIR, testing_filename)
     assert storage.load(filename=testing_filename) == testing_payload
 
     # testing binary file
     assert storage.save_dump(
         filename=testing_filename,
         data=testing_payload
-    ) == os.path.join(cachedir, testing_filename)
+    ) == os.path.join(CACHEDIR, testing_filename)
     assert storage.load_dump(filename=testing_filename) == testing_payload
 
 

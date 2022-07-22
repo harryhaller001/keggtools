@@ -8,21 +8,27 @@ import responses
 from keggtools import Resolver, Storage, Pathway
 
 
-from .fixtures import cachedir, storage, resolver # pylint: disable=unused-import
+from .fixtures import ( # pylint: disable=unused-import
+    storage,
+    resolver,
+    CACHEDIR,
+    ORGANISM,
+)
 
 
-def test_resolver_init(cachedir: str, storage: Storage) -> None:
+
+def test_resolver_init(storage: Storage) -> None:
     """
     Testing init function of resolver with different arugment types.
     """
 
     # pylint: disable=redefined-outer-name
 
-    assert Resolver(organism="mmu", cache=None).storage.cachedir == Storage().cachedir
+    assert Resolver(cache=None).storage.cachedir == Storage().cachedir
 
-    assert Resolver(organism="mmu", cache=storage).storage.cachedir == cachedir
+    assert Resolver(cache=storage).storage.cachedir == CACHEDIR
 
-    assert Resolver(organism="mmu", cache=cachedir).storage.cachedir == cachedir
+    assert Resolver(cache=CACHEDIR).storage.cachedir == CACHEDIR
 
 
 
@@ -80,7 +86,7 @@ def test_get_pathway_list(
         status=200,
     )
 
-    result: Dict[str, str] = resolver.get_pathway_list()
+    result: Dict[str, str] = resolver.get_pathway_list(organism=ORGANISM)
 
     assert result["path:mmu00010"] == "Glycolysis / Gluconeogenesis - Mus musculus (house mouse)"
     assert result["path:mmu00020"] == "Citrate cycle (TCA cycle) - Mus musculus (house mouse)"
@@ -106,7 +112,7 @@ def test_get_pathway(
         status=200,
     )
 
-    assert isinstance(resolver.get_pathway(code="12345"), Pathway) is True
+    assert isinstance(resolver.get_pathway(organism=ORGANISM, code="12345"), Pathway) is True
 
 
 @responses.activate

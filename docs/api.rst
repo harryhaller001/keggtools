@@ -58,12 +58,6 @@ Models
     .. automethod:: __init__
 
 
-.. autofunction:: keggtools.models::is_valid_hex_color
-.. autofunction:: keggtools.models::is_valid_pathway_name
-.. autofunction:: keggtools.models::is_valid_pathway_number
-.. autofunction:: keggtools.models::is_valid_pathway_org
-
-
 
 Resolver
 --------
@@ -137,3 +131,7 @@ Utils
 .. autofunction:: keggtools.utils::parse_tsv_to_dict
 .. autofunction:: keggtools.utils::parse_xml
 
+.. autofunction:: keggtools.utils::is_valid_hex_color
+.. autofunction:: keggtools.utils::is_valid_pathway_name
+.. autofunction:: keggtools.utils::is_valid_pathway_number
+.. autofunction:: keggtools.utils::is_valid_pathway_org

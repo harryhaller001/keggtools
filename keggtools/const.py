@@ -34,13 +34,6 @@ IMMUNE_SYSTEM_PATHWAYS: Dict[str, str] = {
 # Constant element types in the KGML format
 # Details at KGML manual https://www.kegg.jp/kegg/xml/docs/
 
-# RELATION_SUBTYPES = {
-#     "activation": "-->",
-#     "inhibition": "--|",
-#     "expression": "-->",
-#     "repression": "--|",
-#     "indirect effect": "..>"
-# }
 
 RELATION_SUBTYPES: List[str] = [
     "compound",
@@ -87,4 +80,10 @@ ENTRY_TYPE: List[str] = [
     "map",
     "brite",
     "other"
+]
+
+
+REACTION_TYPE: List[str] = [
+    "reversible",
+    "irreversible",
 ]

@@ -158,11 +158,7 @@ class Relation:
 
 class Component:
     """
-    The component element is a subelement of the entry element, and is used when the entry
-    element is a complex node; namely, when the type attribute value of the entry element
-    is "group". The nodes that constitute the complex are specified by recurrent calls. For
-    example, when the complex is composed of two nodes, two component elements are specified.
-    The attribute of this element is as follows.
+    Component model.
     """
 
     def __init__(self, id: str) -> None:

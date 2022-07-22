@@ -39,7 +39,8 @@ def storage() -> Generator[Storage, None, None]:
 @pytest.fixture(scope="function")
 def resolver(storage: Storage) -> Generator[Resolver, None, None]:
     """
-    generate resolver instance on top of storage fixtures.
+    generate resolver instance on top of storage fixtures. `@responses.activate` decorator must be placed at testing
+    methods.
     """
 
     test_resolver: Resolver = Resolver(cache=storage)

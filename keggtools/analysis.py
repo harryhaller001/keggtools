@@ -150,23 +150,26 @@ class Enrichment:
 
     def _check_analysis_result_exist(self) -> None:
         """
-        Check if summary exists
-        :return: bool
+        Check if summary exists.
         """
+
         if not self.result or len(self.result) == 0:
             raise ValueError("need to 'run_analysis' first")
 
 
-    def get_subset(self, subset: list, inplace: bool = False) -> List[EnrichmentResult]:
+    def get_subset(self, subset: List[str], inplace: bool = False) -> List[EnrichmentResult]:
         """
         Create subset of analysis result by list of pathway ids
-        :param subset: list
-        :param inplace: bool
+
+        :param List[str] subset: List of pathway identifer to filter enrichment result by.
+        :param bool inplace: Update instance variable of enrichment result list and overwrite with generated subset.
+        :return: Subset of enrichment results.
+        :rtype: List[EnrichmentResult]
         """
         self._check_analysis_result_exist()
 
         buffer = []
-        subset = [str(s) for s in subset]
+        # subset = [str(s) for s in subset]
         for item in self.result:
             if str(item.pathway_id) in subset:
                 buffer.append(item)
@@ -177,11 +180,13 @@ class Enrichment:
         return buffer
 
 
-    def run_analysis(self, gene_list: list) -> List[EnrichmentResult]:
+    def run_analysis(self, gene_list: List[str]) -> List[EnrichmentResult]:
         """
         List of gene ids. Return list of EnrichmentResult instances
-        :param gene_list: list
-        :return: list(EnrichmentResult)
+
+        :param List[str] gene_list: List of genes to analyse.
+        :return: List of enrichment result instances.
+        :rtype: List[EnrichmentResult]
         """
         # pylint: disable=too-many-locals
 
@@ -243,6 +248,9 @@ class Enrichment:
     def to_json(self) -> List[Dict[str, Any]]:
         """
         Export to json dict.
+
+        :rtype: List[Dict[str, Any]]
+        :return: Json dict of enrichment results.
         """
 
         self._check_analysis_result_exist()
@@ -255,12 +263,18 @@ class Enrichment:
         return result
 
 
-    def to_csv(self, file_obj: Union[str, IOBase, Any], delimiter="\t", overwrite=False) -> None:
+    def to_csv(
+        self,
+        file_obj: Union[str, IOBase, Any],
+        delimiter: str = "\t",
+        overwrite: bool = False
+        ) -> None:
         """
-        Save result summary as file
-        :param file: Union[str, IOBase] String to file or IOBase object
-        :param delimiter: str
-        :param overwrite: bool
+        Save result summary as file.
+
+        :param Union[str, IOBase, Any] file_obj: String to file or IOBase object
+        :param str delimiter: Deleimiter used for csv.
+        :param bool overwrite: Set to True to overwrite file, if already exist.
         """
 
         # Check if summary exists
@@ -310,6 +324,9 @@ class Enrichment:
     def to_dataframe(self) -> Any:
         """
         Return analysis result as pandas DataFrame. Required pandas dependency.
+
+        :return: Export enrichment results as pandas dataframe.
+        :rtype: pandas.DataFrame
         """
 
         # Ignore import lint at this place to keep pandas an optional dependency

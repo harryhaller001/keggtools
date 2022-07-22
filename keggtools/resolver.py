@@ -148,7 +148,7 @@ class Resolver:
 
         compound_data: str = self._cache_or_request(
             filename="compound.tsv",
-            url="http://rest.kegg.jp/list/compound/",
+            url="http://rest.kegg.jp/list/compound",
         )
 
         # Parse tsv string

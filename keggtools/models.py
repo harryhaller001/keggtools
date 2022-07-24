@@ -459,6 +459,18 @@ class Entry:
         self.components: List[Component] = []
 
 
+    @property
+    def has_multiple_names(self) -> bool:
+        """
+        Checks if entry has multiple names that are space seperated.
+
+        :return: Retruns True if entry has multiple names.
+        :rtype: bool
+        """
+
+        return len(self.name.split(" ")) > 1
+
+
 
     @staticmethod
     def parse(item: Element) -> "Entry":

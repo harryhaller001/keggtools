@@ -379,7 +379,7 @@ class Renderer:
 
 
         # Check correct type of dot string
-        if not isinstance(render_string, str): # pragma: no cover
+        if not isinstance(render_string, str):
             raise TypeError("Object returned from pydot graph object is not a string.")
 
         return render_string
@@ -406,7 +406,7 @@ class Renderer:
         graph_data: Any = self.graph.create(prog="dot", format=extension)
 
         # Type check of return value
-        if not isinstance(graph_data, bytes): # pragma: no cover
+        if not isinstance(graph_data, bytes):
             raise TypeError("Failed to create binary file object from pydot graph instance.")
 
         return graph_data

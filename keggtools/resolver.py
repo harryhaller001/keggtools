@@ -5,7 +5,10 @@ from warnings import warn
 
 import requests
 
-from .utils import parse_tsv_to_dict, is_valid_gene_name
+from .utils import (
+    parse_tsv_to_dict,
+    # is_valid_gene_name,
+)
 from .storage import Storage
 from .models import Pathway
 
@@ -39,13 +42,13 @@ def get_gene_names(genes: List[str]) -> Dict[str, str]:
     if len(genes) > 50:
         raise ValueError(f"Too many entries are requested at once ({len(genes)}/50).")
 
-    # check if pattern of identifer is correct
-    for item in genes:
-        if not is_valid_gene_name(value=item):
-            raise ValueError(
-                f"Item '{item}' is not a valid gene identifer." \
-                "Identifier must be 3 letter organism code with 5 digit KEGG gene id."
-            )
+    # TODO check if pattern of identifer is correct
+    # for item in genes:
+    #     if not is_valid_gene_name(value=item):
+    #         raise ValueError(
+    #             f"Item '{item}' is not a valid gene identifer." \
+    #             "Identifier must be 3 letter organism code with 5 digit KEGG gene id."
+    #         )
 
     # Build query string
     query_string: str = "+".join(genes)

@@ -67,8 +67,8 @@ doc = [
 
 # Entrypoints for flit
 # https://flit.pypa.io/en/latest/pyproject_toml.html#scripts-section
-[project.scripts]
-flit = "flit:main"
+# [project.scripts]
+# keggtools = "keggtools.cli:main"
 
 
 # Pylint config

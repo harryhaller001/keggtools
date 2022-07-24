@@ -1,13 +1,17 @@
 """ Testing keggtools resolver module """
 
+import warnings
 import os
-from typing import Dict
+from typing import Dict, List
 from unittest.mock import patch
+import pytest
 
 
 from responses import RequestsMock, GET as HTTP_METHOD_GET
 
-from keggtools import Resolver, Storage, Pathway
+from keggtools.resolver import Resolver, get_gene_names
+from keggtools.storage import Storage
+from keggtools.models import Pathway
 
 
 from .fixtures import ( # pylint: disable=unused-import
@@ -16,6 +20,43 @@ from .fixtures import ( # pylint: disable=unused-import
     CACHEDIR,
     ORGANISM,
 )
+
+
+def test_get_gene_names() -> None:
+    """
+    Testing get gene names function.
+    """
+
+
+    # Filter warnings
+    warnings.filterwarnings("ignore", category=UserWarning)
+
+    gene_list: List[str] = [
+        "mmu:11797",
+        "mmu:266632",
+        "mmu:22033", # This item is not resolved by request
+    ]
+
+    # register mock response
+    with RequestsMock() as mocked_response:
+        mocked_response.add(
+            method=HTTP_METHOD_GET,
+            url="http://rest.kegg.jp/list/mmu:11797+mmu:266632+mmu:22033",
+            body="mmu:11797\tBirc2, AW146227, Api1, Api2, Birc3\n" \
+                "mmu:266632\tIrak4, 8430405M07Rik, 9330209D03Rik\n",
+            status=200
+        )
+
+
+        result_dict: Dict[str, str] = get_gene_names(genes=gene_list)
+
+        # Check results are correctly parsed
+        assert result_dict["mmu:11797"] == "Birc2" and result_dict["mmu:266632"] == "Irak4"
+
+
+    # Check Value error on too many items
+    with pytest.raises(ValueError):
+        get_gene_names(genes=["mmu:12345"] * 51)
 
 
 

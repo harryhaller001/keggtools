@@ -421,165 +421,6 @@ class Entry:
 
 
 
-
-class Pathway:
-    """
-    KEGG Pathway object.
-    The KEGG pathway object stores graphics information and related objects.
-    """
-    # pylint: disable=too-many-instance-attributes
-
-    def __init__(
-        self,
-        name: str,
-        org: str,
-        number: str,
-        title: Optional[str] = None,
-        image: Optional[str] = None,
-        link: Optional[str] = None,
-        ) -> None:
-        """
-        Init KEGG Pathway model.
-
-        :param str name: Name of pathway, which is the full KEGG identifier.
-        :param str org: Organism code.
-        :param str number: Number of pathway.
-        :param Optional[str] title: Title of pathway.
-        :param Optional[str] image: Image for pathway provided by KEGG database.
-        :param Optional[str] link: Link to pathway in KEGG database.
-        """
-
-        # required parameter of pathway element
-        self.name: str = name
-        self.org: str = org
-        self.number: str = number
-
-        # Check all required parameter formats
-        if not is_valid_pathway_name(value=name):
-            raise ValueError(f"Pathway name '{name}' is not a valid value.")
-
-        if not is_valid_pathway_org(value=org):
-            raise ValueError(f"Pathway org '{org}' is not a valid value.")
-
-        if not is_valid_pathway_number(value=number):
-            raise ValueError(f"Pathway number '{number}' is not a valid value.")
-
-
-        # Check match of number, org and name
-        if self.name != f"path:{self.org}{self.number}":
-            raise ValueError("Mismatch of arguments name, org and number.")
-
-
-        # implied
-        self.title: Optional[str] = title
-        self.image: Optional[str] = image
-        self.link: Optional[str] = link
-
-        # children
-        self.relations: List[Relation] = []
-        self.entries: List[Entry] = []
-        self.reactions: List[Reaction] = []
-
-
-
-
-    @staticmethod
-    def parse(data: Union[Element, str]) -> "Pathway":
-        """
-        Parsing XML string or element in Pathway instance.
-
-        :param Union[Element, str] data: String or XML element to parse.
-        :return: Parsed Pathway instance.
-        :rtype: Pathway
-        """
-
-        # Generate correct format from string or XML element object
-        item: Element = parse_xml(xml_object_or_string=data)
-
-
-        # Init pathway instance with all required attributes
-        pathway: Pathway = Pathway(
-            name=get_attribute(element=item, key="name"),
-            org=get_attribute(element=item, key="org"),
-            number=get_attribute(element=item, key="number"),
-            title=item.attrib.get("title"),
-            image=item.attrib.get("image"),
-            link=item.attrib.get("link"),
-        )
-
-
-        # Parse child items of pathway
-        for child in item:
-            if child.tag == "entry":
-                pathway.entries.append(Entry.parse(child))
-            elif child.tag == "relation":
-                pathway.relations.append(Relation.parse(child))
-            elif child.tag == "reaction":
-                pathway.reactions.append(Reaction.parse(child))
-
-
-        return pathway
-
-
-
-    def get_entry_by_id(self, entry_id: str) -> Optional[Entry]:
-        """
-        Get pathway Entry object by id.
-
-        :param str entry_id: Id of Entry.
-        :return: Returns Entry instance if id is found in Pathway. Otherwise returns None.
-        :rtype: Optional[Entry]
-        """
-
-        for item in self.entries:
-            if item.id == entry_id:
-                return item
-        return None
-
-
-
-    def get_genes(self) -> List[str]:
-        """
-        List all genes from pathway.
-
-        :return: List of entry ids with type gene.
-        :rtype: List[str]
-        """
-
-        result: List[str] = []
-
-        # Iterate of entries and get all gene type
-        # Keep list of genes unique
-        for entry in self.entries:
-            if entry.type == "gene":
-
-                # Get name of entry (KEGG identifier)
-                if " " in entry.name:
-                    # Check if name contains a space, which indicates list of multiple identifier
-                    splitted_entries: List[str] = entry.name.split(" ")
-                    for single_entry in splitted_entries:
-                        if single_entry not in result:
-                            result.append(single_entry)
-
-
-                elif entry.name not in result:
-                    result.append(entry.name)
-
-        return result
-
-
-    def __str__(self) -> str:
-        """
-        Build string summary for KEGG pathway.
-
-        :return: String of Pathway instance.
-        :rtype: str
-        """
-        return f"<Pathway path:{self.org}{self.number} title='{self.title}'>"
-
-
-
-
 class Alt:
     """
     Alt model.
@@ -820,3 +661,181 @@ class Reaction:
         """
 
         return f"<Reaction id='{self.id}' name='{self.name}'>"
+
+
+
+
+class Pathway:
+    """
+    KEGG Pathway object.
+    The KEGG pathway object stores graphics information and related objects.
+    """
+    # pylint: disable=too-many-instance-attributes
+
+    def __init__(
+        self,
+        name: str,
+        org: str,
+        number: str,
+        title: Optional[str] = None,
+        image: Optional[str] = None,
+        link: Optional[str] = None,
+        ) -> None:
+        """
+        Init KEGG Pathway model.
+
+        :param str name: Name of pathway, which is the full KEGG identifier.
+        :param str org: Organism code.
+        :param str number: Number of pathway.
+        :param Optional[str] title: Title of pathway.
+        :param Optional[str] image: Image for pathway provided by KEGG database.
+        :param Optional[str] link: Link to pathway in KEGG database.
+        """
+
+        # required parameter of pathway element
+        self.name: str = name
+        self.org: str = org
+        self.number: str = number
+
+        # Check all required parameter formats
+        if not is_valid_pathway_name(value=name):
+            raise ValueError(f"Pathway name '{name}' is not a valid value.")
+
+        if not is_valid_pathway_org(value=org):
+            raise ValueError(f"Pathway org '{org}' is not a valid value.")
+
+        if not is_valid_pathway_number(value=number):
+            raise ValueError(f"Pathway number '{number}' is not a valid value.")
+
+
+        # Check match of number, org and name
+        if self.name != f"path:{self.org}{self.number}":
+            raise ValueError("Mismatch of arguments name, org and number.")
+
+
+        # implied
+        self.title: Optional[str] = title
+        self.image: Optional[str] = image
+        self.link: Optional[str] = link
+
+        # children
+        self.relations: List[Relation] = []
+        self.entries: List[Entry] = []
+        self.reactions: List[Reaction] = []
+
+
+
+
+    @staticmethod
+    def parse(data: Union[Element, str]) -> "Pathway":
+        """
+        Parsing XML string or element in Pathway instance.
+
+        :param Union[Element, str] data: String or XML element to parse.
+        :return: Parsed Pathway instance.
+        :rtype: Pathway
+        """
+
+        # Generate correct format from string or XML element object
+        item: Element = parse_xml(xml_object_or_string=data)
+
+
+        # Init pathway instance with all required attributes
+        pathway: Pathway = Pathway(
+            name=get_attribute(element=item, key="name"),
+            org=get_attribute(element=item, key="org"),
+            number=get_attribute(element=item, key="number"),
+            title=item.attrib.get("title"),
+            image=item.attrib.get("image"),
+            link=item.attrib.get("link"),
+        )
+
+
+        # Parse child items of pathway
+        for child in item:
+            if child.tag == "entry":
+                pathway.entries.append(Entry.parse(child))
+            elif child.tag == "relation":
+                pathway.relations.append(Relation.parse(child))
+            elif child.tag == "reaction":
+                pathway.reactions.append(Reaction.parse(child))
+
+
+        return pathway
+
+
+
+    def get_entry_by_id(self, entry_id: str) -> Optional[Entry]:
+        """
+        Get pathway Entry object by id.
+
+        :param str entry_id: Id of Entry.
+        :return: Returns Entry instance if id is found in Pathway. Otherwise returns None.
+        :rtype: Optional[Entry]
+        """
+
+        for item in self.entries:
+            if item.id == entry_id:
+                return item
+        return None
+
+
+
+    def get_genes(self) -> List[str]:
+        """
+        List all genes from pathway.
+
+        :return: List of entry ids with type gene.
+        :rtype: List[str]
+        """
+
+        result: List[str] = []
+
+        # Iterate of entries and get all gene type
+        # Keep list of genes unique
+        for entry in self.entries:
+            if entry.type == "gene":
+
+                # Get name of entry (KEGG identifier)
+                if " " in entry.name:
+                    # Check if name contains a space, which indicates list of multiple identifier
+                    splitted_entries: List[str] = entry.name.split(" ")
+                    for single_entry in splitted_entries:
+                        if single_entry not in result:
+                            result.append(single_entry)
+
+
+                elif entry.name not in result:
+                    result.append(entry.name)
+
+        return result
+
+
+    def __str__(self) -> str:
+        """
+        Build string summary for KEGG pathway.
+
+        :return: String of Pathway instance.
+        :rtype: str
+        """
+        return f"<Pathway path:{self.org}{self.number} title='{self.title}'>"
+
+
+    def merge(self) -> "Pathway":
+        """
+        Merge identical entries in Pathway together and generate new pathway instance.
+
+        :return: Merged Pathway instance.
+        :rtype: Pathway
+        """
+
+        merged_pathway: Pathway = Pathway(
+            name=self.name,
+            org=self.org,
+            number=self.number,
+            title=self.title,
+        )
+
+        # TODO find duplicate entries in pathway
+
+        return merged_pathway

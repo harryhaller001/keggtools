@@ -18,18 +18,22 @@ def generate_embedded_html_table(
     items: Dict[str, str],
     border: int = 0,
     cellborder: int = 1,
+    truncate: Optional[int] = 5
     ) -> str:
     """
     Generate HTML table in insert into label of dot node.
 
     `generate_embedded_html_table({"gene1": "#ffffff", "gene2": "#454545"})`
 
-    :param List[Dict[str, str]] items: Items are dicts with have format `{name: hex_color}`.
+    :param Dict[str, str] items: Items are dicts with have format `{name: hex_color}`.
     :param int border: Thickness of table border.
     :param int cellborder: Thickness of cell border within the table.
+    :param int truncate: Maximal number of items in table. Set to None to disable trunaction.
     :return: Returns html string of table.
     :rtype: str
     """
+
+    # TODO: items input must be an ordered iterable!
 
     # TODO: implement more suppored html attributes in table, tr and td elements
 
@@ -45,10 +49,18 @@ def generate_embedded_html_table(
 
 
     # TODO: implement multiple cols for longer lists (square format)
-    for key, value in items.items():
+    for index, (key, value) in enumerate(items.items()):
 
         element_row: Element = SubElement(element_table, "tr", attrib={})
-        element_col: Element = SubElement(element_row, "td", attrib={"bgcolor": value})
+
+        element_col: Element = SubElement(element_row, "td")
+
+        if truncate is not None and index >= truncate:
+
+            element_col.text = f"{len(items.items()) - truncate} more genes..."
+            break
+
+        element_col.attrib = {"bgcolor": value}
 
         # Set key as inner text of table cell
         element_col.text = key
@@ -162,7 +174,7 @@ class Renderer:
         Render KEGG pathway.
         """
 
-        # pylint: disable=too-many-branches
+        # pylint: disable=too-many-branches,too-many-locals,too-many-statements
 
 
         # TODO: find all entries with multiple names (space-seperates)
@@ -185,16 +197,22 @@ class Renderer:
                 if entry.type == "gene":
 
 
-                    # TODO: add node name
+                    # Get entry name by graphics element name attribute
                     if entry.graphics is not None and entry.graphics.name is not None:
                         entry_label = entry.graphics.name.split(", ")[0]
 
 
-                    # TODO Check if node has multiple names
-                    # if len(entry.name.split(" ")) > 1:
-                    #     entry_label += " - " + str(len(entry.name.split(" ")))
-                    # TODO: generate list from entry name items
-                    # TODO: resolve all names "\l".join()
+                    # Check if entry name contains multiple gene entries
+                    if len(entry.name.split(" ")) > 1:
+                        entry_gene_list: List[str] = entry.name.split(" ")
+
+                        # Overwrite name of first item with graphics name
+                        entry_gene_list[0] = entry_label
+
+                        # Overwrite label with html table
+                        entry_label = "<" + generate_embedded_html_table(
+                            items=dict(zip(entry_gene_list, ["#ffffff"] * len(entry_gene_list)))
+                        ) + ">"
 
 
                     self.graph.add_node(Node(
@@ -260,6 +278,13 @@ class Renderer:
                     ))
 
 
+                elif entry.type == "reaction":
+
+                    # TODO: implement reaction rendering
+
+                    pass
+
+
         for rel in self.pathway.relations:
 
 
@@ -275,6 +300,10 @@ class Renderer:
             if rel.type == "GErel":
                 # Gene expression interaction gets a distinct line style
                 line_style = "dashed"
+
+            elif rel.type == "PCrel":
+                # Protein-compound interaction gets a distinct line style
+                line_style = "dotted"
 
 
 
@@ -324,8 +353,8 @@ class Renderer:
                     arrowhead = "none"
 
                 # Add special line type for state change interaction type
-                if subtype.name == "state change":
-                    line_style = "dotted"
+                # if subtype.name == "state change":
+
 
             # set arrowhead to edge instance
             relation_edge.set(name="arrowhead", value=arrowhead)

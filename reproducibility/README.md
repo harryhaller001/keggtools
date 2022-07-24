@@ -1,5 +1,5 @@
 
-# Guide to reproduce figures
+# Guide to reproduce paper
 
 ### Compile all figures
 

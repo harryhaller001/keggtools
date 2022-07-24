@@ -224,7 +224,6 @@ class Renderer:
                         style="filled",
                         color="#000000",
                         fillcolor="#ffffff",
-                        # fillcolor="#ff00ff" if len(entry.name.split(" ")) > 1 else "#ffffff",
                     ))
 
 
@@ -254,7 +253,6 @@ class Renderer:
                     self.graph.add_node(Node(
                         name=entry.id,
                         label=f"<{html_table_string}>",
-                        # shape="rectangle",
                         shape="plaintext",
                         style="filled",
                         color="#000000",
@@ -309,16 +307,7 @@ class Renderer:
 
 
 
-            # molecular events:
-            # This relation subtype information is used for label of edge.
-            # --------------------
-            # phosphorylation   +p
-            # dephosphorylation -p
-            # glycosylation     +g
-            # ubiquitination    +u
-            # methylation	    +m
-
-            # TODO: move to const
+            # Add molecular events as edge labels
             molecular_event_dict: Dict[str, str] = {
                 "phosphorylation": "+p",
                 "dephosphorylation": "-p",
@@ -351,11 +340,13 @@ class Renderer:
                     arrowhead = "normal"
                 elif subtype.name in ("inhibition", "repression", "dissociation"):
                     arrowhead = "tee"
+
+                if subtype.name == "state change":
+                    arrowhead = "diamond"
+
                 else:
                     arrowhead = "none"
 
-                # Add special line type for state change interaction type
-                # if subtype.name == "state change":
 
 
             # set arrowhead to edge instance

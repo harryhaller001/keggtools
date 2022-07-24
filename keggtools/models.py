@@ -2,10 +2,12 @@
 # pylint: disable=invalid-name,redefined-builtin
 
 
+# from warnings import warn
 from xml.etree.ElementTree import Element
 from typing import List, Union, Optional
 
 from .const import (
+    REACTION_TYPE,
     RELATION_TYPES,
     RELATION_SUBTYPES,
     ENTRY_TYPE,
@@ -476,7 +478,7 @@ class Pathway:
         # children
         self.relations: List[Relation] = []
         self.entries: List[Entry] = []
-        # TODO self.reactions: List[Reaction] = []
+        self.reactions: List[Reaction] = []
 
 
 
@@ -512,9 +514,8 @@ class Pathway:
                 pathway.entries.append(Entry.parse(child))
             elif child.tag == "relation":
                 pathway.relations.append(Relation.parse(child))
-            # elif child.tag == "reaction":
-            #     # TODO: implement parsing, not needed for current use case
-            #     pass
+            elif child.tag == "reaction":
+                pathway.reactions.append(Reaction.parse(child))
 
 
         return pathway
@@ -575,3 +576,247 @@ class Pathway:
         :rtype: str
         """
         return f"<Pathway path:{self.org}{self.number} title='{self.title}'>"
+
+
+
+
+class Alt:
+    """
+    Alt model.
+    """
+
+    def __init__(self, name: str) -> None:
+        """
+        Init Alt instance.
+
+        :param str name: Alt element name.
+        """
+
+        self.name: str = name
+
+
+    @staticmethod
+    def parse(item: Element) -> "Alt":
+        """
+        Parse Alt instance from XML element.
+        """
+        assert item.tag == "alt"
+
+        return Alt(name=get_attribute(element=item, key="name"))
+
+
+    def __str__(self) -> str:
+        """
+        Build string from Alt instance.
+
+        :return: String of Alt instance.
+        :rtype: str
+        """
+
+        return f"<Alt name='{self.name}'>"
+
+
+class Product:
+    """
+    Reaction Product model.
+    """
+
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        alt: Optional[Alt] = None
+        ) -> None:
+        """
+        Init Product instance.
+
+        :param str id: Identifier of Product in pathway.
+        :param str name: KEGG identifier of compound.
+        :param Alt alt: Alternative name of element.
+        """
+
+        # TODO: verify correct format
+
+        self.id: str = id
+        self.name: str = name
+        self.alt: Optional[Alt] = alt
+
+    @staticmethod
+    def parse(item: Element) -> "Product":
+        """
+        Parse XML element instance to Product model instance.
+
+        :param xml.etree.ElementTree.Element item: XML element to parse.
+        :return: Parsed Product model.
+        :rtype: Product
+        """
+
+        assert item.tag == "product"
+
+        parsed_product: Product = Product(
+            id=get_attribute(element=item, key="id"),
+            name=get_attribute(element=item, key="name"),
+        )
+
+        # Parse child alt elements
+        for child in item:
+            if child.tag == "alt":
+
+                # TODO warn if overwrite
+                # TODO: or raise exception (only 1 alt should be presnet)
+                # if parsed_product.alt is not None:
+                #     warn(message="'Alt'")
+
+                parsed_product.alt = Alt.parse(item=child)
+
+        return parsed_product
+
+
+    def __str__(self) -> str:
+        """
+        Build string from Product instance.
+
+        :return: String of Product instance.
+        :rtype: str
+        """
+        return f"<Product id='{self.id}' name='{self.name}'>"
+
+
+class Substrate:
+    """
+    reaction Substrate model
+    """
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        alt: Optional[Alt] = None,
+        ) -> None:
+        """
+        Init Substrate instance.
+
+        :param str id: Identifier of Substrate in pathway.
+        :param str name: KEGG identifier of compound.
+        :param Alt alt: Alternative name of element.
+        """
+
+        # TODO: verify correct format
+
+        self.id: str = id
+        self.name: str = name
+        self.alt: Optional[Alt] = alt
+
+    @staticmethod
+    def parse(item: Element) -> "Substrate":
+        """
+        Parse XML element instance to Substrate model instance.
+
+        :param xml.etree.ElementTree.Element item: XML element to parse.
+        :return: Parsed Substrate model.
+        :rtype: Substrate
+        """
+
+        assert item.tag == "substrate"
+
+        parsed_substrate: Substrate = Substrate(
+            id=get_attribute(element=item, key="id"),
+            name=get_attribute(element=item, key="name"),
+        )
+
+        # Parse child alt elements
+        for child in item:
+            if child.tag == "alt":
+
+                # TODO warn if overwrite
+                # TODO: or raise exception (only 1 alt should be presnet)
+                # if parsed_substrate.alt is not None:
+                #     warn(message="'Alt'")
+
+                parsed_substrate.alt = Alt.parse(item=child)
+
+        return parsed_substrate
+
+
+    def __str__(self) -> str:
+        """
+        Build string from Substrate instance.
+
+        :return: String of Substrate instance.
+        :rtype: str
+        """
+        return f"<Substrate id='{self.id}' name='{self.name}'>"
+
+
+
+class Reaction:
+    """
+    Reaction model.
+    """
+
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        type: str,
+        ) -> None:
+        """
+        Init Reaction model instance.
+
+        :param str id: Identifier of reaction.
+        :param str name: KEGG identifer of reaction.
+        :param str type: Type of reaction. Must be contained in list of valid reaction types.
+        """
+
+        if type not in REACTION_TYPE:
+            raise ValueError("Type of reaction is not in list of valid reaction types.")
+
+        # TODO: check valid reaction id
+        self.id = id
+        self.name = name
+        self.type = type
+
+        # Child elements of reaction
+        self.products: List[Product] = []
+        self.substrates: List[Substrate] = []
+
+
+    @staticmethod
+    def parse(item: Element) -> "Reaction":
+        """
+        Parse XML element instance to Reaction model instance.
+
+        :param xml.etree.ElementTree.Element item: XML element to parse.
+        :return: Parsed Reaction model.
+        :rtype: Reaction
+        """
+
+        assert item.tag == "reaction"
+
+        # Parse reaction instance from xml attributes
+        parsed_reaction: Reaction = Reaction(
+            id=get_attribute(element=item, key="id"),
+            name=get_attribute(element=item, key="name"),
+            type=get_attribute(element=item, key="type"),
+        )
+
+        # Parse product and substrate from child elements
+        for child in item:
+            if child.tag == "product":
+                parsed_reaction.products.append(Product.parse(child))
+            elif child.tag == "substrate":
+                parsed_reaction.substrates.append(Substrate.parse(child))
+
+
+
+        return parsed_reaction
+
+
+    def __str__(self) -> str:
+        """
+        Build string of reaction instance.
+
+        :return: String of Reaction instance.
+        :rtype: str
+        """
+
+        return f"<Reaction id='{self.id}' name='{self.name}'>"

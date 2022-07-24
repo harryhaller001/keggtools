@@ -58,6 +58,30 @@ Models
     .. automethod:: __init__
 
 
+.. autoclass:: keggtools.models::Reaction
+    :members:
+
+    .. automethod:: __init__
+
+
+.. autoclass:: keggtools.models::Product
+    :members:
+
+    .. automethod:: __init__
+
+
+.. autoclass:: keggtools.models::Substrate
+    :members:
+
+    .. automethod:: __init__
+
+
+.. autoclass:: keggtools.models::Alt
+    :members:
+
+    .. automethod:: __init__
+
+
 
 Resolver
 --------

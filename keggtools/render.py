@@ -366,11 +366,12 @@ class Renderer:
 
     def to_binary(self, extension: str) -> bytes:
         """
-        Export pydot graph to file.
+        Export pydot graph to binary data.
 
         :param str extension: Extension of file to export. Supported are "png", "svg", "pdf" and "jpeg".
         :return: File content are bytes object.
         :rtype: bytes
+        :raises: TypeError
         """
 
         # TODO: check supported file formats
@@ -387,3 +388,21 @@ class Renderer:
             raise TypeError("Failed to create binary file object from pydot graph instance.")
 
         return graph_data
+
+
+    def to_file(self, filename: str, extension: str) -> None:
+        """
+        Export pydot graph to file.
+
+        :param str filename: Filename to save file at.
+        :param str extension: Extension of file to export. Supported are "png", "svg", "pdf" and "jpeg".
+        """
+
+        # TODO: get export format from filename
+
+        # Get binary data from graph object
+        binary_data: bytes = self.to_binary(extension=extension)
+
+        # Save binary data to file object
+        with open(filename, mode="wb") as file_obj:
+            file_obj.write(binary_data)

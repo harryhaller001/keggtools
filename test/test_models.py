@@ -13,6 +13,10 @@ from keggtools.models import (
     Subtype,
     Component,
     Graphics,
+    Alt,
+    Product,
+    Substrate,
+    Reaction
 )
 
 
@@ -287,10 +291,96 @@ def test_pathway_parsing() -> None:
 
 
 
+
+def test_reaction_parsing() -> None:
+    """
+    Testing function to parse XML to reaction.
+    """
+
+    # test correct parsing
+    parsed_reaction: Reaction = Reaction.parse(ElementTree.fromstring("""
+        <reaction id="29" name="rn:R01274" type="irreversible">
+            <substrate id="86" name="cpd:C00154"/>
+            <product id="87" name="cpd:C00249"/>
+        </reaction>"""
+    ))
+
+    # Check values are parsed correctly
+    assert parsed_reaction.id == "29"
+    assert parsed_reaction.name == "rn:R01274"
+
+
+    # Check correct types
+    assert isinstance(parsed_reaction.substrates[0], Substrate)
+    assert isinstance(parsed_reaction.products[0], Product)
+
+
+    assert len(parsed_reaction.products) == 1 and parsed_reaction.products[0].name == "cpd:C00249"
+    assert len(parsed_reaction.substrates) == 1 and parsed_reaction.substrates[0].name == "cpd:C00154"
+
+
+    # Testing correct type of string conversion
+    assert isinstance(parsed_reaction.__str__(), str)
+    assert isinstance(parsed_reaction.products[0].__str__(), str)
+    assert isinstance(parsed_reaction.substrates[0].__str__(), str)
+
+
+    # Testing invalid reaction type
+    with pytest.raises(ValueError):
+        Reaction(id="123", name="rn:R01274", type="invalid")
+
+
+
+
+def test_alt_element_parsing() -> None:
+    """
+    Testing parsing function of Alt element.
+    """
+
+    # Testing correct parsing of element
+    parsed_product: Product = Product.parse(ElementTree.fromstring("""
+        <product id="87" name="cpd:C00249">
+            <alt name="cpd:C00154"></alt>
+        </product>
+    """))
+
+    assert parsed_product.alt is not None and isinstance(parsed_product.alt, Alt)
+    assert parsed_product.alt.name == "cpd:C00154"
+
+    # Testing correct parsing from substrate element
+    parsed_substrate: Substrate = Substrate.parse(ElementTree.fromstring("""
+        <substrate id="87" name="cpd:C00249">
+            <alt name="cpd:C00154"></alt>
+        </substrate>
+    """))
+
+    assert parsed_substrate.alt is not None and isinstance(parsed_substrate.alt, Alt)
+    assert parsed_substrate.alt.name == "cpd:C00154"
+
+
+    # Testing correct type of string conversion
+    assert isinstance(parsed_product.alt.__str__(), str)
+
+
+    # Testing errors when tags are not valid
+    with pytest.raises(AssertionError):
+        Product.parse(ElementTree.fromstring("<invalid-tag />"))
+
+    with pytest.raises(AssertionError):
+        Substrate.parse(ElementTree.fromstring("<invalid-tag />"))
+
+    with pytest.raises(AssertionError):
+        Alt.parse(ElementTree.fromstring("<invalid-tag />"))
+
+
+
+
 def test_full_pathway_parsing() -> None:
     """
     Testing parsing functions by loading full KGML pathway.
     """
+
+    # TODO: add parsing of reaction, products and substrates
 
     basedir: str = os.path.dirname(__file__)
 

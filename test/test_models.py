@@ -19,6 +19,8 @@ from keggtools.models import (
     Reaction
 )
 
+from .fixtures import pathway # pylint: disable=unused-import
+
 
 
 def test_relation_model_parsing() -> None:
@@ -407,3 +409,18 @@ def test_full_pathway_parsing() -> None:
     gene_list: List[str] = pathway_parsed.get_genes()
 
     assert "mmu:19697" in gene_list
+
+
+def test_kgml_to_xml(pathway: Pathway) -> None: # pylint: disable=redefined-outer-name
+    """
+    Testing generate and parsing from pathway instance.
+    """
+
+    # Testing KGML model to xml string
+    xml_string: str = pathway.to_xml_string()
+    assert isinstance(xml_string, str)
+
+    # Parsing XML string to pathway
+    parsed_pathway: Pathway = Pathway.parse(data=xml_string)
+
+    assert parsed_pathway.name == pathway.name

@@ -1,8 +1,10 @@
 """ KEGG pathway models to parse object relational """
-# pylint: disable=invalid-name,redefined-builtin
+# pylint: disable=invalid-name,redefined-builtin,too-many-lines
 
 
 # from warnings import warn
+from datetime import datetime
+from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 from typing import List, Union, Optional
 
@@ -70,6 +72,23 @@ class Subtype:
         return Subtype(
             name=get_attribute(element=item, key="name"),
             value=get_attribute(element=item, key="value")
+        )
+
+
+    def to_xml(self) -> Element:
+        """
+        Generate XML string from Subtype element.
+
+        :return: XML string.
+        :rtype: xml.etree.ElementTree.Element
+        """
+
+        return Element(
+            "subtype",
+            attrib={
+                "name": self.name,
+                "value": self.value
+            },
         )
 
 
@@ -146,6 +165,23 @@ class Relation:
         return relation
 
 
+    def to_xml(self) -> Element:
+        """
+        Generate XML string from Relation element.
+
+        :return: XML string.
+        :rtype: xml.etree.ElementTree.Element
+        """
+
+        return Element(
+            "relation",
+            attrib={
+                "entry1": self.entry1,
+                "entry2": self.entry2,
+                "type": self.type,
+            },
+        )
+
     def __str__(self) -> str:
         """
         Generate string from relation instance.
@@ -196,6 +232,22 @@ class Component:
 
         # Create component instance from id attribute
         return Component(id=get_attribute(element=item, key="id"))
+
+
+    def to_xml(self) -> Element:
+        """
+        Generate XML string from Component element.
+
+        :return: XML string.
+        :rtype: xml.etree.ElementTree.Element
+        """
+
+        return Element(
+            "component",
+            attrib={
+                "id": self.id,
+            },
+        )
 
 
     def __str__(self) -> str:
@@ -307,6 +359,48 @@ class Graphics:
         )
 
 
+    def to_xml(self) -> Element:
+        """
+        Generate XML string from Graphics element.
+
+        :return: XML string.
+        :rtype: xml.etree.ElementTree.Element
+        """
+
+        graphics_element: Element = Element(
+            "graphics",
+        )
+
+        if self.x is not None:
+            graphics_element.attrib["x"] = self.x
+
+        if self.y is not None:
+            graphics_element.attrib["y"] = self.y
+
+        if self.width is not None:
+            graphics_element.attrib["width"] = self.width
+
+        if self.height is not None:
+            graphics_element.attrib["height"] = self.height
+
+        if self.name is not None:
+            graphics_element.attrib["name"] = self.name
+
+        if self.type is not None:
+            graphics_element.attrib["type"] = self.type
+
+        if self.fgcolor is not None:
+            graphics_element.attrib["fgcolor"] = self.fgcolor
+
+        if self.bgcolor is not None:
+            graphics_element.attrib["bgcolor"] = self.bgcolor
+
+        if self.coords is not None:
+            graphics_element.attrib["coords"] = self.coords
+
+        return graphics_element
+
+
     def __str__(self) -> str:
         """
         Return Graphics instance summary string.
@@ -376,6 +470,8 @@ class Entry:
         :rtype: Entry
         """
 
+        assert item.tag == "entry"
+
         # Generate entry instance from required attributes
         entry: Entry = Entry(
             id=get_numeric_attribute(element=item, key="id"),
@@ -393,6 +489,47 @@ class Entry:
                 entry.components.append(Component.parse(child))
 
         return entry
+
+
+    def to_xml(self) -> Element:
+        """
+        Generate XML string from Entry element.
+
+        :return: XML string.
+        :rtype: xml.etree.ElementTree.Element
+        """
+
+        entry_element: Element = Element(
+            "entry",
+            attrib={
+                "id": self.id,
+                "name": self.name,
+                "type": self.type
+            }
+        )
+
+        # Add optional attributes to xml element
+        if self.link is not None:
+            entry_element.attrib["link"] = self.link
+
+        if self.reaction is not None:
+            entry_element.attrib["reaction"] = self.reaction
+
+        # generate xml element from children elements
+
+        # Add graphics element to entry element
+        if self.graphics is not None:
+            entry_element.append(self.graphics.to_xml())
+
+
+        # Iterate over components and add to entry element
+        for component in self.components:
+            entry_element.append(component.to_xml())
+
+
+        return entry_element
+
+
 
 
     def __str__(self) -> str:
@@ -448,6 +585,22 @@ class Alt:
         assert item.tag == "alt"
 
         return Alt(name=get_attribute(element=item, key="name"))
+
+
+    def to_xml(self) -> Element:
+        """
+        Generate XML string from Alt element.
+
+        :return: XML string.
+        :rtype: xml.etree.ElementTree.Element
+        """
+
+        return Element(
+            "alt",
+            attrib={
+                "name": self.name,
+            },
+        )
 
 
     def __str__(self) -> str:
@@ -517,6 +670,29 @@ class Product:
         return parsed_product
 
 
+    def to_xml(self) -> Element:
+        """
+        Generate XML string from Product element.
+
+        :return: XML string.
+        :rtype: xml.etree.ElementTree.Element
+        """
+
+        product_element: Element = Element(
+            "product",
+            attrib={
+                "id": self.id,
+                "name": self.name,
+            },
+        )
+
+        # Add optional alt element if exist
+        if self.alt is not None:
+            product_element.append(self.alt.to_xml())
+
+        return product_element
+
+
     def __str__(self) -> str:
         """
         Build string from Product instance.
@@ -580,6 +756,29 @@ class Substrate:
                 parsed_substrate.alt = Alt.parse(item=child)
 
         return parsed_substrate
+
+
+    def to_xml(self) -> Element:
+        """
+        Generate XML string from Substrate element.
+
+        :return: XML string.
+        :rtype: xml.etree.ElementTree.Element
+        """
+
+        substrate_element: Element = Element(
+            "substrate",
+            attrib={
+                "id": self.id,
+                "name": self.name,
+            },
+        )
+
+        # Add optional alt element if exist
+        if self.alt is not None:
+            substrate_element.append(self.alt.to_xml())
+
+        return substrate_element
 
 
     def __str__(self) -> str:
@@ -651,9 +850,36 @@ class Reaction:
             elif child.tag == "substrate":
                 parsed_reaction.substrates.append(Substrate.parse(child))
 
-
-
         return parsed_reaction
+
+
+    def to_xml(self) -> Element:
+        """
+        Generate XML string from Reaction element.
+
+        :return: XML string.
+        :rtype: xml.etree.ElementTree.Element
+        """
+
+        reaction_element: Element = Element(
+            "reaction",
+            attrib={
+                "id": self.id,
+                "name": self.name,
+                "type": self.type,
+            },
+        )
+
+        # Add substrate and product to reaction element
+
+        for substrate in self.substrates:
+            reaction_element.append(substrate.to_xml())
+
+        for product in self.products:
+            reaction_element.append(product.to_xml())
+
+
+        return reaction_element
 
 
     def __str__(self) -> str:
@@ -767,6 +993,71 @@ class Pathway:
 
         return pathway
 
+
+    def to_xml(self) -> Element:
+        """
+        Generate XML element from Pathway instance and its children.
+
+        :return: XML element in KGML format.
+        :rtype: xml.etree.ElementTree.Element
+        """
+
+        pathway_element: Element = Element(
+            "pathway",
+            attrib={
+                "name": self.name,
+                "org": self.org,
+                "number": self.number,
+            }
+        )
+
+        # Adding optional attributes to pathway root element
+        if self.title is not None:
+            pathway_element.attrib["title"] = self.title
+
+        if self.link is not None:
+            pathway_element.attrib["link"] = self.link
+
+        if self.image is not None:
+            pathway_element.attrib["image"] = self.image
+
+
+        # add children entries, relations and reactions
+
+        for entry in self.entries:
+            pathway_element.append(entry.to_xml())
+
+        for relation in self.relations:
+            pathway_element.append(relation.to_xml())
+
+        for reaction in self.reactions:
+            pathway_element.append(reaction.to_xml())
+
+
+        return pathway_element
+
+
+    def to_xml_string(self) -> str:
+        """
+        Generate XML string from pathway instance.
+
+        :return: XML string in KGML format.
+        :rtype: str
+        """
+
+        # Generate xml header string
+        # docstring is not supported by build-in xml builer
+        xml_timestamp: str = datetime.now().astimezone().strftime("%b %d, %Y %H:%M:%S (GMT%z)")
+        xml_header: str = "<?xml version=\"1.0\"?>\n" \
+            "<!DOCTYPE pathway SYSTEM \"http://www.kegg.jp/kegg/xml/KGML_v0.7.2_.dtd\">\n" \
+            f"<!-- Creation date: {xml_timestamp} -->\n"
+
+
+        pathway_element: Element = self.to_xml()
+
+        xml_content: str = ElementTree.tostring(pathway_element).decode("utf-8")
+
+        return xml_header + xml_content
 
 
     def get_entry_by_id(self, entry_id: str) -> Optional[Entry]:

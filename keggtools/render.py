@@ -87,8 +87,10 @@ class Renderer:
         Init Renderer instance for KEGG Pathway.
 
         :param Pathway kegg_pathway: Pathway instance to render.
-        :param typing.Optional[typing.Dict[str, float]] gene_dict: Dict to specify overlay color gradient to rendered entries.
-        :param typing.Optional[typing.Union[Storage, str]] cache: Specify cache to resolver compound data needed for rendering.
+        :param typing.Optional[typing.Dict[str, float]] gene_dict: Dict to specify overlay color \
+            gradient to rendered entries.
+        :param typing.Optional[typing.Union[Storage, str]] cache: Specify cache to resolver compound \
+            data needed for rendering.
         :param tuple upper_color: Color for upper bound of color gradient.
         :param tuple lower_color: Color for lower bound of color gradient.
         """

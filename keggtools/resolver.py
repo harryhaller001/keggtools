@@ -5,7 +5,7 @@ from warnings import warn
 
 import requests
 
-from .utils import parse_tsv_to_dict
+from .utils import parse_tsv_to_dict, is_valid_gene_name
 from .storage import Storage
 from .models import Pathway
 
@@ -20,6 +20,56 @@ def _request(url: str) -> str:
     response = requests.get(url=url)
     response.raise_for_status()
     return response.content.decode(encoding="utf-8")
+
+
+
+def get_gene_names(genes: List[str]) -> Dict[str, str]:
+    """
+    Resolve KEGG gene identifer to name using to KEGG database REST Api.
+    Function is implemented outside the resolver instance, because requests are not cached and only gene identifier
+    are used.
+
+    :param typing.List[str] genes: List of gene identifer in format "<organism>:<code>"
+    :return: Dict of gene idenifier to gene name.
+    :rtype: typing.Dict[str, str]
+    """
+
+    # Check maximum number of entries requests
+    # TODO: build fallback to make multiple requests from long lists (iterate over list chunks)
+    if len(genes) > 50:
+        raise ValueError(f"Too many entries are requested at once ({len(genes)}/50).")
+
+    # check if pattern of identifer is correct
+    for item in genes:
+        if not is_valid_gene_name(value=item):
+            raise ValueError(
+                f"Item '{item}' is not a valid gene identifer." \
+                "Identifier must be 3 letter organism code with 5 digit KEGG gene id."
+            )
+
+    # Build query string
+    query_string: str = "+".join(genes)
+
+    # Request without cache
+    resolve_dict: Dict[str, str] = parse_tsv_to_dict(data=_request(f"http://rest.kegg.jp/list/{query_string}"))
+
+    # Sanitize dict by splitting first entry of gene name
+    result_dict: Dict[str, str] = {}
+
+    for key, value in resolve_dict.items():
+        result_dict[key] = value.split(", ")[0]
+
+
+    # Check if all genes are in dict
+    for item in genes:
+        if item not in result_dict:
+            warn(
+                message=f"Gene identifer '{item}' could not be resolved by API request.",
+                category=UserWarning,
+            )
+
+
+    return result_dict
 
 
 class Resolver:
@@ -204,39 +254,3 @@ class Resolver:
 
         organism_list = self.get_organism_list()
         return organism_list.get(organism) is not None
-
-
-    def list_genes(self, genes: List[str]) -> Dict[str, str]: # pylint: disable=no-self-use
-        """
-        Resolve KEGG gene identifer to name using to KEGG database REST Api.
-
-        :param typing.List[str] genes: List of gene identifer in format "<organism>:<code>"
-        :return: Dict of gene idenifier to gene name.
-        :rtype: typing.Dict[str, str]
-        """
-
-        # TODO: check if pattern of identifer is correct
-        # query_list: List[str] = []
-        # for item in genes:
-        #     if re.
-
-        # Build query string
-        query_string: str = "+".join(genes)
-
-        # Request without cache
-        resolve_dict: Dict[str, str] = parse_tsv_to_dict(data=_request(f"http://rest.kegg.jp/list/{query_string}"))
-
-        # Sanitize dict by splitting first entry of gene name
-        result_dict: Dict[str, str] = {}
-
-        for key, value in resolve_dict.items():
-            result_dict[key] = value.split(", ")[0]
-
-
-        # Check if all genes are in dict
-        for item in genes:
-            if item not in result_dict:
-                warn(message=f"Gene identifer '{item}' could not be resolved by API request.")
-
-
-        return result_dict

@@ -13,6 +13,7 @@ from keggtools.utils import (
     is_valid_pathway_number,
     is_valid_pathway_org,
     is_valid_hex_color,
+    is_valid_gene_name,
 )
 
 
@@ -154,3 +155,18 @@ def test_valid_hex_color() -> None:
 
     assert is_valid_hex_color(value="#00af4E00") is False
     assert is_valid_hex_color(value="#00af4K") is False
+
+
+
+def test_valid_gene_name() -> None:
+    """
+    Testing function to check if gene name is valid.
+    """
+
+    # Test valid cases
+    assert is_valid_gene_name(value="mmu:12345")
+    assert is_valid_gene_name(value="hsa:00001")
+
+    # Test invalid cases
+    assert is_valid_gene_name(value="ko:12345") is False
+    assert is_valid_gene_name(value="hsa:1234") is False

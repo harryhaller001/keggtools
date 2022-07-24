@@ -35,7 +35,7 @@ class Resolver:
         """
         Init Resolver instance.
 
-        :param Optional[Union[Storage, str]] cache: Directory to use as cache storage or Storage instance.
+        :param typing.Optional[typing.Union[Storage, str]] cache: Directory to use as cache storage or Storage instance.
         """
 
         # Handle different types of argument for cache
@@ -100,7 +100,7 @@ class Resolver:
 
         :param str organism: 3 letter organism code used by KEGG database.
         :return: Dict in format {<pathway-id>: <name>}.
-        :rtype: Dict[str, str]
+        :rtype: typing.Dict[str, str]
         """
 
         # TODO: return as list of pathway identifier ?
@@ -155,7 +155,8 @@ class Resolver:
         """
         Get dict of components. Request from KEGG API if not in cache.
 
-        :return: dict
+        :return: Dict of compound identifier to compound name.
+        :rtype: typing.Dict[str, str]
         """
 
         compound_data: str = self._cache_or_request(
@@ -174,7 +175,8 @@ class Resolver:
         """
         Get organism codes from file or KEGG API.
 
-        :return: dict {<org>: <org-name>}
+        :return: Dict with format {<org>: <org-name>}
+        :rtype: typing.Dict[str, str]
         """
 
         data: str = self._cache_or_request(
@@ -195,8 +197,9 @@ class Resolver:
         """
         Check if organism code exist.
 
-        :param organism: (str) 3 letter organism code used by KEGG database.
-        :return: (bool) returns True if organism code is found in list of valid organisms.
+        :param str organism: 3 letter organism code used by KEGG database.
+        :return: Returns True if organism code is found in list of valid organisms.
+        :rtype: bool
         """
 
         organism_list = self.get_organism_list()
@@ -207,9 +210,9 @@ class Resolver:
         """
         Resolve KEGG gene identifer to name using to KEGG database REST Api.
 
-        :param List[str] genes: List of gene identifer in format "<organism>:<code>"
+        :param typing.List[str] genes: List of gene identifer in format "<organism>:<code>"
         :return: Dict of gene idenifier to gene name.
-        :rtype: Dict[str, str]
+        :rtype: typing.Dict[str, str]
         """
 
         # TODO: check if pattern of identifer is correct

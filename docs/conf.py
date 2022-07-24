@@ -25,9 +25,14 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.doctest",
     # "sphinx.ext.autosummary",
-    # "sphinx.ext.intersphinx",
+    "sphinx.ext.intersphinx",
 ]
 
+# Mapping for intersphinx extension
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'pandas': ('http://pandas.pydata.org/pandas-docs/dev', None),
+}
 
 
 source_suffix = '.rst'

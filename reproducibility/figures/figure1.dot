@@ -10,21 +10,33 @@ digraph KGMLTree {
 
     // nodes
     pathway  [label="{pathway|- name\l- org\l- number\l- title\l- image\l}"];
-    // reaction  [label="{reaction|- id\l- name\l- type\l}"];
+
     relation [label="{relation|- entry1\l- entry2\l- type\l}"];
     subtype [label="{subtype|- name\l- value\l}"];
     entry [label="{entry|- id\l- name\l-type\l- link\l- reaction\l}"];
     component [label="{component|- id\l}"]
     graphics [label="{graphics|- name\l- x\l- y\l- coords\l- type\l- width\l- height\l- fgcolor\l}"]
 
+    reaction  [label="{reaction|- id\l- name\l- type\l}"];
+    product [label="{product|- id\l- name\l}"]
+    substrate [label="{substrate|- id\l- name\l}"]
+    alt [label="{alt|- name \l}"]
+
 
     // Edges
-    // reaction -> pathway [arrowhead=odiamond arrowsize=1];
+    reaction -> pathway [arrowhead=odiamond arrowsize=1];
     relation -> pathway [arrowhead=odiamond arrowsize=1];
     subtype -> relation [arrowhead=odiamond arrowsize=1];
     entry -> pathway [arrowhead=odiamond arrowsize=1];
     component -> entry [arrowhead=odiamond arrowsize=1];
     graphics -> entry [arrowhead=odiamond arrowsize=1];
+
+
+    product -> reaction [arrowhead=odiamond arrowsize=1];
+    substrate -> reaction [arrowhead=odiamond arrowsize=1];
+
+    alt -> product [arrowhead=odiamond arrowsize=1];
+    alt -> substrate [arrowhead=odiamond arrowsize=1];
 
     {rank=same; entry; relation}
     {rank=same; subtype; component; graphics}

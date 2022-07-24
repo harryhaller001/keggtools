@@ -14,7 +14,7 @@ class Storage:
         """
         Init KEGG data storage instance.
 
-        :param Optional[str] cachedir: Path to folder to use as cache.
+        :param typing.Optional[str] cachedir: Path to folder to use as cache.
         """
 
         if cachedir is None:
@@ -37,7 +37,7 @@ class Storage:
         """
         Checks if cache dir exist. Raises "NotADirectoryError" of caching folder not found.
 
-        :raises: NotADirectoryError
+        :raises NotADirectoryError: Error if cache folder does not exist.
         """
 
         if os.path.isdir(self.cachedir) is False:
@@ -96,7 +96,7 @@ class Storage:
         Save binary dump as file in local storage. Returns absolute filename of save file.
 
         :param str filename: Filename to storage file at.
-        :param Any data: Data to store to cache file. Can be any object.
+        :param typing.Any data: Data to store to cache file. Can be any object.
         :return: Full filename to cached file.
         :rtype: str
         """
@@ -137,7 +137,7 @@ class Storage:
 
         :param str filename: Filename of file to load from cache folder.
         :return: Object from file.
-        :rtype: Any
+        :rtype: typing.Any
         """
 
         path: str = self.build_cache_path(filename=filename)

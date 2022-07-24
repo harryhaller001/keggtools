@@ -229,15 +229,15 @@ class Graphics:
         """
         Init Graphics model instance.
 
-        :param Optional[str] x:
-        :param Optional[str] y:
-        :param Optional[str] width:
-        :param Optional[str] height:
-        :param Optional[str] coords:
-        :param Optional[str] name:
-        :param Optional[str] type:
-        :param Optional[str] fgcolor:
-        :param Optional[str] bgcolor:
+        :param typing.Optional[str] x:
+        :param typing.Optional[str] y:
+        :param typing.Optional[str] width:
+        :param typing.Optional[str] height:
+        :param typing.Optional[str] coords:
+        :param typing.Optional[str] name:
+        :param typing.Optional[str] type:
+        :param typing.Optional[str] fgcolor:
+        :param typing.Optional[str] bgcolor:
         """
 
         # All parameter are implied (optional)
@@ -337,8 +337,8 @@ class Entry:
         :param str id: Id of Entry.
         :param str name: Name of Entry.
         :param str type: Type of Entry. Must be contained in list of valid entry types.
-        :param Optional[str] link: Link to KEGG database with reference to entry.
-        :param Optional[str] reaction: Reaction TODO: specify. Is str format correct?
+        :param typing.Optional[str] link: Link to KEGG database with reference to entry.
+        :param typing.Optional[str] reaction: Reaction TODO: specify. Is str format correct?
         """
 
         # required
@@ -410,7 +410,7 @@ class Entry:
         """
         Parse variable 'name' of Entry into KEGG id.
 
-        :return: KEGG id
+        :return: KEGG identifier
         :rtype: str
         """
 
@@ -440,6 +440,10 @@ class Alt:
     def parse(item: Element) -> "Alt":
         """
         Parse Alt instance from XML element.
+
+        :param xml.etree.ElementTree.Element item: XML element to parse.
+        :rtype: Alt
+        :return: Parsed Alt element.
         """
         assert item.tag == "alt"
 
@@ -687,9 +691,9 @@ class Pathway:
         :param str name: Name of pathway, which is the full KEGG identifier.
         :param str org: Organism code.
         :param str number: Number of pathway.
-        :param Optional[str] title: Title of pathway.
-        :param Optional[str] image: Image for pathway provided by KEGG database.
-        :param Optional[str] link: Link to pathway in KEGG database.
+        :param typing.Optional[str] title: Title of pathway.
+        :param typing.Optional[str] image: Image for pathway provided by KEGG database.
+        :param typing.Optional[str] link: Link to pathway in KEGG database.
         """
 
         # required parameter of pathway element
@@ -731,7 +735,7 @@ class Pathway:
         """
         Parsing XML string or element in Pathway instance.
 
-        :param Union[Element, str] data: String or XML element to parse.
+        :param typing.Union[xml.etree.ElementTree.Element, str] data: String or XML element to parse.
         :return: Parsed Pathway instance.
         :rtype: Pathway
         """
@@ -771,7 +775,7 @@ class Pathway:
 
         :param str entry_id: Id of Entry.
         :return: Returns Entry instance if id is found in Pathway. Otherwise returns None.
-        :rtype: Optional[Entry]
+        :rtype: typing.Optional[Entry]
         """
 
         for item in self.entries:
@@ -786,7 +790,7 @@ class Pathway:
         List all genes from pathway.
 
         :return: List of entry ids with type gene.
-        :rtype: List[str]
+        :rtype: typing.List[str]
         """
 
         result: List[str] = []

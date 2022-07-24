@@ -85,8 +85,8 @@ class EnrichmentResult:
         Build json summary for enrichment analysis.
 
         :param str gene_delimiter: Delimiter to seperate genes in gene list.
-        :rtype: dict
-        :return: Dict
+        :rtype: typing.Dict[str, typing.Any]
+        :return: Summary of enrichment result instance as dict.
         """
 
         return {
@@ -104,8 +104,8 @@ class EnrichmentResult:
         """
         Build default header for enrichment analysis.
 
-        :rtype: list
-        :return: list
+        :rtype: typing.List[str]
+        :return: List of header names as string.
         """
 
         return [
@@ -135,7 +135,7 @@ class Enrichment:
 
         :param str org: Organism identifier used by KEGG database \
             (3 letter code, e.g. "mmu" for mus musculus or "hsa" for human).
-        :param List[Pathway] pathways: (Optional) List of Pathway instances or list of KEGG pathway identifier.
+        :param typing.List[Pathway] pathways: (Optional) List of Pathway instances or list of KEGG pathway identifier.
         """
 
         # self.organism: str = org
@@ -161,10 +161,10 @@ class Enrichment:
         """
         Create subset of analysis result by list of pathway ids
 
-        :param List[str] subset: List of pathway identifer to filter enrichment result by.
+        :param typing.List[str] subset: List of pathway identifer to filter enrichment result by.
         :param bool inplace: Update instance variable of enrichment result list and overwrite with generated subset.
         :return: Subset of enrichment results.
-        :rtype: List[EnrichmentResult]
+        :rtype: typing.List[EnrichmentResult]
         """
         self._check_analysis_result_exist()
 
@@ -184,9 +184,9 @@ class Enrichment:
         """
         List of gene ids. Return list of EnrichmentResult instances
 
-        :param List[str] gene_list: List of genes to analyse.
+        :param typing.List[str] gene_list: List of genes to analyse.
         :return: List of enrichment result instances.
-        :rtype: List[EnrichmentResult]
+        :rtype: typing.List[EnrichmentResult]
         """
         # pylint: disable=too-many-locals
 
@@ -249,7 +249,7 @@ class Enrichment:
         """
         Export to json dict.
 
-        :rtype: List[Dict[str, Any]]
+        :rtype: typing.List[typing.Dict[str, typing.Any]]
         :return: Json dict of enrichment results.
         """
 
@@ -272,7 +272,7 @@ class Enrichment:
         """
         Save result summary as file.
 
-        :param Union[str, IOBase, Any] file_obj: String to file or IOBase object
+        :param typing.Union[str, io.IOBase, typing.Any] file_obj: String to file or IOBase object
         :param str delimiter: Deleimiter used for csv.
         :param bool overwrite: Set to True to overwrite file, if already exist.
         """

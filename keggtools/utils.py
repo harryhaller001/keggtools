@@ -16,11 +16,11 @@ def get_attribute(element: Element, key: str) -> str:
     """
     Get attribute from XML Element object. Raises KeyError is Attribute is not found or not valid.
 
-    :param Element element: XML element to get attribute from.
+    :param xml.etree.ElementTree.Element element: XML element to get attribute from.
     :param str key: Name of attribute.
     :return: Value of attribute.
     :rtype: str
-    :raises: ValueError
+    :raises ValueError: Error if attribute does not exist or is wrong type.
     """
 
     value: Optional[str] = element.attrib.get(key)
@@ -41,7 +41,7 @@ def get_numeric_attribute(element: Element, key: str) -> str:
     :param str key: Name of attribute.
     :return: Value of attribute. ValueError is raised if value is not a numeric string.
     :rtype: str
-    :raises: ValueError
+    :raises ValueError: Error is attribute is not a digit (numberic string), does not exist or is wrong type.
     """
 
     value: str = get_attribute(element=element, key=key)
@@ -58,9 +58,9 @@ def parse_xml(xml_object_or_string: Union[str, Element]) -> Element:
     """
     Returns XML Element object from string or XML Element.
 
-    :param Union[str, Element] xml_object_or_string: Input parameter to check.
+    :param typing.Union[str, xml.etree.ElementTree.Element] xml_object_or_string: Input parameter to check.
     :return: XML element instance.
-    :rtype: Element
+    :rtype: xml.etree.ElementTree.Element
     """
     if isinstance(xml_object_or_string, str):
         return ElementTree.fromstring(xml_object_or_string)
@@ -93,7 +93,7 @@ def parse_tsv_to_dict(
     :param int col_keys: Number of colum to parse as dict keys (0-index).
     :param int col_values: Number of colum to parse as dict values (0-index).
     :return: Dict of two tsv columns.
-    :rtype: Dict[str, str]
+    :rtype: typing.Dict[str, str]
     """
     list_data: list = parse_tsv(data=data)
 
@@ -168,7 +168,7 @@ class ColorGradient:
         Get gradient color as list.
 
         :return: Returns list of hexadecimal color strings with a gradient.
-        :rtype: List[str]
+        :rtype: typing.List[str]
         """
 
         step_list = [index / float(self.steps) for index in range(self.steps)]

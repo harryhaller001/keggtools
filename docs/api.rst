@@ -2,16 +2,15 @@
 .. Licensed under the MIT License
 
 
-.. module:: keggtools
-.. automodule:: keggtools
-    :noindex:
-
-
 .. _api:
 
 ===
 API
 ===
+
+.. module:: keggtools
+.. automodule:: keggtools
+    :noindex:
 
 
 Models

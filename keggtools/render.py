@@ -25,7 +25,7 @@ def generate_embedded_html_table(
 
     `generate_embedded_html_table({"gene1": "#ffffff", "gene2": "#454545"})`
 
-    :param Dict[str, str] items: Items are dicts with have format `{name: hex_color}`.
+    :param typing.Dict[str, str] items: Items are dicts with have format `{name: hex_color}`.
     :param int border: Thickness of table border.
     :param int cellborder: Thickness of cell border within the table.
     :param int truncate: Maximal number of items in table. Set to None to disable trunaction.
@@ -87,8 +87,8 @@ class Renderer:
         Init Renderer instance for KEGG Pathway.
 
         :param Pathway kegg_pathway: Pathway instance to render.
-        :param Optional[Dict[str, float]] gene_dict: Dict to specify overlay color gradient to rendered entries.
-        :param Optional[Union[Storage, str]] cache: Specify cache to resolver compound data needed for rendering.
+        :param typing.Optional[typing.Dict[str, float]] gene_dict: Dict to specify overlay color gradient to rendered entries.
+        :param typing.Optional[typing.Union[Storage, str]] cache: Specify cache to resolver compound data needed for rendering.
         :param tuple upper_color: Color for upper bound of color gradient.
         :param tuple lower_color: Color for lower bound of color gradient.
         """
@@ -400,7 +400,7 @@ class Renderer:
         :param str extension: Extension of file to export. Supported are "png", "svg", "pdf" and "jpeg".
         :return: File content are bytes object.
         :rtype: bytes
-        :raises: TypeError
+        :raises TypeError: If variable with generated dot graph is not type bytes.
         """
 
         # TODO: check supported file formats

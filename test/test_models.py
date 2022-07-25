@@ -216,7 +216,7 @@ def test_entry_parsing() -> None:
     assert isinstance(entry_parsed.__str__(), str)
 
 
-    assert entry_parsed.get_gene_id() == "12048"
+    assert entry_parsed.get_gene_id() == ["12048"]
 
 
     # Test invalid cases
@@ -408,7 +408,7 @@ def test_full_pathway_parsing() -> None:
 
     gene_list: List[str] = pathway_parsed.get_genes()
 
-    assert "mmu:19697" in gene_list
+    assert "19697" in gene_list
 
 
 def test_kgml_to_xml(pathway: Pathway) -> None: # pylint: disable=redefined-outer-name

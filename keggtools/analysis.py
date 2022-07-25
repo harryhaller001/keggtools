@@ -24,6 +24,7 @@ class EnrichmentResult:
         pathway_name: str,
         found_genes: list,
         pathway_genes: list,
+        pathway_title: Optional[str] = None,
     ) -> None:
 
         """
@@ -40,6 +41,7 @@ class EnrichmentResult:
         self.organism: str = org
         self.pathway_id: str = pathway_id
         self.pathway_name: str = pathway_name
+        self.pathway_title: Optional[str] = pathway_title
 
         # Results from enrichment analysis
         self.found_genes: list = found_genes
@@ -91,6 +93,7 @@ class EnrichmentResult:
 
         return {
             "pathway_name": self.pathway_name,
+            "pathway_title": self.pathway_title,
             "pathway_id": self.pathway_id,
             "study_count": self.study_count,
             "pathway_genes": self.pathway_genes_count,
@@ -110,6 +113,7 @@ class EnrichmentResult:
 
         return [
             "pathway_name",
+            "pathway_title",
             "pathway_id",
             "study_count",
             "pathway_genes",
@@ -210,9 +214,10 @@ class Enrichment:
 
             # Create analysis results instance and append to list of results
             pathway_result: EnrichmentResult = EnrichmentResult(
-                org="mmu",
+                org=pathway.org,
                 pathway_id=pathway.number,
                 pathway_name=pathway.name,
+                pathway_title=pathway.title,
                 found_genes=genes_found,
                 pathway_genes=all_pathways_genes
             )

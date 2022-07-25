@@ -206,25 +206,41 @@ class Renderer:
 
                     # Check if entry name contains multiple gene entries
                     if len(entry.name.split(" ")) > 1:
-                        entry_gene_list: List[str] = entry.name.split(" ")
+                        # entry_gene_list: List[str] = entry.name.split(" ")
+                        entry_gene_list: List[str] = entry.get_gene_id()
 
                         # Overwrite name of first item with graphics name
                         entry_gene_list[0] = entry_label
 
-                        # Overwrite label with html table
-                        entry_label = "<" + generate_embedded_html_table(
-                            items=dict(zip(entry_gene_list, ["#ffffff"] * len(entry_gene_list)))
-                        ) + ">"
+                        # Add node
+                        self.graph.add_node(Node(
+                            name=entry.id,
+                            label="<" + generate_embedded_html_table(
+                                items=dict(zip(
+                                    entry_gene_list,
+                                    [
+                                        self.get_gene_color(gene_id) for gene_id in entry_gene_list
+                                    ],
+                                ))
+                            ) + ">",
+                            shape="rectangle",
+                            style="filled",
+                            color="#000000",
+                            fillcolor="#ffffff",
+                        ))
 
 
-                    self.graph.add_node(Node(
-                        name=entry.id,
-                        label=entry_label,
-                        shape="rectangle",
-                        style="filled",
-                        color="#000000",
-                        fillcolor="#ffffff",
-                    ))
+                    else:
+
+                        # Single node
+                        self.graph.add_node(Node(
+                            name=entry.id,
+                            label=entry_label,
+                            shape="rectangle",
+                            style="filled",
+                            color=self.get_gene_color(gene_id=entry.get_gene_id()[0]),
+                            fillcolor="#ffffff",
+                        ))
 
 
 
@@ -245,6 +261,8 @@ class Renderer:
 
                     # Generate html table string from gene dict
                     # TODO: add cell spacing/padding
+                    # TODO: add gene color
+
                     html_table_string: str = generate_embedded_html_table(
                         items=dict(zip(labels, ["#ffffff"] * len(labels))),
                     )

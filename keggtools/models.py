@@ -555,18 +555,20 @@ class Entry:
 
 
 
-    def get_gene_id(self) -> str:
+    def get_gene_id(self) -> List[str]:
         """
         Parse variable 'name' of Entry into KEGG id.
 
-        :return: KEGG identifier
-        :rtype: str
+        :return: List of KEGG identifier.
+        :rtype: typing.List[str]
         """
 
         # TODO: validate return valid !!
         # r"^([a-z]){3}([0-9]){5}$"
 
-        return self.name.split(":")[1]
+        # return self.name.split(":")[1]
+        return [value.split(":")[1] for value in self.name.split(" ")]
+
 
 
 
@@ -1104,16 +1106,20 @@ class Pathway:
             if entry.type == "gene":
 
                 # Get name of entry (KEGG identifier)
-                if " " in entry.name:
-                    # Check if name contains a space, which indicates list of multiple identifier
-                    splitted_entries: List[str] = entry.name.split(" ")
-                    for single_entry in splitted_entries:
-                        if single_entry not in result:
-                            result.append(single_entry)
+                # if " " in entry.name:
+                #     # Check if name contains a space, which indicates list of multiple identifier
+                #     splitted_entries: List[str] = entry.name.split(" ")
+                #     for single_entry in splitted_entries:
+                #         if single_entry not in result:
+                #             result.append(single_entry)
 
 
-                elif entry.name not in result:
-                    result.append(entry.name)
+                # elif entry.name not in result:
+                #     result.append(entry.name)
+
+                for gene_id in entry.get_gene_id():
+                    if gene_id not in result:
+                        result.append(gene_id)
 
         return result
 

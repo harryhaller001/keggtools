@@ -65,7 +65,7 @@ def test_enrichment(
 
 
     results: List[EnrichmentResult] = enrichment.run_analysis(
-        gene_list=["mmu:12043", "mmu:18035", "mmu:17874", "mmu:21937"]
+        gene_list=["12043", "18035", "17874", "21937"]
     )
 
     assert len(results) == 1
@@ -118,7 +118,8 @@ def test_enrichment(
     validate_df: pandas.DataFrame = pandas.read_csv(csv_filename, delimiter="\t", header=None)
 
     # Check if gene list (5th column of csv file) contains seperated list of genes
-    assert len(str(validate_df.iat[0, 5]).split(" ")) == 4
+    # TODO: make better test!
+    assert len(str(validate_df.iat[0, 6]).split(" ")) == 4
 
 
     # Check error of space is used as delimiter

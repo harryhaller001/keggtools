@@ -1,6 +1,8 @@
 """ Render object """
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
+from functools import lru_cache
+# from enum import Enum, unique
 
 from xml.etree.ElementTree import Element, SubElement
 from xml.etree import ElementTree
@@ -14,11 +16,43 @@ from .utils import ColorGradient
 
 
 
+# TODO: add hex string to int tuple function
+# TODO: add int tuple to hex string function
+
+
+# Color variables
+# TODO: implement all colors as tuple or Union[str, Tuple[int, int, int]]
+# TODO: convert color from tuple to string on function level
+
+# @unique
+# class Color(Enum):
+#     """
+#     Color variables.
+#     """
+#     WHITE: Tuple[int, int, int] = (255, 255, 255)
+#     BLACK: Tuple[int, int, int] = (0, 0, 0)
+
+
+# TODO: use enum nested classes for different parameter options in pydot ???
+# class PydotNode(Enum):
+#     """
+#     ...
+#     """
+#     class LineStyle(Enum):
+#         """
+#         ...
+#         """
+#         DASHED: str = ""
+
+
+
+# Helper functions for renderer
+
 def generate_embedded_html_table(
     items: Dict[str, str],
     border: int = 0,
     cellborder: int = 1,
-    truncate: Optional[int] = 5
+    truncate: Optional[int] = None,
     ) -> str:
     """
     Generate HTML table in insert into label of dot node.
@@ -26,9 +60,10 @@ def generate_embedded_html_table(
     `generate_embedded_html_table({"gene1": "#ffffff", "gene2": "#454545"})`
 
     :param typing.Dict[str, str] items: Items are dicts with have format `{name: hex_color}`.
-    :param int border: Thickness of table border.
-    :param int cellborder: Thickness of cell border within the table.
-    :param int truncate: Maximal number of items in table. Set to None to disable trunaction.
+    :param int border: Thickness of table border. (Default: 0)
+    :param int cellborder: Thickness of cell border within the table. (Default: 1)
+    :param typing.Optional[int] truncate: Maximal number of items in table. Set to None to disable trunaction. \
+        (Default: None)
     :return: Returns html string of table.
     :rtype: str
     """
@@ -68,6 +103,8 @@ def generate_embedded_html_table(
     return ElementTree.tostring(element_table).decode("utf-8")
 
 
+
+
 class Renderer:
     """
     Renderer for KEGG Pathway.
@@ -80,8 +117,8 @@ class Renderer:
         cache: Optional[Union[Storage, str]] = None,
         # resolve_compounds: bool = True # TODO: Specify if renderer should resolver compounds in human readable text
 
-        upper_color: tuple = (255, 0, 0),
-        lower_color: tuple = (0, 0, 255),
+        upper_color: Tuple[int, int, int] = (255, 0, 0),
+        lower_color: Tuple[int, int, int] = (0, 0, 255),
     ) -> None:
         """
         Init Renderer instance for KEGG Pathway.
@@ -91,8 +128,8 @@ class Renderer:
             gradient to rendered entries.
         :param typing.Optional[typing.Union[Storage, str]] cache: Specify cache to resolver compound \
             data needed for rendering.
-        :param tuple upper_color: Color for upper bound of color gradient.
-        :param tuple lower_color: Color for lower bound of color gradient.
+        :param typing.Tuple[int, int, int] upper_color: Color for upper bound of color gradient.
+        :param typing.Tuple[int, int, int] lower_color: Color for lower bound of color gradient.
         """
 
         # Pathway instance to render
@@ -123,29 +160,66 @@ class Renderer:
         self.upper_color: tuple = upper_color
         self.lower_color: tuple = lower_color
 
-        self.cmap_upreg: List[str] = ColorGradient(
-            start=(255, 255, 255),
-            stop=self.upper_color,
-            steps=100
-        ).get_list()
-        self.cmap_downreg: List[str] = ColorGradient(
-            start=(255, 255, 255),
-            stop=self.lower_color,
-            steps=100
-        ).get_list()
-
 
         # Init resolver instance from pathway org code.
         self.resolver: Resolver = Resolver(cache=cache)
 
 
+
+    # implement color gradient as properties with lru_cache decorator
+    @property
+    def cmap_upreg(self) -> List[str]:
+        """
+        Generated color map as list of hexadecimal strings for upregulated genes in gene dict.
+        """
+        @lru_cache(maxsize=1)
+        def cache_wrapper() -> List[str]:
+            return ColorGradient(
+                start=(255, 255, 255),
+                stop=self.upper_color,
+                steps=100
+            ).get_list()
+
+        return cache_wrapper()
+
+
+    @property
+    def cmap_downreg(self) -> List[str]:
+        """
+        Generated color map as list of hexadecimal strings for downregulated genes in gene dict.
+        """
+        @lru_cache(maxsize=1)
+        def cache_wrapper() -> List[str]:
+            return ColorGradient(
+                start=(255, 255, 255),
+                stop=self.lower_color,
+                steps=100
+            ).get_list()
+
+        return cache_wrapper()
+
+
+
+    def resolve_missing_gene_names(self) -> None:
+        """
+        Resolve names of gene entries with only gene id given, but no human-readable names.
+        This cases appears in entries with type gene with multiple, space-seperated gene id entries in the name
+        attribute.
+        """
+
+        # TODO: implement request with resolve instance
+
+        # TODO: save in instance list of gene-id to gene name lookup dict
+
+
     # TODO: fix because its broken
-    def get_gene_color(self, gene_id: str, default_color: tuple = (255, 255, 255)) -> str:
+    def get_gene_color(self, gene_id: str, default_color: Tuple[int, int, int] = (255, 255, 255)) -> str:
         """
         Get overlay color for given gene.
 
         :param str gene_id: Identify of gene.
-        :param tuple default_color: Default color to return if gene is not found in gene_dict. Format in RGB tuple.
+        :param typing.Tuple[int, int, int] default_color: Default color to return if gene is not found in gene_dict. \
+            Format in RGB tuple.
         :return: Color of gene by expression level specified in gene_dict.
         :rtype: str
         """
@@ -179,11 +253,7 @@ class Renderer:
         # pylint: disable=too-many-branches,too-many-locals,too-many-statements
 
 
-        # TODO: find all entries with multiple names (space-seperates)
-        # TODO: request the names of the entry names with .../find/gene1+gene2 -> parse list and use names as labels
-
         # add all nodes and edges
-
         related_entries = [int(p.entry1) for p in self.pathway.relations]
         related_entries.extend([int(p.entry2) for p in self.pathway.relations])
 
@@ -205,6 +275,9 @@ class Renderer:
 
 
                     # Check if entry name contains multiple gene entries
+                    # TODO: request the names of the entry names with .../find/gene1+gene2 ->
+                    # parse list and use names as labels
+
                     if len(entry.name.split(" ")) > 1:
                         # entry_gene_list: List[str] = entry.name.split(" ")
                         entry_gene_list: List[str] = entry.get_gene_id()
@@ -216,14 +289,9 @@ class Renderer:
                         self.graph.add_node(Node(
                             name=entry.id,
                             label="<" + generate_embedded_html_table(
-                                items=dict(zip(
-                                    entry_gene_list,
-                                    [
-                                        self.get_gene_color(gene_id) for gene_id in entry_gene_list
-                                    ],
-                                ))
+                                items={ gene_id: self.get_gene_color(gene_id) for gene_id in entry_gene_list }
                             ) + ">",
-                            shape="rectangle",
+                            shape="plaintext",
                             style="filled",
                             color="#000000",
                             fillcolor="#ffffff",
@@ -238,39 +306,44 @@ class Renderer:
                             label=entry_label,
                             shape="rectangle",
                             style="filled",
-                            color=self.get_gene_color(gene_id=entry.get_gene_id()[0]),
-                            fillcolor="#ffffff",
+                            color="#000000",
+                            fillcolor=self.get_gene_color(gene_id=entry.get_gene_id()[0]),
                         ))
 
 
 
                 elif entry.type == "group":
 
-                    labels: List[str] = []
+                    component_label: List[Tuple[str, str]] = []
 
+                    # Iterate of components of group entry
                     for comp in entry.components:
+
                         component_entry: Optional[Entry] = self.pathway.get_entry_by_id(comp.id)
 
                         if component_entry is not None and \
                             component_entry.graphics is not None and \
                             component_entry.graphics.name is not None:
 
-                            # Append to labels
-                            labels.append(component_entry.graphics.name.split(", ")[0])
+                            # Append tuple of gene id and color to labels
+                            component_label.append((
+                                    component_entry.graphics.name.split(", ")[0],
+                                    self.get_gene_color(component_entry.get_gene_id()[0]),
+                            ))
 
 
                     # Generate html table string from gene dict
-                    # TODO: add cell spacing/padding
-                    # TODO: add gene color
+                    # TODO: adjust cell spacing/padding, border
 
                     html_table_string: str = generate_embedded_html_table(
-                        items=dict(zip(labels, ["#ffffff"] * len(labels))),
+                        items=dict(component_label),
                     )
 
                     # Add dot node to graph
                     self.graph.add_node(Node(
                         name=entry.id,
                         label=f"<{html_table_string}>",
+                        # shape="rectangle",
                         shape="plaintext",
                         style="filled",
                         color="#000000",
@@ -286,6 +359,7 @@ class Renderer:
                     if entry.graphics is not None and entry.graphics.name is not None:
                         entry_label = entry.graphics.name.split(", ")[0]
 
+                    # Add compound node to graph
                     self.graph.add_node(Node(
                         name=entry.id,
                         label=entry_label,
@@ -305,12 +379,13 @@ class Renderer:
 
         for rel in self.pathway.relations:
 
-
+            # Create edge instance from relation enties
             relation_edge: Edge = Edge(
                 src=rel.entry1,
                 dst=rel.entry2,
             )
 
+            # default line style
             line_style: str = "solid"
 
 
@@ -336,7 +411,9 @@ class Renderer:
 
             # Iterate over relation subtypes and check if moleuclar event is present
             edge_label: Optional[str] = None
-            arrowhead: str = "normal"
+
+            # Default arrowhead
+            arrowhead: str = "none"
 
             for subtype in rel.subtypes:
 
@@ -356,15 +433,12 @@ class Renderer:
                 # Check for quality of interaction to set arrow head of edge
                 if subtype.name in ("activation", "expression", "indirect effect", "binding/association"):
                     arrowhead = "normal"
+
                 elif subtype.name in ("inhibition", "repression", "dissociation"):
                     arrowhead = "tee"
 
-                if subtype.name == "state change":
+                elif subtype.name == "state change":
                     arrowhead = "diamond"
-
-                else:
-                    arrowhead = "none"
-
 
 
             # set arrowhead to edge instance
@@ -378,7 +452,7 @@ class Renderer:
             # Set line style to edge instance
             relation_edge.set(name="style", value=line_style)
 
-
+            # Add edge to graph
             self.graph.add_edge(relation_edge)
 
 
@@ -408,17 +482,11 @@ class Renderer:
         """
         Export pydot graph to binary data.
 
-        :param str extension: Extension of file to export. Supported are "png", "svg", "pdf" and "jpeg".
+        :param str extension: Extension of file to export. Use format string like "png", "svg", "pdf" or "jpeg".
         :return: File content are bytes object.
         :rtype: bytes
         :raises TypeError: If variable with generated dot graph is not type bytes.
         """
-
-        # TODO: check supported file formats
-        # if extension not in ("png", "svg", "pdf", "jpeg"):
-        #     raise ValueError("Supported are only extensions 'png', 'svg', 'pdf' and 'jpeg'.")
-
-        # TODO: direct save to file object
 
         # render with pydot to binary
         graph_data: Any = self.graph.create(prog="dot", format=extension)
@@ -435,7 +503,7 @@ class Renderer:
         Export pydot graph to file.
 
         :param str filename: Filename to save file at.
-        :param str extension: Extension of file to export. Supported are "png", "svg", "pdf" and "jpeg".
+        :param str extension: Extension of file to export. Use format string like "png", "svg", "pdf" or "jpeg".
         """
 
         # TODO: get export format from filename

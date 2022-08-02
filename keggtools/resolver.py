@@ -1,7 +1,7 @@
 """ Resolve requests to KEGG data Api """
 
 from typing import Dict, List, Optional, Union
-from warnings import warn
+# from warnings import warn
 
 import requests
 
@@ -26,7 +26,7 @@ def _request(url: str) -> str:
 
 
 
-def get_gene_names(genes: List[str]) -> Dict[str, str]:
+def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
     """
     Resolve KEGG gene identifer to name using to KEGG database REST Api.
     Function is implemented outside the resolver instance, because requests are not cached and only gene identifier
@@ -37,9 +37,12 @@ def get_gene_names(genes: List[str]) -> Dict[str, str]:
     :rtype: typing.Dict[str, str]
     """
 
+    if len(genes) == 0:
+        raise ValueError("No items to request.")
+
     # Check maximum number of entries requests
     # TODO: build fallback to make multiple requests from long lists (iterate over list chunks)
-    if len(genes) > 50:
+    if len(genes) > max_genes:
         raise ValueError(f"Too many entries are requested at once ({len(genes)}/50).")
 
     # TODO check if pattern of identifer is correct
@@ -64,12 +67,12 @@ def get_gene_names(genes: List[str]) -> Dict[str, str]:
 
 
     # Check if all genes are in dict
-    for item in genes:
-        if item not in result_dict:
-            warn(
-                message=f"Gene identifer '{item}' could not be resolved by API request.",
-                category=UserWarning,
-            )
+    # for item in genes:
+    #     if item not in result_dict:
+    #         warn(
+    #             message=f"Gene identifer '{item}' could not be resolved by API request.",
+    #             category=UserWarning,
+    #         )
 
 
     return result_dict

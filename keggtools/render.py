@@ -1,5 +1,6 @@
 """ Render object """
 
+# import logging
 from typing import Any, Dict, List, Optional, Tuple, Union
 from functools import lru_cache
 # from enum import Enum, unique
@@ -11,7 +12,7 @@ from pydot import Dot, Node, Edge
 
 from .storage import Storage
 from .models import Pathway, Entry
-from .resolver import Resolver
+from .resolver import Resolver, get_gene_names
 from .utils import ColorGradient
 
 
@@ -114,7 +115,7 @@ class Renderer:
         self,
         kegg_pathway: Pathway,
         gene_dict: Optional[Dict[str, float]] = None,
-        cache: Optional[Union[Storage, str]] = None,
+        cache_or_resolver: Optional[Union[Storage, str, Resolver]] = None,
         # resolve_compounds: bool = True # TODO: Specify if renderer should resolver compounds in human readable text
 
         upper_color: Tuple[int, int, int] = (255, 0, 0),
@@ -126,8 +127,9 @@ class Renderer:
         :param Pathway kegg_pathway: Pathway instance to render.
         :param typing.Optional[typing.Dict[str, float]] gene_dict: Dict to specify overlay color \
             gradient to rendered entries.
-        :param typing.Optional[typing.Union[Storage, str]] cache: Specify cache to resolver compound \
-            data needed for rendering.
+        :param typing.Optional[typing.Union[Storage, str, cache_or_resolver]] cache: \
+            Specify cache for resolver instance or pass resolver. Resolver is needed to get compound data needed for \
+            rendering.
         :param typing.Tuple[int, int, int] upper_color: Color for upper bound of color gradient.
         :param typing.Tuple[int, int, int] lower_color: Color for lower bound of color gradient.
         """
@@ -162,8 +164,18 @@ class Renderer:
 
 
         # Init resolver instance from pathway org code.
-        self.resolver: Resolver = Resolver(cache=cache)
+        resolver_buffer: Optional[Resolver] = None
 
+        if isinstance(cache_or_resolver, (str, Storage)) or cache_or_resolver is None:
+            resolver_buffer = Resolver(cache=cache_or_resolver)
+        elif isinstance(cache_or_resolver, Resolver):
+            resolver_buffer = cache_or_resolver
+        else:
+            # Raise error of type is not correct
+            raise TypeError("String to directory, storage instance or resolver instance must be passed.")
+
+
+        self.resolver: Resolver = resolver_buffer
 
 
     # implement color gradient as properties with lru_cache decorator
@@ -199,20 +211,6 @@ class Renderer:
         return cache_wrapper()
 
 
-
-    def resolve_missing_gene_names(self) -> None:
-        """
-        Resolve names of gene entries with only gene id given, but no human-readable names.
-        This cases appears in entries with type gene with multiple, space-seperated gene id entries in the name
-        attribute.
-        """
-
-        # TODO: implement request with resolve instance
-
-        # TODO: save in instance list of gene-id to gene name lookup dict
-
-
-    # TODO: fix because its broken
     def get_gene_color(self, gene_id: str, default_color: Tuple[int, int, int] = (255, 255, 255)) -> str:
         """
         Get overlay color for given gene.
@@ -243,15 +241,71 @@ class Renderer:
 
 
 
+    def resolve_missing_gene_names(
+        self,
+        truncate_gene_list: Optional[int] = None,
+        ) -> Dict[str, str]:
+        """
+        Resolve names of gene entries with only gene id given, but no human-readable names.
+        This cases appears in entries with type gene with multiple, space-seperated gene id entries in the name
+        attribute.
+
+        :param typing.Optional[int] truncate_gene_list: With truncate entries with multiple space-seperated names \
+            to given length. To keep all genes, set parameter to `None`.
+        """
+
+        # TODO: get list of genes with only kegg id and no label
+        gene_names: List[str] = []
+
+        # get all gene ids from entries with multiples names
+        for entry in self.pathway.entries:
+            if entry.type == "gene":
+                name_parts: List[str] = entry.name.split(" ")
+                if len(name_parts) > 1:
+
+                    max_name_index: int = len(name_parts)
+
+                    # Overwrite max index of list iteration, if truncation is set to integer below list length
+                    if truncate_gene_list is not None and truncate_gene_list < max_name_index:
+                        max_name_index = truncate_gene_list
+
+                    for name_index in range(1, max_name_index):
+                        if name_parts[name_index] not in gene_names:
+                            gene_names.append(name_parts[name_index])
+
+        # save in instance list of gene-id to gene name lookup dict
+        # TODO: check if all genes got resolved
+
+        loopup_dict: Dict[str, str] = {}
+
+        # Split organism code from gene id
+        for key, value in get_gene_names(genes=gene_names, max_genes=len(gene_names) + 1).items():
+            loopup_dict[key.split(":")[1]] = value
+
+        return loopup_dict
+
+
     def render(
         self,
-    ) -> None:
+        resolve_unlabeled_genes: bool = True,
+        # display_unlabeled_genes: bool = True, TODO
+        truncate_gene_list: Optional[int] = None,
+        ) -> None:
         """
         Render KEGG pathway.
+
+        :param bool resolve_unlabeled_genes: If `True` the function will resolve all gene names for gene entries \
+            which only have a gene id given.
+        :param typing.Optional[int] truncate_gene_list: With truncate entries with multiple space-seperated names \
+            to given length. To keep all genes, set parameter to `None`.
         """
 
         # pylint: disable=too-many-branches,too-many-locals,too-many-statements
 
+        resolved_gene_names: Dict[str, str] = {}
+
+        if resolve_unlabeled_genes is True:
+            resolved_gene_names = self.resolve_missing_gene_names(truncate_gene_list=truncate_gene_list)
 
         # add all nodes and edges
         related_entries = [int(p.entry1) for p in self.pathway.relations]
@@ -278,12 +332,20 @@ class Renderer:
                     # TODO: request the names of the entry names with .../find/gene1+gene2 ->
                     # parse list and use names as labels
 
-                    if len(entry.name.split(" ")) > 1:
-                        # entry_gene_list: List[str] = entry.name.split(" ")
+                    if len(entry.get_gene_id()) > 1:
                         entry_gene_list: List[str] = entry.get_gene_id()
 
                         # Overwrite name of first item with graphics name
                         entry_gene_list[0] = entry_label
+
+                        # Skip first entry
+                        for index in range(1, len(entry_gene_list)):
+                            # Get item from lookup dict and fallback to gene id
+                            # TODO: mark entry if gene id is used ??
+                            entry_gene_list[index] = resolved_gene_names.get(
+                                entry_gene_list[index], entry_gene_list[index]
+                            )
+
 
                         # Add node
                         self.graph.add_node(Node(

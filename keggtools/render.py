@@ -12,7 +12,10 @@ from pydot import Dot, Node, Edge
 
 from .storage import Storage
 from .models import Pathway, Entry
-from .resolver import Resolver, get_gene_names
+from .resolver import (
+    Resolver,
+    # get_gene_names,
+)
 from .utils import ColorGradient
 
 
@@ -240,72 +243,76 @@ class Renderer:
         return self.cmap_upreg[abs(int(self.overlay[gene_id] / exp_max * 100))]
 
 
+    # TODO: implement not here
+    # def resolve_missing_gene_names(
+    #     self,
+    #     truncate_gene_list: Optional[int] = None,
+    #     ) -> Dict[str, str]:
+    #     """
+    #     Resolve names of gene entries with only gene id given, but no human-readable names.
+    #     This cases appears in entries with type gene with multiple, space-seperated gene id entries in the name
+    #     attribute.
 
-    def resolve_missing_gene_names(
-        self,
-        truncate_gene_list: Optional[int] = None,
-        ) -> Dict[str, str]:
-        """
-        Resolve names of gene entries with only gene id given, but no human-readable names.
-        This cases appears in entries with type gene with multiple, space-seperated gene id entries in the name
-        attribute.
+    #     :param typing.Optional[int] truncate_gene_list: With truncate entries with multiple space-seperated names \
+    #         to given length. To keep all genes, set parameter to `None`.
+    #     """
 
-        :param typing.Optional[int] truncate_gene_list: With truncate entries with multiple space-seperated names \
-            to given length. To keep all genes, set parameter to `None`.
-        """
+    #     # TODO: get list of genes with only kegg id and no label
+    #     gene_names: List[str] = []
 
-        # TODO: get list of genes with only kegg id and no label
-        gene_names: List[str] = []
+    #     # get all gene ids from entries with multiples names
+    #     for entry in self.pathway.entries:
+    #         if entry.type == "gene":
+    #             name_parts: List[str] = entry.name.split(" ")
+    #             if len(name_parts) > 1:
 
-        # get all gene ids from entries with multiples names
-        for entry in self.pathway.entries:
-            if entry.type == "gene":
-                name_parts: List[str] = entry.name.split(" ")
-                if len(name_parts) > 1:
+    #                 max_name_index: int = len(name_parts)
 
-                    max_name_index: int = len(name_parts)
+    #                 # Overwrite max index of list iteration, if truncation is set to integer below list length
+    #                 if truncate_gene_list is not None and truncate_gene_list < max_name_index:
+    #                     max_name_index = truncate_gene_list
 
-                    # Overwrite max index of list iteration, if truncation is set to integer below list length
-                    if truncate_gene_list is not None and truncate_gene_list < max_name_index:
-                        max_name_index = truncate_gene_list
+    #                 for name_index in range(1, max_name_index):
+    #                     if name_parts[name_index] not in gene_names:
+    #                         gene_names.append(name_parts[name_index])
 
-                    for name_index in range(1, max_name_index):
-                        if name_parts[name_index] not in gene_names:
-                            gene_names.append(name_parts[name_index])
+    #     # save in instance list of gene-id to gene name lookup dict
+    #     # TODO: check if all genes got resolved
 
-        # save in instance list of gene-id to gene name lookup dict
-        # TODO: check if all genes got resolved
+    #     loopup_dict: Dict[str, str] = {}
 
-        loopup_dict: Dict[str, str] = {}
+    #     # Split organism code from gene id
+    #     for key, value in get_gene_names(genes=gene_names, max_genes=len(gene_names) + 1).items():
+    #         loopup_dict[key.split(":")[1]] = value
 
-        # Split organism code from gene id
-        for key, value in get_gene_names(genes=gene_names, max_genes=len(gene_names) + 1).items():
-            loopup_dict[key.split(":")[1]] = value
-
-        return loopup_dict
+    #     return loopup_dict
 
 
     def render(
         self,
-        resolve_unlabeled_genes: bool = True,
-        # display_unlabeled_genes: bool = True, TODO
-        truncate_gene_list: Optional[int] = None,
+        # resolve_unlabeled_genes: bool = True,
+        display_unlabeled_genes: bool = True,
+        # truncate_gene_list: Optional[int] = None,
         ) -> None:
         """
         Render KEGG pathway.
 
-        :param bool resolve_unlabeled_genes: If `True` the function will resolve all gene names for gene entries \
-            which only have a gene id given.
-        :param typing.Optional[int] truncate_gene_list: With truncate entries with multiple space-seperated names \
-            to given length. To keep all genes, set parameter to `None`.
+
+        :param bool display_unlabeled_genes: Entries in the KGML format can have space-seperated entry names. \
+            Set this parameter to `False` to hide the entries.
         """
+
+        # :param bool resolve_unlabeled_genes: If `True` the function will resolve all gene names for gene entries \
+        #     which only have a gene id given.
+        # :param typing.Optional[int] truncate_gene_list: With truncate entries with multiple space-seperated names \
+        #     to given length. To keep all genes, set parameter to `None`.
+        # """
 
         # pylint: disable=too-many-branches,too-many-locals,too-many-statements
 
-        resolved_gene_names: Dict[str, str] = {}
-
-        if resolve_unlabeled_genes is True:
-            resolved_gene_names = self.resolve_missing_gene_names(truncate_gene_list=truncate_gene_list)
+        # resolved_gene_names: Dict[str, str] = {}
+        # if resolve_unlabeled_genes is True:
+        #     resolved_gene_names = self.resolve_missing_gene_names(truncate_gene_list=truncate_gene_list)
 
         # add all nodes and edges
         related_entries = [int(p.entry1) for p in self.pathway.relations]
@@ -332,19 +339,20 @@ class Renderer:
                     # TODO: request the names of the entry names with .../find/gene1+gene2 ->
                     # parse list and use names as labels
 
-                    if len(entry.get_gene_id()) > 1:
+                    if len(entry.get_gene_id()) > 1 and display_unlabeled_genes is True:
                         entry_gene_list: List[str] = entry.get_gene_id()
 
                         # Overwrite name of first item with graphics name
                         entry_gene_list[0] = entry_label
 
+                        # TODO: resolve missing gene names by lookup dict
                         # Skip first entry
-                        for index in range(1, len(entry_gene_list)):
-                            # Get item from lookup dict and fallback to gene id
-                            # TODO: mark entry if gene id is used ??
-                            entry_gene_list[index] = resolved_gene_names.get(
-                                entry_gene_list[index], entry_gene_list[index]
-                            )
+                        # for index in range(1, len(entry_gene_list)):
+                        #     # Get item from lookup dict and fallback to gene id
+                        #     # TODO: mark entry if gene id is used ??
+                        #     entry_gene_list[index] = resolved_gene_names.get(
+                        #         entry_gene_list[index], entry_gene_list[index]
+                        #     )
 
 
                         # Add node

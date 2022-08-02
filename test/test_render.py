@@ -1,12 +1,12 @@
 """ Testing keggtools rendering module """
 
-import re
+# import re
 from typing import Dict
 
 from xml.etree.ElementTree import Element
 from xml.etree import ElementTree
 
-from responses import RequestsMock, GET as HTTP_METHOD_GET
+# from responses import RequestsMock, GET as HTTP_METHOD_GET
 
 from keggtools.models import is_valid_hex_color, Pathway
 from keggtools.render import Renderer, generate_embedded_html_table
@@ -53,7 +53,7 @@ def test_rendering_function(
 
     renderer: Renderer = Renderer(kegg_pathway=pathway)
 
-    renderer.render(resolve_unlabeled_genes=False)
+    renderer.render()
 
     # testing export dot string function
     assert isinstance(renderer.to_string(), str)
@@ -63,48 +63,48 @@ def test_rendering_function(
         assert isinstance(renderer.to_binary(extension=extension), bytes)
 
 
+# TODO: resolving of mising entry names not implemented yet
+# def test_rendering_with_resolve(
+#     pathway: Pathway, # pylint: disable=redefined-outer-name
+#     ) -> None:
+#     """
+#     Testing rendering function and resolving of missing gene names.
+#     """
 
-def test_rendering_with_resolve(
-    pathway: Pathway, # pylint: disable=redefined-outer-name
-    ) -> None:
-    """
-    Testing rendering function and resolving of missing gene names.
-    """
+#     with RequestsMock() as mocked_request:
 
-    with RequestsMock() as mocked_request:
+#         mocked_request.add(
+#             method=HTTP_METHOD_GET,
+#             url=re.compile(r"http://rest.kegg.jp/list/(.*)"),
+#             body="mmu:11797\tBirc2, AW146227\n" \
+#                 "mmu:266632\tIrak4, 8430405M07Rik\n" \
+#                 "mmu:22033\tTraf5; TNF receptor-associated factor 5\n" \
+#                 "mmu:108723\tCard11, 0610008L17Rik\n" \
+#                 "mmu:170720\tCard14, Bimp2\n" \
+#                 "mmu:22030\tTraf2, AI325259; TNF receptor-associated factor 2\n" \
+#                 "mmu:66724\tTab3, 4921526G09Rik\n" \
+#                 "mmu:68652\tTab2, 1110030N06Rik\n" \
+#                 "mmu:22034\tTraf6, 2310003F17Rik\n" \
+#                 "mmu:13000\tCsnk2a2, 1110035J23Rik\n" \
+#                 "mmu:13001\tCsnk2b, CK_II_beta; casein kinase 2\n" \
+#                 "mmu:12045\tBcl2a1b, A1-b; B cell leukemia/lymphoma 2 related protein A1b\n" \
+#                 "mmu:12046\tBcl2a1c, A1-c; B cell leukemia/lymphoma 2 related protein A1c\n" \
+#                 "mmu:12047\tBcl2a1d, A1-d; B cell leukemia/lymphoma 2 related protein A1d\n" \
+#                 "mmu:20310\tCxcl2, CINC-2a\n" \
+#                 "mmu:330122\tCxcl3, Dcip1\n" \
+#                 "mmu:100042493\tCcl21b, 6CKBAC1\n" \
+#                 "mmu:100504239\tGm10591, 6Ckine\n" \
+#                 "mmu:100504346\tGm13304, 6Ckine\n" \
+#                 "mmu:100862177\tCcl21d, 6Ckine\n" \
+#                 "mmu:18829\tCcl21a, 6CKBAC2\n" \
+#                 "mmu:24047\tCcl19, CKb11\n"
+#         )
 
-        mocked_request.add(
-            method=HTTP_METHOD_GET,
-            url=re.compile(r"http://rest.kegg.jp/list/(.*)"),
-            body="mmu:11797\tBirc2, AW146227\n" \
-                "mmu:266632\tIrak4, 8430405M07Rik\n" \
-                "mmu:22033\tTraf5; TNF receptor-associated factor 5\n" \
-                "mmu:108723\tCard11, 0610008L17Rik\n" \
-                "mmu:170720\tCard14, Bimp2\n" \
-                "mmu:22030\tTraf2, AI325259; TNF receptor-associated factor 2\n" \
-                "mmu:66724\tTab3, 4921526G09Rik\n" \
-                "mmu:68652\tTab2, 1110030N06Rik\n" \
-                "mmu:22034\tTraf6, 2310003F17Rik\n" \
-                "mmu:13000\tCsnk2a2, 1110035J23Rik\n" \
-                "mmu:13001\tCsnk2b, CK_II_beta; casein kinase 2\n" \
-                "mmu:12045\tBcl2a1b, A1-b; B cell leukemia/lymphoma 2 related protein A1b\n" \
-                "mmu:12046\tBcl2a1c, A1-c; B cell leukemia/lymphoma 2 related protein A1c\n" \
-                "mmu:12047\tBcl2a1d, A1-d; B cell leukemia/lymphoma 2 related protein A1d\n" \
-                "mmu:20310\tCxcl2, CINC-2a\n" \
-                "mmu:330122\tCxcl3, Dcip1\n" \
-                "mmu:100042493\tCcl21b, 6CKBAC1\n" \
-                "mmu:100504239\tGm10591, 6Ckine\n" \
-                "mmu:100504346\tGm13304, 6Ckine\n" \
-                "mmu:100862177\tCcl21d, 6Ckine\n" \
-                "mmu:18829\tCcl21a, 6CKBAC2\n" \
-                "mmu:24047\tCcl19, CKb11\n"
-        )
+#         renderer: Renderer = Renderer(kegg_pathway=pathway)
 
-        renderer: Renderer = Renderer(kegg_pathway=pathway)
+#         renderer.render(resolve_unlabeled_genes=True)
 
-        renderer.render(resolve_unlabeled_genes=True)
-
-        # TODO: check if genes got resolved
+#         # TODO: check if genes got resolved
 
 
 

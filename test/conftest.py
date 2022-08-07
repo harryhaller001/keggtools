@@ -1,5 +1,4 @@
 """ Pytest fixtures """
-# pylint: disable=redefined-outer-name
 
 import os
 from typing import Generator
@@ -23,9 +22,9 @@ def storage() -> Generator[Storage, None, None]:
 
     assert os.path.isdir(CACHEDIR) is False
 
-    storage: Storage = Storage(cachedir=CACHEDIR)
+    test_storage: Storage = Storage(cachedir=CACHEDIR)
 
-    yield storage
+    yield test_storage
 
     # Cleanup all files in cachedir and remove folder
     for filename in os.listdir(path=CACHEDIR):
@@ -37,7 +36,7 @@ def storage() -> Generator[Storage, None, None]:
 
 
 @pytest.fixture(scope="function")
-def resolver(storage: Storage) -> Generator[Resolver, None, None]:
+def resolver(storage: Storage) -> Generator[Resolver, None, None]: # pylint: disable=redefined-outer-name
     """
     generate resolver instance on top of storage fixtures. `@responses.activate` decorator must be placed at testing
     methods.

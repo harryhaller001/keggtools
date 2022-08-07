@@ -75,3 +75,11 @@ html_context = dict(
     github_version='main',
     conf_py_path='/docs/',
 )
+
+
+html_static_path = ['static']
+
+# Addind custom css script
+html_css_files = [
+    'css/custom.css',
+]

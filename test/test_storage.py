@@ -6,11 +6,7 @@ import pytest
 
 from keggtools.storage import Storage
 
-from .fixtures import ( # pylint: disable=unused-import
-    storage,
-    resolver,
-    CACHEDIR,
-)
+from .conftest import CACHEDIR
 
 
 
@@ -44,9 +40,7 @@ def test_cachedir_default() -> None:
 
 
 
-def test_folder_generation( # pylint: disable=redefined-outer-name
-    storage: Storage,
-    ) -> None:
+def test_folder_generation(storage: Storage) -> None:
     """
     Testing generation of new cache folder.
     """
@@ -59,9 +53,7 @@ def test_folder_generation( # pylint: disable=redefined-outer-name
 
 
 
-def test_folder_check_fails( # pylint: disable=redefined-outer-name
-    storage: Storage,
-    ) -> None:
+def test_folder_check_fails(storage: Storage) -> None:
     """
     Testing if check fails if cache folder does not exist.
     """
@@ -78,9 +70,7 @@ def test_folder_check_fails( # pylint: disable=redefined-outer-name
 
 
 
-def test_cache_readwrite( # pylint: disable=redefined-outer-name
-    storage: Storage,
-    ) -> None:
+def test_cache_readwrite(storage: Storage) -> None:
     """
     Testing saving/loading of file to storage.
     """

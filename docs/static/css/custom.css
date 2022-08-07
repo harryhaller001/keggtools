@@ -1,0 +1,22 @@
+
+/* Overwrite max width of main content */
+.wy-nav-content {
+    max-width: 1000px;
+}
+
+
+/* All tables are full-width */
+.wy-table-responsive table {
+    width: 100%;
+}
+
+
+
+/*
+override table no-wrap
+https://stackoverflow.com/questions/16570087/multiple-lines-of-text-in-single-cell-of-simple-table
+*/
+.wy-table-responsive table td, .wy-table-responsive table th {
+    white-space: normal;
+}
+

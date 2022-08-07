@@ -106,12 +106,17 @@ clean: ## Clean all build and caching directories
 .PHONY: docs
 docs: ## Build sphinx docs
 	@rm -rf ./docs/_build
-	@$(SPHINX_OPT) -M html ./docs ./docs/_build
 	@$(SPHINX_OPT) -M doctest ./docs ./docs/_build
 	@$(SPHINX_OPT) -M coverage ./docs ./docs/_build
 
-# TODO: add latex pdf version of docs
-#	@$(SPHINX_OPT) -M latexpdf ./docs ./docs/_build
+# TODO: add latex pdf version of docs and copy to static files to include in HTML version
+#	@$(SPHINX_OPT) -M latexpdf ./docs ./docs/_build && cp ./docs/_build/latex/keggtools.pdf ./docs/static/keggtools.pdf
+
+
+# Build HTML version
+	@$(SPHINX_OPT) -M html ./docs ./docs/_build
+
+
 
 
 # Run all checks (always before committing!)

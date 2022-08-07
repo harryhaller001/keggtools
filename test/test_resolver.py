@@ -13,13 +13,7 @@ from keggtools.resolver import Resolver, get_gene_names
 from keggtools.storage import Storage
 from keggtools.models import Pathway
 
-
-from .fixtures import ( # pylint: disable=unused-import
-    storage,
-    resolver,
-    CACHEDIR,
-    ORGANISM,
-)
+from .conftest import CACHEDIR, ORGANISM
 
 
 def test_get_gene_names() -> None:
@@ -65,8 +59,6 @@ def test_resolver_init(storage: Storage) -> None:
     Testing init function of resolver with different arugment types.
     """
 
-    # pylint: disable=redefined-outer-name
-
     assert Resolver(cache=None).storage.cachedir == Storage().cachedir
 
     assert Resolver(cache=storage).storage.cachedir == CACHEDIR
@@ -75,9 +67,7 @@ def test_resolver_init(storage: Storage) -> None:
 
 
 
-def test_resolver_cache_or_request(
-    resolver: Resolver, # pylint: disable=redefined-outer-name
-    ) -> None:
+def test_resolver_cache_or_request(resolver: Resolver) -> None:
     """
     Testing resolve cache or request function.
     """
@@ -116,9 +106,7 @@ def test_resolver_cache_or_request(
 
 
 
-def test_get_pathway_list(
-    resolver: Resolver, # pylint: disable=redefined-outer-name
-    ) -> None:
+def test_get_pathway_list(resolver: Resolver) -> None:
     """
     Testing request of pathway list.
     """
@@ -139,9 +127,7 @@ def test_get_pathway_list(
 
 
 
-def test_get_pathway(
-    resolver: Resolver, # pylint: disable=redefined-outer-name
-    ) -> None:
+def test_get_pathway(resolver: Resolver) -> None:
     """
     Testing request of KGML pathway.
     """
@@ -164,9 +150,7 @@ def test_get_pathway(
         assert isinstance(resolver.get_pathway(organism=ORGANISM, code="12345"), Pathway) is True
 
 
-def test_get_organism_list(
-    resolver: Resolver, # pylint: disable=redefined-outer-name
-    ) -> None:
+def test_get_organism_list(resolver: Resolver) -> None:
     """
     Testing request of org list.
     """
@@ -192,9 +176,7 @@ def test_get_organism_list(
     assert resolver.check_organism(organism="hsa") is True
 
 
-def test_get_compounds(
-    resolver: Resolver, # pylint: disable=redefined-outer-name
-    ) -> None:
+def test_get_compounds(resolver: Resolver) -> None:
     """
     Testing get compund function.
     """

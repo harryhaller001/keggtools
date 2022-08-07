@@ -1,17 +1,12 @@
 """ Testing keggtools rendering module """
 
-# import re
 from typing import Dict
 
 from xml.etree.ElementTree import Element
 from xml.etree import ElementTree
 
-# from responses import RequestsMock, GET as HTTP_METHOD_GET
-
 from keggtools.models import is_valid_hex_color, Pathway
 from keggtools.render import Renderer, generate_embedded_html_table
-
-from .fixtures import pathway # pylint: disable=unused-import
 
 
 def test_generate_html_table() -> None:
@@ -44,9 +39,7 @@ def test_generate_html_table() -> None:
 
 
 
-def test_rendering_function(
-    pathway: Pathway, # pylint: disable=redefined-outer-name
-    ) -> None:
+def test_rendering_function(pathway: Pathway) -> None:
     """
     testing rendering function with test KGML pathway.
     """
@@ -65,7 +58,7 @@ def test_rendering_function(
 
 # TODO: resolving of mising entry names not implemented yet
 # def test_rendering_with_resolve(
-#     pathway: Pathway, # pylint: disable=redefined-outer-name
+#     pathway: Pathway,
 #     ) -> None:
 #     """
 #     Testing rendering function and resolving of missing gene names.
@@ -108,9 +101,7 @@ def test_rendering_function(
 
 
 
-def test_color_gradient_rendering(
-    pathway: Pathway, # pylint: disable=redefined-outer-name
-    ) -> None:
+def test_color_gradient_rendering(pathway: Pathway) -> None:
     """
     Testing color overlay from gene expression levels.
     """

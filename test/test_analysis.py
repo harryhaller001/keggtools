@@ -10,8 +10,6 @@ import pandas
 from keggtools import Enrichment, EnrichmentResult, Pathway
 from keggtools.storage import Storage
 
-from .fixtures import storage # pylint: disable=unused-import
-
 
 def test_enrichment_result() -> None:
     """
@@ -43,9 +41,7 @@ def test_enrichment_result() -> None:
 
 
 
-def test_enrichment(
-    storage: Storage, # pylint: disable=redefined-outer-name
-    ) -> None:
+def test_enrichment(storage: Storage) -> None:
     """
     Testing enrichment analysis instance.
     """

@@ -88,6 +88,103 @@ Data types
 
 
 
+.. list-table:: Entry type
+    :widths: 30 70
+    :header-rows: 1
+
+    * - Value
+      - Description
+
+
+    * - ortholog
+      - Ortholog entry (KO entry).
+
+    * - enzyme
+      - Enzyme entry.
+
+    * - reaction
+      - Reaction entry.
+
+    * - gene
+      - Gene product entry (Protein).
+
+    * - group
+      - Protein complex entry.
+
+    * - compound
+      - Compound entry (molecule, glycan).
+
+    * - map
+      - Linked pathway entry.
+
+    * - brite
+      - Brite hierarchy entry.
+
+    * - other
+      - Unclassified type of entry.
+
+
+.. list-table:: Graphics type
+    :widths: 30 70
+    :header-rows: 1
+
+    * - Value
+      - Description
+
+
+    * - rectangle
+      - Gene products and complexes are represented with a rectangle shape.
+
+    * - circle
+      - Molecules, compounds and glycans are represented with a circle shape.
+
+    * - roundrectangle
+      - Linked pathways are represented with a rounded rectangle shape.
+
+    * - line
+      - Reactions and relations are represented with a line.
+
+
+
+.. list-table:: Relation type
+    :widths: 30 70
+    :header-rows: 1
+
+    * - Value
+      - Description
+
+
+    * - ECrel
+      - Enzyme-enzyme relation.
+
+    * - PPrel
+      - Protein-protein relation.
+
+    * - GErel
+      - Transcription factor and target gene relation.
+
+    * - PCrel
+      - Protein-compound relation.
+
+    * - maplink
+      - Link to other pathway.
+
+
+
+.. list-table:: Reaction type
+    :widths: 30 70
+    :header-rows: 1
+
+    * - Value
+      - Description
+
+
+    * - reversible
+      - Reversible reaction.
+
+    * - irreversible
+      - Irreversible reaction.
+
 
 Elements
 ========

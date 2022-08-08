@@ -121,7 +121,7 @@ docs: ## Build sphinx docs
 
 # Run all checks (always before committing!)
 .PHONY: check
-check: clean freeze pylint mypy coverage twine docs precommit ## Full check of package
+check: clean install freeze pylint mypy coverage twine docs precommit ## Full check of package
 
 
 

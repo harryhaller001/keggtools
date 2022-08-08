@@ -1,0 +1,127 @@
+
+# Package build system
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+
+# Project details
+[project]
+name = "keggtools"
+description = "Enrichment analysis and visualisation toolkit for KEGG pathways"
+requires-python = '>=3.6'
+license = {file = "LICENSE"}
+
+authors = [
+    {name="harryhaller001", email = "harryhaller001@gmail.com"}
+]
+
+maintainers = [
+    {name="harryhaller001", email = "harryhaller001@gmail.com"}
+]
+
+readme = {file = "README.md", content-type="text/markdown"}
+
+classifiers=[
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pydot >= 1.4.2",
+    "requests >= 2.27.1",
+    "scipy >= 1.5.4",
+]
+
+dynamic = ["version"]
+
+
+# Project urls
+[project.urls]
+# Documentation = "TODO"
+Source = "https://github.com/harryhaller001/keggtools"
+# Home-page = "TODO"
+
+
+# Optional dependencies for testing and docs
+[project.optional-dependencies]
+test = [
+    "pylint",
+    "pytest",
+    "coverage",
+    "mypy",
+    "types-requests",
+    "responses",
+    "pandas",
+]
+
+doc = [
+    "Sphinx",
+    "sphinx-rtd-theme",
+]
+
+
+# Entrypoints for flit
+# https://flit.pypa.io/en/latest/pyproject_toml.html#scripts-section
+# [project.scripts]
+# keggtools = "keggtools.cli:main"
+
+
+# Pylint config
+[tool.pylint.'MESSAGES CONTROL']
+max-line-length = 120
+disable = "fixme,trailing-newlines,too-many-instance-attributes,too-many-arguments,unnecessary-dunder-call"
+
+
+# Mypy config
+# https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
+[tool.mypy]
+python_version = "3.6"
+warn_return_any = true
+warn_unused_configs = true
+
+
+# Ignore libs which are not PEP 561 compliant
+[[tool.mypy.overrides]]
+module = [
+    "pandas",
+    "sphinx_rtd_theme",
+    "setuptools",
+    "scipy",
+    "pydot",
+
+]
+ignore_missing_imports = true
+
+
+# Pytest config
+[tool.pytest.ini_options]
+minversion = "7.0"
+
+log_format = "%(asctime)s %(levelname)s %(message)s"
+log_date_format = "%Y-%m-%d %H:%M:%S"
+log_level = "DEBUG"
+log_cli = true
+
+python_files = "test_*.py"
+testpaths = [
+    "test",
+]
+
+
+# Coverage config
+[tool.coverage.run]
+source = ["keggtools"]
+omit = ["*/test/*"]
+
+
+# Flit sdist config
+# https://flit.pypa.io/en/latest/pyproject_toml.html#sdist-section
+[tool.flit.sdist]
+include = ["keggtools/"]
+exclude = ["docs", "test", "reproducibility",]
+

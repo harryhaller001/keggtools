@@ -1,9 +1,13 @@
 """ Global constants """
-import os
 
 
 # Example list for immune system pathways
-IMMUNE_SYSTEM_PATHWAYS = {
+# TODO: complete list of all pathways by groups
+
+from typing import Dict, List
+
+
+IMMUNE_SYSTEM_PATHWAYS: Dict[str, str] = {
     "04640": "Hematopoietic cell lineage",
     "04610": "Complement and coagulation cascades",
     "04611": "Platelet activation",
@@ -28,32 +32,45 @@ IMMUNE_SYSTEM_PATHWAYS = {
 
 
 # Constant element types in the KGML format
-
-RELATION_SUBTYPES = {
-    "activation": "-->",
-    "inhibition": "--|",
-    "expression": "-->",
-    "repression": "--|",
-    "indirect effect": "..>"
-}
+# Details at KGML manual https://www.kegg.jp/kegg/xml/docs/
 
 
-RELATION_TYPES = {
-    "ECrel": "enzyme-enzyme relation",
-    "PPrel": "protein-protein interaction",
-    "GErel": "gene expression interaction",
-    "PCrel": "protein-compound interaction",
-    "maplink": "link to another map"
-}
+RELATION_SUBTYPES: List[str] = [
+    "compound",
+    "hidden compound",
+    "activation",
+    "inhibition",
+    "expression",
+    "repression",
+    "indirect effect",
+    "state change",
+    "binding/association",
+    "dissociation",
+    "missing interaction",
+    "phosphorylation",
+    "dephosphorylation",
+    "glycosylation",
+    "ubiquitination",
+    "methylation",
+]
 
-GRAPHICS_TYPE = [
+
+RELATION_TYPES: List[str] = [
+    "ECrel",
+    "PPrel",
+    "GErel",
+    "PCrel",
+    "maplink",
+]
+
+GRAPHIC_TYPE: List[str] = [
     "rectangle",
     "circle",
     "roundrectangle",
     "line"
 ]
 
-ENTRY_TYPE = [
+ENTRY_TYPE: List[str] = [
     "ortholog",
     "enzyme",
     "reaction",
@@ -66,12 +83,7 @@ ENTRY_TYPE = [
 ]
 
 
-# KEGG cache folder name
-
-
-if os.environ.get("KEGG_DATA", None) is not None:
-    # if KEGG_DATA is set, overwrite caching dir
-    KEGG_DATA = os.environ["KEGG_DATA"]
-else:
-    # fallback to default caching dir
-    KEGG_DATA = os.path.join(os.path.dirname(__file__), ".cache")
+REACTION_TYPE: List[str] = [
+    "reversible",
+    "irreversible",
+]

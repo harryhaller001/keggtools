@@ -1,14 +1,8 @@
 
-# Ignore rendered figures
-# /figures/*.png
-/notebooks/*.csv
-
-# Ignore testing notebook
-/notebooks/testing.ipynb
-
-# Ignore all rawdata
-/notebooks/rawdata/*
-!/notebooks/rawdata/.git*
-
 *.tar.gz
+
+/rawdata
+
+# Ignore exported csv files
+*.csv
 

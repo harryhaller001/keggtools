@@ -23,7 +23,8 @@ jobs:
         strategy:
             matrix:
                 # Check for all python versions >=3.6
-                python-version: [3.6, 3.7, 3.8, 3.9]
+                # python-version: [3.6, 3.7, 3.8, 3.9]
+                python-version: [3.6]
 
         steps:
           - uses: actions/checkout@v2
@@ -35,44 +36,49 @@ jobs:
           # Install dependencies from freeze
           - name: Install dependencies
             run: |
+                sudo apt-get install -y graphviz
                 python -m pip install --upgrade pip
-                pip install mypy wheel
-                pip install -r requirements.txt
+                pip install mypy pylint pytest coverage twine setuptools types-requests responses flit
+                pip install requests scipy pydot pandas
 
-          # Install package from setup.py and static code analysis
-          - name: Static code analysis
-            run: |
-                mypy setup.py
-                python setup.py install
-                mypy -p keggtools
 
-          # Build whl and egg
-          - name: Build package
-            run: |
-                python setup.py sdist bdist_wheel
-                python -m pip install twine
-                twine check ./dist/*
 
           # Linting package
           - name: Lint
             run: |
-                python -m pip install pylint
-                pylint ./setup.py
-                pylint keggtools
+                pylint ./keggtools
+                pylint ./test/*.py
+
+
+          # Install package from setup.py and static code analysis
+          - name: Static code analysis
+            run: |
+                mypy ./test
+                mypy ./keggtools
+
 
           # Run unittest on installed package
           - name: Unit testing with pytest
             run: |
-                sudo apt-get install -y graphviz
-                python -m mypy ./test/*.py
-                python -m pylint ./test/*.py
-                python -m pip install pytest
-                pytest -p keggtools
+                pytest ./test --show-capture=log
+
+
+
+          # Build wheel and egg with flit backend
+          - name: Build package
+            run: |
+                flit build --setup-py
+                twine check --strict ./dist/*
+                flit install
+
 
           # Test and build the docs for keggtools
           - name: test and build docs
             run: |
-                python -m pip install Sphinx sphinx-rtd-theme
-                python -m mypy ./docs/conf.py
-                python -m pylint ./docs/conf.py
-                python -m sphinx ./docs ./docs/_build
+                pip install Sphinx sphinx-rtd-theme
+                mypy ./docs/conf.py
+                pylint ./docs/conf.py
+                python -m sphinx -M doctest ./docs ./docs/_build
+                python -m  sphinx -M coverage ./docs ./docs/_build
+                python -m  sphinx -M html ./docs ./docs/_build
+

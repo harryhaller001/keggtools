@@ -30,4 +30,5 @@ For more details, see :ref:`install`.
 
     install
     example
+    kgml
     api

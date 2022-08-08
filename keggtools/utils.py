@@ -1,225 +1,291 @@
 """ Basic utils for HTTP requests, parsing and rendering """
 
-
-import logging
-import math
-import os
-from datetime import datetime
+import re
 import csv
 from io import StringIO
-from tqdm import tqdm
-import requests
-# from typing import Optional, Union, Any, Iterable
+
+from typing import Dict, List, Optional, Union
+from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
 
 
+# XML parsing helper functions
 
-def getcwd():
+
+def get_attribute(element: Element, key: str) -> str:
     """
-    Return dirname of package file
-    :returnr: str
-    """
-    # return os.path.split(__file__)[0]
-    return os.path.dirname(__file__)
+    Get attribute from XML Element object. Raises KeyError is Attribute is not found or not valid.
 
-
-def get_timestamp():
-    """
-    Return timestamp
-    :return: datetime
-    """
-    return datetime.now().timestamp()
-
-
-# Code using from
-# https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks
-# Thanks to Ned Batchelder (https://stackoverflow.com/users/14343/ned-batchelder)
-def chunks(items: list, count: int):
-    """
-    Yield successive count-sized chunks from items.
-    """
-    for index in range(0, len(items), count):
-        yield items[index:index + count]
-
-
-class Downloader:
-    """
-    URL Downloader
+    :param xml.etree.ElementTree.Element element: XML element to get attribute from.
+    :param str key: Name of attribute.
+    :return: Value of attribute.
+    :rtype: str
+    :raises ValueError: Error if attribute does not exist or is wrong type.
     """
 
-    def __init__(self, url: str):
-        """
-        Init Downloader
-        :param url: str
-        """
-        self.url = url
-        self.filename = ""
+    value: Optional[str] = element.attrib.get(key)
+
+    # Check if value is not none and is string
+    if value is None or isinstance(value, str) is False:
+        raise ValueError(f"Value of attribute '{key}' is not a string.")
+
+    return value
 
 
-    def set_filename(self, filename: str):
-        """
-        Set filename for output
-        :param filename: str
-        """
-        self.filename = filename
 
-    def run(self):
-        """
-        Run Downloader
-        """
-        if not self.filename:
-            raise ValueError("Output filename not set!")
+def get_numeric_attribute(element: Element, key: str) -> str:
+    """
+    Get attribute from XML Element object. Raises KeyError is Attribute is not found or not valid.
 
-        if not self.url:
-            raise ValueError("Url not set.")
+    :param Element element: XML element to get attribute from.
+    :param str key: Name of attribute.
+    :return: Value of attribute. ValueError is raised if value is not a numeric string.
+    :rtype: str
+    :raises ValueError: Error is attribute is not a digit (numberic string), does not exist or is wrong type.
+    """
 
-        # Streaming, so we can iterate over the response.
-        response = requests.get(self.url, stream=True)
+    value: str = get_attribute(element=element, key=key)
 
-        # Total size in bytes.
-        total_size = int(response.headers.get('content-length', 0))
-        block_size = 1024
-        wrote = 0
+    # Check if string is numeric
+    if str.isnumeric(value) is False:
+        raise ValueError(f"Value of attribute '{key}' is not numeric.")
 
-        with open(self.filename, 'wb') as f_obj:
-            for data in tqdm(response.iter_content(block_size),
-                             total=math.ceil(total_size // block_size),
-                             unit='KB',
-                             unit_scale=True):
+    return value
 
-                wrote = wrote + len(data)
-                f_obj.write(data)
-        # if total_size != 0 and wrote != total_size:
-        if total_size not in (0, wrote):
-            logging.error("ERROR, something went wrong")
+
+
+def parse_xml(xml_object_or_string: Union[str, Element]) -> Element:
+    """
+    Returns XML Element object from string or XML Element.
+
+    :param typing.Union[str, xml.etree.ElementTree.Element] xml_object_or_string: Input parameter to check.
+    :return: XML element instance.
+    :rtype: xml.etree.ElementTree.Element
+    """
+    if isinstance(xml_object_or_string, str):
+        return ElementTree.fromstring(xml_object_or_string)
+    return xml_object_or_string
 
 
 
 
-def parse_tsv(data: str):
+def parse_tsv(data: str) -> list:
     """
     Parse .tsv file from string
-    :param data: str
-    :return: list
+
+    :param str data: Tsv string to parse into list.
+    :return: List of items.
+    :rtype: list
     """
-    if isinstance(data, str):
-        fstream = StringIO(data)
-    else:
-        raise TypeError("Type of 'data' must be str or bytes.")
-
-    return list(csv.reader(fstream, delimiter="\t"))
+    return list(csv.reader(StringIO(data), delimiter="\t"))
 
 
 
-def request(url: str, encoding="utf-8"):
+def parse_tsv_to_dict(
+    data: str,
+    col_keys: int = 0,
+    col_values: int = 1,
+    ) -> Dict[str, str]:
     """
-    Small request GET method. Returns string.
-    :param url: str
-    :param encoding: str
-    :return: str
+    Parse .tsv file from string and build dict from first two columns. Other columns are ignored.
+
+    :param str data: Tsv string to parse.
+    :param int col_keys: Number of colum to parse as dict keys (0-index).
+    :param int col_values: Number of colum to parse as dict values (0-index).
+    :return: Dict of two tsv columns.
+    :rtype: typing.Dict[str, str]
     """
-    logging.info("Requesting Url %s", url)
-    response = requests.get(url=url)
-    logging.info("Request finished with status code %d", response.status_code)
-    response.raise_for_status()
-    content = response.content
+    list_data: list = parse_tsv(data=data)
 
-    if isinstance(content, bytes):
-        return content.decode(encoding)
+    result: Dict[str, str] = {}
 
-    return content
+    for row in list_data:
+        if len(row) >= 2 and row[col_keys] != "":
+            result[row[col_keys]] = row[col_values]
+
+        # TODO: handle else cases or ignore silent ?
+
+    return result
+
 
 
 class ColorGradient:
     """
-    Create color gradient
+    Create color gradient.
     """
 
-    def __init__(self, start: tuple, stop: tuple, steps: int):
+    def __init__(
+        self,
+        start: tuple,
+        stop: tuple,
+        steps: int = 100
+    ) -> None:
         """
-        Init ColorGradient
-        :param start: tuple
-        :param stop: tuple
-        :param steps: int
+        Init ColorGradient instance.
+
+        :param tuple start: Color tuple
+        :param tuple stop: Color tuple
+        :param int steps: Number of steps.
         """
-        self.start = start
-        self.stop = stop
-        self.steps = steps
+        self.start: tuple = start
+        self.stop: tuple = stop
+        self.steps: int = steps
 
 
     @staticmethod
-    def to_css(color: tuple):
+    def to_css(color: tuple) -> str:
         """
-        Convert color tuple to CSS rgb color string
-        :param color: tuple
-        :return: str
+        Convert color tuple to CSS rgb color string.
+
+        :param tuple color: RGB color tuple containing 3 integers
+        :return: Color as CSS string (e.g. "rgb(0, 0, 0)").
+        :rtype: str
         """
-        return f"rgb({color[0]},{color[1]},{color[2]})"
+        # if len(color) != 3 or not all([isinstance(value, int) for value in color]):
+        #     raise ValueError("Color must be a tuple of 3 integers.")
+
+        return f"rgb({color[0]},{color[1]},{color[2]})".lower()
 
 
-    def get_list(self):
+    @staticmethod
+    def to_hex(color: tuple) -> str:
         """
-        Get Gradient Color as list
-        :return: list
+        Convert color tuple to hex color string.
+
+        :param tuple color: RGB color tuple containing 3 integers.
+        :return: Hexadecimal color string (e.g. "#000000").
+        :rtype: str
         """
+
+        # TODO: check for int type.
+        # TODO: check for 0-255 range
+
+        return f"#{color[0]:02x}{color[1]:02x}{color[2]:02x}".lower()
+
+
+    def get_list(self) -> List[str]:
+        """
+        Get gradient color as list.
+
+        :return: Returns list of hexadecimal color strings with a gradient.
+        :rtype: typing.List[str]
+        """
+
+        step_list = [index / float(self.steps) for index in range(self.steps)]
+        result = [ColorGradient._intermediate(self.stop, self.start, step) for step in step_list]
+        result.append(self.stop)
+
+
         return [
-            ColorGradient.list_to_hex(code) for code in ColorGradient._gradient(
-                self.stop,
-                self.start,
-                self.steps)
-                ]
+            ColorGradient.to_hex(code) for code in result
+        ]
 
 
     @staticmethod
-    def _intermediate(a_var, b_var, ratio):
+    def _intermediate(a_var: tuple, b_var: tuple, ratio: float) -> tuple:
         def _array_multiply(array, c_var):
             return [element * c_var for element in array]
 
         a_component = _array_multiply(a_var, ratio)
         b_component = _array_multiply(b_var, 1 - ratio)
-        return list(map(sum, zip(a_component, b_component)))
+        values: List[float] = list(map(sum, zip(a_component, b_component)))
+
+        return tuple((int(item) for item in values))
 
 
-    @staticmethod
-    def _gradient(a_var, b_var, steps):
-        steps -= 1
-        steps = [index / float(steps) for index in range(steps)]
-        result = [ColorGradient._intermediate(a_var, b_var, step) for step in steps]
-        result.append(a_var)
-        return result
 
 
-    @staticmethod
-    def list_to_hex(code: list):
-        """
-        Convert color list to CSS hex color string
-        :param code: list
-        :return: str
-        """
-        return "#" + "".join([f"{num:02x}" for num in code])
+
+def is_valid_pathway_org(value: str) -> bool:
+    """
+    Check if organism identifier is valid.
+
+    :param str value: String value to check.
+    :return: Returns True if value is a valid organism code.
+    :rtype: bool
+    """
+
+    # Organism must be 3 letter code
+    # Identifier can also be KO or Enzyme identifer
+    # TODO: validate with KEGG organism list
+    return re.match(pattern=r"^(ko|ec|[a-z]{3})$", string=value) is not None
 
 
-    def render_graphviz(self):
-        """
-        Testing function using graphviz
-        :return: str
-        """
-        result = self.get_list()
-        string = ["digraph G {"]
-        for i in range(0, 20):
-            # result[i]
-            string.append(f"\tnode[color = \"{result[i]}\" style = filled] {i};")
+def is_valid_pathway_number(value: str) -> bool:
+    """
+    Check if pathway number has correct 5 digit format.
 
-        string.append("\t" + " -> ".join([str(l) for l in range(0, 20)]))
-        string.append("}")
-        return "\n".join(string)
+    :param str value: String value to check.
+    :return: Returns True if value has the correct format of pathway number.
+    :rtype: bool
+    """
+
+    # KEGG pathway number must be a 5 digit number
+    return re.match(pattern=r"^([0-9]{5})$", string=value) is not None
 
 
-if __name__ == "__main__":
+def is_valid_pathway_name(value: str) -> bool:
+    """
+    Check if combined pathway identifer is valid. String must match "path:<org><number>".
 
-    logging.basicConfig(level=logging.DEBUG)
+    :param str value: String value to check.
+    :return: Returns True if value matches format of pathway name.
+    :rtype: bool
+    """
 
-    COLOR_GRADIENT = ColorGradient(start=(0, 179, 0), stop=(187, 0, 0), steps=20)
-    print(COLOR_GRADIENT.get_list())
-    print(COLOR_GRADIENT.render_graphviz())
+    return re.match(pattern=r"^path:(ko|ec|[a-z]{3})([0-9]{5})$", string=value) is not None
 
-    request("http://example.com/")
+
+def is_valid_hex_color(value: str) -> bool:
+    """
+    Check if string is a valid hex color.
+
+    :param str value: String value to check.
+    :return: Returns True if value is valid hexadecimal color string.
+    :rtype: bool
+    """
+    return re.match(pattern=r"^\#([a-fA-F0-9]{6})$", string=value) is not None
+
+
+def is_valid_gene_name(value: str) -> bool:
+    """
+    Check if gene identifer is valid. String must match "<org>:<number>".
+
+    :param str value: String value to check.
+    :return: Returns True if value matches format of gene name.
+    :rtype: bool
+    """
+
+    # TODO Support ko|ec entries ???
+    return re.match(pattern=r"^([a-z]{3}):([0-9]{5})$", string=value) is not None
+
+
+
+# TODO: is a custom warning class needed
+# class MissingDataWarning(Warning):
+#     """
+#     Warning to alert user of missing data.
+#     """
+
+#     def __init__(self, message: str) -> None:
+#         """
+#         Init custom missing data warning instance.
+
+#         :param str message: Message of missing data warning.
+#         """
+
+#         # Call super init method
+#         super().__init__()
+
+#         self.message: str = message
+
+
+#     def __str__(self) -> str:
+#         """
+#         Missing data warning instance to string.
+
+#         :return: String of message.
+#         :rtype: str
+#         """
+
+#         return repr(self.message)

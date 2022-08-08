@@ -12,14 +12,13 @@ Dependencies
 `python` dependencies
 
 * `requests`
-* `tqdm`
 * `pydot`
 * `scipy>=1.5.4`
 
 Installation of `python` dependencies:
 
 ```bash
-python3 -m pip install requests tqdm pydot scipy
+python3 -m pip install requests pydot scipy
 ```
 
 

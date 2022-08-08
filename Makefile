@@ -3,15 +3,17 @@
 
 PACKAGE_NAME	= keggtools
 
+BASE_DIR		= ${PWD}
+
 PYTHON_OPT		= python3
 PIP_OPT			= $(PYTHON_OPT) -m pip
 MYPY_OPT		= $(PYTHON_OPT) -m mypy
 LINT_OPT		= $(PYTHON_OPT) -m pylint
 TEST_OPT		= $(PYTHON_OPT) -m pytest
 TWINE_OPT		= $(PYTHON_OPT) -m twine
-BANDIT_OPT		= $(PYTHON_OPT) -m bandit
 SPHINX_OPT		= $(PYTHON_OPT) -m sphinx
-
+COVERAGE_OPT	= $(PYTHON_OPT) -m coverage
+FLIT_OPT		= $(PYTHON_OPT) -m flit
 
 # Run help by default
 
@@ -29,51 +31,48 @@ help: ## This help.
 
 .PHONY: install
 install: ## install all python dependencies
-	$(PIP_OPT) install mypy pylint pytest twine setuptools types-requests --upgrade
-	$(PIP_OPT) install requests scipy pydot tqdm --upgrade
-	$(PYTHON_OPT) setup.py install
+	@$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests responses flit pre-commit --upgrade
+	@$(PIP_OPT) install requests scipy pydot pandas --upgrade
+	@$(PIP_OPT) install Sphinx sphinx-rtd-theme --upgrade
+
 
 
 .PHONY: freeze
 freeze: ## Freeze package dependencies
-	$(PIP_OPT) freeze | grep -E "requests==|tqdm==|pydot==|scipy==" > requirements.txt
-	$(PIP_OPT) freeze --exclude keggtools > requirements-dev.txt
-
-
-# .PHONY: devfreeze
-# devfreeze: ## Freeze all dependencies for development
-# 	$(PIP_OPT) freeze --exclude keggtools > requirements-dev.txt
-
-
+	@$(PIP_OPT) freeze --exclude keggtools > requirements.txt
 
 
 
 .PHONY: twine
 twine: ## Twine package upload and checks
-	$(PYTHON_OPT) setup.py install
-	$(PYTHON_OPT) setup.py sdist bdist_wheel
-	$(TWINE_OPT) check ./dist/*
+
+# Build package with flit backend
+	@$(FLIT_OPT) build --setup-py
+
+# Check package using twine
+	@$(TWINE_OPT) check --strict ./dist/*
+
+# Install package with flit
+	@$(FLIT_OPT) install
+
 
 
 .PHONY: pylint
 pylint: ## Linting package
-	$(LINT_OPT) keggtools
-	$(LINT_OPT) ./setup.py
-	$(LINT_OPT) ./test/*.py
+	@$(LINT_OPT) keggtools
+	@$(LINT_OPT) ./test/*.py
+	@$(LINT_OPT) ./docs/conf.py
 
 
 .PHONY: pytest
 pytest: ## Unittest of package
-	$(MYPY_OPT) ./test/test_package.py
-	$(LINT_OPT) ./test/test_package.py
-	$(TEST_OPT) -p keggtools --show-capture=log
+	@$(TEST_OPT) -p keggtools --show-capture=log
 
 
 .PHONY: mypy
 mypy: ## Run static code analysis
-	@$(MYPY_OPT) setup.py
-	@$(MYPY_OPT) ./test
-	@$(MYPY_OPT) ./docs
+	@$(MYPY_OPT) ./test/*.py
+	@$(MYPY_OPT) ./docs/conf.py
 	@$(MYPY_OPT) -p keggtools
 
 
@@ -82,44 +81,47 @@ mypy: ## Run static code analysis
 .PHONY: clean
 clean: ## Clean all build and caching directories
 
+# Remove old keggtools package
+	@pip uninstall keggtools -y --quiet
+
 # Remove package build folders
-	rm -rf ./build
-	rm -rf ./dist
-	rm -rf ./$(PACKAGE_NAME).egg-info
+	@rm -rf ./build
+	@rm -rf ./dist
+	@rm -rf ./$(PACKAGE_NAME).egg-info
 
 # Remove mypy and pytest caching folders
-	rm -rf ./.mypy_cache
-	rm -rf ./.pytest_cache
+	@rm -rf ./.mypy_cache
+	@rm -rf ./.pytest_cache
+	@rm -rf ./coverage
+	@rm -f .coverage
 
 # Remove build folders for docs
-	rm -rf ./docs/_build
-	rm -rf ./docs/dist
-	rm -rf ./docs/cloudflare-workers/node_modules
-	@echo "All build and caching folders removed"
+	@rm -rf ./docs/_build
+	@rm -rf ./docs/dist
+	@rm -rf ./docs/cloudflare-workers/node_modules
 
-
-
-# TODO: fix all common vulnerabilies in package
-.PHONY: bandit
-bandit: ## Run bandit analysis to find common security issues in code
-	$(BANDIT_OPT) -r ./keggtools
-	$(BANDIT_OPT) -r ./test
-	$(BANDIT_OPT) setup.py
-	$(BANDIT_OPT) -r ./docs/*.py
 
 
 
 .PHONY: docs
-docs:
-	$(PIP_OPT) install Sphinx sphinx-rtd-theme --upgrade
-	$(MYPY_OPT) ./docs/conf.py
-	$(LINT_OPT) ./docs/conf.py
-	$(SPHINX_OPT) ./docs ./docs/_build
+docs: ## Build sphinx docs
+	@rm -rf ./docs/_build
+	@$(SPHINX_OPT) -M doctest ./docs ./docs/_build
+	@$(SPHINX_OPT) -M coverage ./docs ./docs/_build
+
+# TODO: add latex pdf version of docs and copy to static files to include in HTML version
+#	@$(SPHINX_OPT) -M latexpdf ./docs ./docs/_build && cp ./docs/_build/latex/keggtools.pdf ./docs/static/keggtools.pdf
+
+
+# Build HTML version
+	@$(SPHINX_OPT) -M html ./docs ./docs/_build
+
+
 
 
 # Run all checks (always before committing!)
 .PHONY: check
-check: clean freeze pylint mypy coverage twine docs ## Full check of package
+check: clean install freeze pylint mypy coverage twine docs precommit ## Full check of package
 
 
 
@@ -131,4 +133,11 @@ coverage: ## Run Coverage
 
 # Long coverage report
 	@$(COVERAGE_OPT) report -m
+
+
+
+.PHONY : precommit
+precommit: ## Run precommit file
+	@pre-commit run --all-files --verbose
+
 

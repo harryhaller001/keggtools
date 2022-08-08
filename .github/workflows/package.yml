@@ -78,7 +78,7 @@ jobs:
                 pip install Sphinx sphinx-rtd-theme
                 mypy ./docs/conf.py
                 pylint ./docs/conf.py
-                sphinx -M doctest ./docs ./docs/_build
-                sphinx -M coverage ./docs ./docs/_build
-                sphinx -M html ./docs ./docs/_build
+                python -m sphinx -M doctest ./docs ./docs/_build
+                python -m  sphinx -M coverage ./docs ./docs/_build
+                python -m  sphinx -M html ./docs ./docs/_build
 

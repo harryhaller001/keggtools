@@ -46,7 +46,7 @@ jobs:
           # Linting package
           - name: Lint
             run: |
-                pylint keggtools
+                pylint ./keggtools
                 pylint ./test/*.py
 
 
@@ -54,13 +54,13 @@ jobs:
           - name: Static code analysis
             run: |
                 mypy ./test
-                mypy -p keggtools
+                mypy ./keggtools
 
 
           # Run unittest on installed package
           - name: Unit testing with pytest
             run: |
-                pytest -p keggtools --show-capture=log
+                pytest ./test --show-capture=log
 
 
 

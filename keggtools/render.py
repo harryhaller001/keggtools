@@ -447,6 +447,24 @@ class Renderer:
                     pass
 
 
+                # TODO: add pathway map to dot graph
+                # elif entry.type == "map":
+
+                #     if entry.graphics is not None and entry.graphics.name is not None:
+                #         entry_label = entry.graphics.name # .split(", ")[0]
+
+                #     # Add map node to graph
+                #     self.graph.add_node(Node(
+                #         name=entry.id,
+                #         label=entry_label,
+                #         shape="rectangle",
+                #         style="rounded,filled",
+                #         color="#000000",
+                #         fillcolor="#ffffff",
+                #     ))
+
+
+
         for rel in self.pathway.relations:
 
             # Create edge instance from relation enties

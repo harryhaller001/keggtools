@@ -15,12 +15,6 @@ Dependencies
 * `pydot`
 * `scipy>=1.5.4`
 
-Installation of `python` dependencies:
-
-```bash
-python3 -m pip install requests pydot scipy
-```
-
 
 Installation `keggtools` package using `pip`:
 
@@ -36,17 +30,16 @@ To get a more detailed list of install options, please read the `INSTALL.md`
 
 
 ```python
-from keggtools.resolver import KEGGPathwayResolver
-from keggtools.const import IMMUNE_SYSTEM_PATHWAYS
+from keggtools import Resolver, IMMUNE_SYSTEM_PATHWAYS
 
 ORGANISM_ID = "hsa"
-resolver = KEGGPathwayResolver(org=ORGANISM_ID)
+resolver = Resolver()
 
 # Select first immune system pathway as example
 pathway_id = list(IMMUNE_SYSTEM_PATHWAYS.keys())[1]
 
 # Resolve pathway
-pathway = resolver.get_pathway(code=pathway_id)
+pathway = resolver.get_pathway(organism=ORGANISM_ID, code=pathway_id)
 print(pathway)
 ```
 
@@ -54,10 +47,13 @@ print(pathway)
 ### Enrichment and Testing
 
 ```python
-from keggtools.analysis import KEGGPathwayAnalysis
+from keggtools import Enrichment
+
+# Add pathway object to list
+pathway_list = []
 
 # Init analysis with organism code
-analysis = KEGGPathwayAnalysis(org=ORGANISM_ID)
+analysis = Enrichment(pathways=pathway_list)
 
 # Study genes as list of entrez gene id's
 study_genes = []
@@ -71,19 +67,16 @@ print(result.head())
 ### Rendering
 
 ```python
-import pydot
-from keggtools.render import KEGGPathwayRenderer
+from keggtools.render import Renderer
 
 # Load and parse pathway
-pathway = KEGGPathwayResolver(org=ORGANISM_ID).get_pathway(pathway_id)
-renderer = KEGGPathwayRenderer(kegg_pathway=pathway)
+renderer = Renderer(kegg_pathway=pathway)
 
 # Render to dot graph
-dot_string = renderer.raw_render()
+renderer.render()
 
-# Export dot graph as png
-graphs = pydot.graph_from_dot_data(dot_string)[0]
-graph.write_png("./output.png")
+# Export to png
+renderer.to_file("output.png", extension="png")
 ```
 
 ## Development
@@ -96,44 +89,48 @@ Fast install with `virtualenv` for development.
 python3 -m virtualenv venv
 source ./venv/bin/activate
 pip install --upgrade pip
+
+# Install from requirements
 pip install -r requirements.txt
+
+# Or use makefile
+make install
 ```
 
-### Testing
 
-Run unittest to verify `keggtools` installation
 
-```bash
-# Install pytest
-python3 -m pip install pytest
+### Linting
 
-# Run unittest for package
-pytest -p keggtools --show-capture=log
-```
-
-Alternatively, the `Makefile` can be used:
+Run linting with `pylint` for `keggtools` package.
 
 ```bash
-make unittest
+# Run linting for package
+make pylint
 ```
 
 ### Static code analysis
 
-Static code analysis using `mypy`
+Static code analysis using `mypy`. Run static code analysis with `mypy`.
 
 ```bash
-# Install mypy
-python3 -m pip install mypy
-
-# Or install full development requirements
-pip install -r dev_requirements.txt
+# Run static code analysis
+make mypy
 ```
 
-Run static code analysis with `mypy`
+### Testing
+
+Run unittest for `keggtools` package.
 
 ```bash
-mypy setup.py
-python3 setup.py install
-mypy -p keggtools
+# Run unittest for package
+make pytest
 ```
 
+### Install package from repo
+
+The package is using the `flit` backend with a `pyproject.toml` and `twine`. To install from repo use
+
+```bash
+# Install package from repo
+make twine
+```

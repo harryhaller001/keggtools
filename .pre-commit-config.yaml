@@ -17,6 +17,17 @@ repos:
 
     -   id: detect-private-key
 
+-   repo: local
+    hooks:
+
+    # Clear cells in jupyter notebooks
+    -   id: jupyter-nb-clear-output
+        name: jupyter-nb-clear-output
+        files: \.ipynb$
+        stages: [commit]
+        language: system
+        entry: jupyter nbconvert ./reproducibility/*.ipynb --ClearOutputPreprocessor.enabled=True --inplace
+
 
 # add pytest hook
 # -   repo: local

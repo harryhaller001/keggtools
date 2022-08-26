@@ -106,6 +106,17 @@ clean: ## Clean all build and caching directories
 .PHONY: docs
 docs: ## Build sphinx docs
 	@rm -rf ./docs/_build
+
+# Generate dot graphics
+	dot ./reproducibility/figures/figure1.dot -Tpng -Gdpi=300 > ./reproducibility/figures/figure1.png
+	dot ./reproducibility/figures/figure5.dot -Tpng -Gdpi=300 > ./reproducibility/figures/figure5.png
+
+# Copy figures to docs folder
+	cp ./reproducibility/figures/figure1.png ./docs/media/kgml-schema.png
+	cp ./reproducibility/figures/figure4.png ./docs/media/keggtools-enrichment.png
+	cp ./reproducibility/figures/figure5.png ./docs/media/keggtools-pathway.png
+
+
 	@$(SPHINX_OPT) -M doctest ./docs ./docs/_build
 	@$(SPHINX_OPT) -M coverage ./docs ./docs/_build
 
@@ -115,6 +126,7 @@ docs: ## Build sphinx docs
 
 # Build HTML version
 	@$(SPHINX_OPT) -M html ./docs ./docs/_build
+
 
 
 
@@ -140,4 +152,11 @@ coverage: ## Run Coverage
 precommit: ## Run precommit file
 	@pre-commit run --all-files --verbose
 
+
+.PHONY : pdf
+pdf: ## Generate Pdf file from latex
+
+	cd ./reproducibility/latex; \
+	biber paper; \
+	pdflatex paper.tex
 

@@ -28,30 +28,30 @@ Data types
 
     * - string.type
       - Simple string type.
-      - :code:`^$`
+      -
 
     * - url.type
       - String of url to locate web resource.
-      - :code:`^$`
+      -
 
     * - keggid.type
-      - 
-      - :code:`^$`
+      - KEGG database identifier.
+      -
 
     * - maporg.type
-      - 
-      - :code:`^$`
+      - Organism of KEGG pathway.
+      -
 
     * - mapnumber.type
-      - 
-      - :code:`^$`
+      - Identifier of KEGG pathway.
+      - :code:`^([0-9]+)$`
 
     * - id.type
-      - 
-      - :code:`^$`
+      - Identifier of element in pathway.
+      - :code:`^([0-9]+)$`
 
     * - entry-type.type
-      - 
+      - Type of entry in KEGG pathway.
       - See list of valid entry types.
 
     * - number.type
@@ -59,7 +59,7 @@ Data types
       - :code:`^([0-9]+)$`
 
     * - graphics.type
-      - 
+      - Type of graphics element.
       - See list of valid graphics types.
 
     * - graphics-color.type
@@ -67,23 +67,23 @@ Data types
       - :code:`^#([0-9a-fA-F]{6})$`
 
     * - idref.type
-      - 
-      - :code:`^$`
+      - Reference to other element identifier of type `id.type`.
+      - :code:`^([0-9]+)$`
 
     * - relation-type.type
-      - 
+      - Type of relation element.
       - See list of valid relation types.
 
     * - subtype-name.type
-      - 
+      - Subtype name.
       - See list of valid subtype names.
 
     * - subtype-value.type
-      -
+      - Subtype value.
       - See list of valid subtype values.
 
     * - reaction-type.type
-      - 
+      - Type of reaction.
       - See list of valid reaction types.
 
 

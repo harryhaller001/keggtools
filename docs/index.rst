@@ -10,7 +10,7 @@ keggtools
 
 Library for KEGG pathway enrichment analysis.
 
-.. image:: media/keggtools-pathway.png
+.. image:: media/keggtools-enrichment.png
 
 
 Quick Start

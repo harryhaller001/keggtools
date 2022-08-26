@@ -1,7 +1,7 @@
 """ Init keggtools module """
 
 
-__version__: str = "0.5.0"
+__version__: str = "1.0.0"
 
 from .analysis import EnrichmentResult, Enrichment
 from .const import IMMUNE_SYSTEM_PATHWAYS

@@ -1,6 +1,6 @@
 """ Resolve requests to KEGG data Api """
 
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 # from warnings import warn
 
 import requests
@@ -13,17 +13,17 @@ from .storage import Storage
 from .models import Pathway
 
 
-def _request(url: str) -> str:
+def _request(url: str, **kwargs: Any) -> str:
     """
     Url request helper function.
 
     :param str url: Url to request from.
+    :param kwargs: other arguments to `requests.get` 
     """
 
-    response = requests.get(url=url)
+    response = requests.get(url=url, **kwargs)
     response.raise_for_status()
     return response.content.decode(encoding="utf-8")
-
 
 
 def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
@@ -43,7 +43,8 @@ def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
     # Check maximum number of entries requests
     # TODO: build fallback to make multiple requests from long lists (iterate over list chunks)
     if len(genes) > max_genes:
-        raise ValueError(f"Too many entries are requested at once ({len(genes)}/50).")
+        raise ValueError(
+            f"Too many entries are requested at once ({len(genes)}/50).")
 
     # TODO check if pattern of identifer is correct
     # for item in genes:
@@ -57,14 +58,14 @@ def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
     query_string: str = "+".join(genes)
 
     # Request without cache
-    resolve_dict: Dict[str, str] = parse_tsv_to_dict(data=_request(f"http://rest.kegg.jp/list/{query_string}"))
+    resolve_dict: Dict[str, str] = parse_tsv_to_dict(
+        data=_request(f"http://rest.kegg.jp/list/{query_string}"))
 
     # Sanitize dict by splitting first entry of gene name
     result_dict: Dict[str, str] = {}
 
     for key, value in resolve_dict.items():
         result_dict[key] = value.split(", ")[0]
-
 
     # Check if all genes are in dict
     # for item in genes:
@@ -73,7 +74,6 @@ def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
     #             message=f"Gene identifer '{item}' could not be resolved by API request.",
     #             category=UserWarning,
     #         )
-
 
     return result_dict
 
@@ -107,21 +107,21 @@ class Resolver:
             # Fallback to default storage with hard coded folder name
             _store = Storage()
 
-
         # Internal storage instance
         self.storage: Storage = _store
-
 
     def _cache_or_request(
         self,
         filename: str,
         url: str,
-        ) -> str:
+        **kwargs: Any,
+    ) -> str:
         """
         Load file from cache folder. If file does not exist, request from given url.
 
         :param str filename: Filename to store in cache folder.
         :param str url: Url to online resource to request if file is not present in cache folder.
+        :param Any kwargs: Other arguments to requests.get 
         :return: Returns content of file as string.
         :rtype: str
         """
@@ -137,20 +137,18 @@ class Resolver:
 
             # Data not found in cache. Request from REST api
 
-            file_data = _request(url=url)
+            file_data = _request(url=url, **kwargs)
 
             # Save in storage
             self.storage.save(filename=filename, data=file_data)
 
         return file_data
 
-
-
-
     def get_pathway_list(
         self,
         organism: str,
-        ) -> Dict[str, str]:
+        **kwargs
+    ) -> Dict[str, str]:
         """
         Request list of pathways linked to organism.
 
@@ -166,12 +164,11 @@ class Resolver:
         # path:mmu00010	Glycolysis / Gluconeogenesis - Mus musculus (mouse)
         # path:<org><code>\t<name> - <org>
 
-
         list_data: str = self._cache_or_request(
             filename=f"pathway_list_{organism}.tsv",
-            url=f"http://rest.kegg.jp/list/pathway/{organism}"
+            url=f"http://rest.kegg.jp/list/pathway/{organism}",
+            **kwargs
         )
-
 
         pathways: Dict[str, str] = parse_tsv_to_dict(
             data=list_data,
@@ -180,12 +177,12 @@ class Resolver:
         # return pathway list
         return pathways
 
-
     def get_pathway(
         self,
         organism: str,
         code: str,
-        ) -> Pathway:
+        **kwargs
+    ) -> Pathway:
         """
         Load and parse KGML pathway by identifier.
 
@@ -200,14 +197,13 @@ class Resolver:
         data: str = self._cache_or_request(
             filename=f"{organism}_path{code}.kgml",
             url=f"http://rest.kegg.jp/get/{organism}{code}/kgml",
+            **kwargs
         )
 
         # Parse string
         return Pathway.parse(data)
 
-
-
-    def get_compounds(self) -> Dict[str, str]:
+    def get_compounds(self, **kwargs) -> Dict[str, str]:
         """
         Get dict of components. Request from KEGG API if not in cache.
 
@@ -218,6 +214,7 @@ class Resolver:
         compound_data: str = self._cache_or_request(
             filename="compound.tsv",
             url="http://rest.kegg.jp/list/compound",
+            **kwargs
         )
 
         # Parse tsv string
@@ -225,9 +222,7 @@ class Resolver:
 
         return result
 
-
-
-    def get_organism_list(self) -> Dict[str, str]:
+    def get_organism_list(self, **kwargs) -> Dict[str, str]:
         """
         Get organism codes from file or KEGG API.
 
@@ -237,7 +232,8 @@ class Resolver:
 
         data: str = self._cache_or_request(
             filename="organism.tsv",
-            url="http://rest.kegg.jp/list/organism"
+            url="http://rest.kegg.jp/list/organism",
+            **kwargs
         )
 
         result: Dict[str, str] = parse_tsv_to_dict(
@@ -247,7 +243,6 @@ class Resolver:
         )
 
         return result
-
 
     def check_organism(self, organism: str) -> bool:
         """

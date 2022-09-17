@@ -56,7 +56,7 @@ def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
     #         )
 
     # Build query string
-    query_string: str = " ".join(genes)
+    query_string: str = "+".join(genes)
 
     # Request without cache
     resolve_dict: Dict[str, str] = parse_tsv_to_dict(

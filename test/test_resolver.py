@@ -53,6 +53,11 @@ def test_get_gene_names() -> None:
         get_gene_names(genes=["mmu:12345"] * 51)
 
 
+    # Check Value error if no genes are provided
+    with pytest.raises(ValueError):
+        get_gene_names(genes=[])
+
+
 
 def test_resolver_init(storage: Storage) -> None:
     """

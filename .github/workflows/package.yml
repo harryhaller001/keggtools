@@ -3,9 +3,9 @@ name: Package testing
 
 on:
     workflow_dispatch:
-    # push:
-    #     branches:
-    #         - main
+    push:
+        branches:
+            - main
 
     # Run action when pull request is opened
     pull_request:

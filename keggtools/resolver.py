@@ -2,14 +2,9 @@
 
 from typing import Any, Dict, List, Optional, Union
 
-# from warnings import warn
-
 import requests
 
-from .utils import (
-    parse_tsv_to_dict,
-    # is_valid_gene_name,
-)
+from .utils import parse_tsv_to_dict
 from .storage import Storage
 from .models import Pathway
 
@@ -19,12 +14,38 @@ def _request(url: str, **kwargs: Any) -> str:
     Url request helper function.
 
     :param str url: Url to request from.
-    :param kwargs: other arguments to `requests.get`
+    :param typing.Any kwargs: other arguments to `requests.get`.
+    :return: Payload decoded to string.
+    :rtype: str
     """
 
     response = requests.get(url=url, **kwargs)
     response.raise_for_status()
     return response.content.decode(encoding="utf-8")
+
+
+def _request_to_dict(
+    url: str,
+    col_keys: int = 0,
+    col_values: int = 1,
+    **kwargs: Any,
+    ) -> Dict[str, str]:
+    """
+    Request TSV resource from Url and parse to dict.
+
+    :param str url: Url to request.
+    :param int col_keys: Number of column representing keys of dict.
+    :param int col_values: Number of column representing values of dict.
+    :param typing.Any kwargs: other arguments to `requests.get`.
+    :return: TSV parsed to dict.
+    :rtype: typing.Dict[str, str]
+    """
+
+    return parse_tsv_to_dict(
+        data=_request(url=url, **kwargs),
+        col_keys=col_keys,
+        col_values=col_values
+    )
 
 
 def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
@@ -59,9 +80,7 @@ def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
     query_string: str = "+".join(genes)
 
     # Request without cache
-    resolve_dict: Dict[str, str] = parse_tsv_to_dict(
-        data=_request(f"http://rest.kegg.jp/list/{query_string}")
-    )
+    resolve_dict: Dict[str, str] = _request_to_dict(url=f"http://rest.kegg.jp/list/{query_string}")
 
     # Sanitize dict by splitting first entry of gene name
     result_dict: Dict[str, str] = {}
@@ -109,6 +128,7 @@ class Resolver:
         # Internal storage instance
         self.storage: Storage = _store
 
+
     def _cache_or_request(
         self,
         filename: str,
@@ -120,7 +140,7 @@ class Resolver:
 
         :param str filename: Filename to store in cache folder.
         :param str url: Url to online resource to request if file is not present in cache folder.
-        :param Any kwargs: Other arguments to requests.get
+        :param typing.Any kwargs: Other arguments to requests.get
         :return: Returns content of file as string.
         :rtype: str
         """
@@ -143,11 +163,41 @@ class Resolver:
 
         return file_data
 
-    def get_pathway_list(self, organism: str, **kwargs) -> Dict[str, str]:
+
+    def _cache_or_request_to_dict(
+        self,
+        filename: str,
+        url: str,
+        col_keys: int = 0,
+        col_values: int = 1,
+        **kwargs: Any
+    ) -> Dict[str, str]:
+        """
+        Load and parse TSV file from cache folder and return two columns as dict. If file does not exist, request
+        from given url.
+
+        :param str filename: Filename to store in cache folder.
+        :param str url: Url to online resource to request if file is not present in cache folder.
+        :param int col_keys: Number of colum to parse as dict keys (0-index).
+        :param int col_values: Number of colum to parse as dict values (0-index).
+        :param typing.Any kwargs: Other arguments to `requests.get`.
+        :return: Dict of two tsv columns.
+        :rtype: typing.Dict[str, str]
+        """
+
+        # Load data
+        tsv_data: str = self._cache_or_request(filename=filename, url=url, **kwargs)
+
+        # Parse tsv data to dict
+        return parse_tsv_to_dict(data=tsv_data, col_keys=col_keys, col_values=col_values)
+
+
+    def get_pathway_list(self, organism: str, **kwargs: Any) -> Dict[str, str]:
         """
         Request list of pathways linked to organism.
 
         :param str organism: 3 letter organism code used by KEGG database.
+        :param typing.Any kwargs: other arguments to `requests.get`.
         :return: Dict in format {<pathway-id>: <name>}.
         :rtype: typing.Dict[str, str]
         """
@@ -159,23 +209,20 @@ class Resolver:
         # path:mmu00010	Glycolysis / Gluconeogenesis - Mus musculus (mouse)
         # path:<org><code>\t<name> - <org>
 
-        list_data: str = self._cache_or_request(
+        return self._cache_or_request_to_dict(
             filename=f"pathway_list_{organism}.tsv",
             url=f"http://rest.kegg.jp/list/pathway/{organism}",
-            **kwargs,
+            **kwargs
         )
 
-        pathways: Dict[str, str] = parse_tsv_to_dict(data=list_data)
 
-        # return pathway list
-        return pathways
-
-    def get_pathway(self, organism: str, code: str, **kwargs) -> Pathway:
+    def get_pathway(self, organism: str, code: str, **kwargs: Any) -> Pathway:
         """
         Load and parse KGML pathway by identifier.
 
         :param str organism: 3 letter organism code used by KEGG database.
         :param str code: Pathway identify used by KEGG database.
+        :param typing.Any kwargs: other arguments to `requests.get`.
         :return: Returns parsed Pathway instance.
         :rtype: Pathway
         """
@@ -191,39 +238,40 @@ class Resolver:
         # Parse string
         return Pathway.parse(data)
 
-    def get_compounds(self, **kwargs) -> Dict[str, str]:
+
+    def get_compounds(self, **kwargs: Any) -> Dict[str, str]:
         """
         Get dict of components. Request from KEGG API if not in cache.
 
+        :param typing.Any kwargs: other arguments to `requests.get`.
         :return: Dict of compound identifier to compound name.
         :rtype: typing.Dict[str, str]
         """
 
-        compound_data: str = self._cache_or_request(
-            filename="compound.tsv", url="http://rest.kegg.jp/list/compound", **kwargs
+        return self._cache_or_request_to_dict(
+            filename="compound.tsv",
+            url="http://rest.kegg.jp/list/compound",
+            **kwargs,
         )
 
-        # Parse tsv string
-        result: Dict[str, str] = parse_tsv_to_dict(data=compound_data)
 
-        return result
-
-    def get_organism_list(self, **kwargs) -> Dict[str, str]:
+    def get_organism_list(self, **kwargs: Any) -> Dict[str, str]:
         """
         Get organism codes from file or KEGG API.
 
+        :param typing.Any kwargs: other arguments to `requests.get`.
         :return: Dict with format {<org>: <org-name>}
         :rtype: typing.Dict[str, str]
         """
 
-        data: str = self._cache_or_request(
-            filename="organism.tsv", url="http://rest.kegg.jp/list/organism", **kwargs
+        return self._cache_or_request_to_dict(
+            filename="organism.tsv",
+            url="http://rest.kegg.jp/list/organism",
+            col_keys=1,
+            col_values=2,
+            **kwargs,
         )
 
-        result: Dict[str, str] = parse_tsv_to_dict(
-            data=data, col_keys=1, col_values=2)
-
-        return result
 
     def check_organism(self, organism: str) -> bool:
         """

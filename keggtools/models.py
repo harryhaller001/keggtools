@@ -266,6 +266,8 @@ class Graphics:
     Graphics information for rendering.
     """
 
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(
         self,
         x: Optional[str] = None,
@@ -291,6 +293,8 @@ class Graphics:
         :param typing.Optional[str] fgcolor:
         :param typing.Optional[str] bgcolor:
         """
+
+        # pylint: disable=too-many-arguments
 
         # All parameter are implied (optional)
         self.x: Optional[str] = x
@@ -434,6 +438,8 @@ class Entry:
         :param typing.Optional[str] link: Link to KEGG database with reference to entry.
         :param typing.Optional[str] reaction: Reaction TODO: specify. Is str format correct?
         """
+
+        # pylint: disable=too-many-arguments
 
         # required
         self.id: str = id
@@ -935,6 +941,8 @@ class Pathway:
         :param typing.Optional[str] image: Image for pathway provided by KEGG database.
         :param typing.Optional[str] link: Link to pathway in KEGG database.
         """
+
+        # pylint: disable=too-many-arguments
 
         # required parameter of pathway element
         self.name: str = name

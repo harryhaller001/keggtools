@@ -137,6 +137,8 @@ class Renderer:
         :param typing.Tuple[int, int, int] lower_color: Color for lower bound of color gradient.
         """
 
+        # pylint: disable=too-many-arguments
+
         # Pathway instance to render
         self.pathway: Pathway = kegg_pathway
 

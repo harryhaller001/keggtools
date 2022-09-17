@@ -150,7 +150,8 @@ coverage: ## Run Coverage
 
 .PHONY : precommit
 precommit: ## Run precommit file
-	@pre-commit run --all-files --verbose
+#	@pre-commit run --all-files --verbose
+	@pre-commit run --all-files
 
 
 .PHONY : pdf

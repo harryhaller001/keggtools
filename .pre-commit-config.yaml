@@ -22,7 +22,7 @@ repos:
 
     # Clear cells in jupyter notebooks
     -   id: jupyter-nb-clear-output
-        name: jupyter-nb-clear-output
+        name: Check notebook cells
         files: \.ipynb$
         stages: [commit]
         language: system
@@ -30,22 +30,33 @@ repos:
 
 
 # add pytest hook
-# -   repo: local
-#     hooks:
-#     -   id: pytest
-#         name: pytest
-#         stages: [commit]
-#         language: system
-#         entry: pytest -p keggtools --show-capture=log
-#         types: [python]
-#         pass_filenames: false
-#         always_run: true
+-   repo: local
+    hooks:
+    # -   id: mypy
+    #     name: Run static code analysis
+    #     stages: [commit]
+    #     language: system
+    #     entry: bash -c 'mypy "$@" || true' --
+    #     types: [python]
+    #     pass_filenames: true
+    #     always_run: false
 
 
+    # -   id: pylint
+    #     name: Run linting
+    #     stages: [commit]
+    #     language: system
+    #     entry: bash -c 'pylint "$@" || true' --
+    #     types: [python]
+    #     pass_filenames: true
+    #     always_run: false
 
-# TODO: add mypy, pylint and coverage hook
-# -   repo: https://github.com/pre-commit/mirrors-mypy
-#     rev: v0.782
-#     hooks:
-#     -   id: mypy
 
+    -   id: pytest
+        name: Run unittest
+        stages: [commit]
+        language: system
+        entry: pytest -p keggtools --show-capture=log
+        types: [python]
+        pass_filenames: false
+        always_run: true

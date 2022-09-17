@@ -1142,21 +1142,22 @@ class Pathway:
         return f"<Pathway path:{self.org}{self.number} title='{self.title}'>"
 
 
-    def merge(self) -> "Pathway":
-        """
-        Merge identical entries in Pathway together and generate new pathway instance.
+    # TODO: has to be implemented
+    # def merge(self) -> "Pathway":
+    #     """
+    #     Merge identical entries in Pathway together and generate new pathway instance.
 
-        :return: Merged Pathway instance.
-        :rtype: Pathway
-        """
+    #     :return: Merged Pathway instance.
+    #     :rtype: Pathway
+    #     """
 
-        merged_pathway: Pathway = Pathway(
-            name=self.name,
-            org=self.org,
-            number=self.number,
-            title=self.title,
-        )
+    #     merged_pathway: Pathway = Pathway(
+    #         name=self.name,
+    #         org=self.org,
+    #         number=self.number,
+    #         title=self.title,
+    #     )
 
-        # TODO find duplicate entries in pathway
+    #     # TODO find duplicate entries in pathway
 
-        return merged_pathway
+    #     return merged_pathway

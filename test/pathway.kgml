@@ -10,6 +10,38 @@
         <graphics name="Cytokine-cytokine receptor interaction" fgcolor="#000000" bgcolor="#FFFFFF"
              type="roundrectangle" x="110" y="662" width="124" height="34"/>
     </entry>
+
+    <entry id="84" name="mmu:331026 mmu:69080" type="gene" reaction="rn:R00885"
+        link="http://www.kegg.jp/dbget-bin/www_bget?mmu:331026+mmu:69080">
+        <graphics name="Gmppb, AI317178, E430010H19..." fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="372" y="426" width="46" height="17"/>
+    </entry>
+    <entry id="88" name="mmu:18641 mmu:18642 mmu:56421" type="gene" reaction="rn:R04779"
+        link="http://www.kegg.jp/dbget-bin/www_bget?mmu:18641+mmu:18642+mmu:56421">
+        <graphics name="Pfkl, AA407869, ATP-PFK, PFK-L..." fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="963" y="418" width="46" height="17"/>
+    </entry>
+    <entry id="93" name="mmu:21991" type="gene" reaction="rn:R01015"
+        link="http://www.kegg.jp/dbget-bin/www_bget?mmu:21991">
+        <graphics name="Tpi1, AI255506, Tpi, Tpi-1" fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="922" y="687" width="46" height="17"/>
+    </entry>
+    <entry id="94" name="mmu:11674 mmu:11676 mmu:230163 mmu:353204" type="gene" reaction="rn:R02568"
+        link="http://www.kegg.jp/dbget-bin/www_bget?mmu:11674+mmu:11676+mmu:230163+mmu:353204">
+        <graphics name="Aldoa, Aldo-1, Aldo1..." fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="589" y="989" width="46" height="17"/>
+    </entry>
+    <entry id="95" name="mmu:225913" type="gene" reaction="rn:R01059"
+        link="http://www.kegg.jp/dbget-bin/www_bget?mmu:225913">
+        <graphics name="Tkfc, BC021917, Dak" fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="976" y="738" width="46" height="17"/>
+    </entry>
+    <entry id="96" name="mmu:11674 mmu:11676 mmu:230163 mmu:353204" type="gene" reaction="rn:R01070"
+        link="http://www.kegg.jp/dbget-bin/www_bget?mmu:11674+mmu:11676+mmu:230163+mmu:353204">
+        <graphics name="Aldoa, Aldo-1, Aldo1..." fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="922" y="593" width="46" height="17"/>
+    </entry>
+
     <entry id="6" name="mmu:12048" type="gene"
         link="http://www.kegg.jp/dbget-bin/www_bget?mmu:12048">
         <graphics name="Bcl2l1, Bcl(X)L, Bcl-XL, Bcl2l, BclX, bcl-x, bcl2-L-1" fgcolor="#000000" bgcolor="#BFFFBF"
@@ -1194,4 +1226,30 @@
     <relation entry1="293" entry2="275" type="PPrel">
         <subtype name="inhibition" value="--|"/>
     </relation>
+
+    <reaction id="84" name="rn:R00885" type="irreversible">
+        <substrate id="157" name="cpd:C00636"/>
+        <product id="142" name="cpd:C00096"/>
+    </reaction>
+    <reaction id="88" name="rn:R04779" type="irreversible">
+        <substrate id="143" name="cpd:C05345"/>
+        <product id="158" name="cpd:C05378"/>
+    </reaction>
+    <reaction id="93" name="rn:R01015" type="reversible">
+        <substrate id="141" name="cpd:C00118"/>
+        <product id="169" name="cpd:C00111"/>
+    </reaction>
+    <reaction id="94" name="rn:R02568" type="reversible">
+        <substrate id="121" name="cpd:C01094"/>
+        <product id="134" name="cpd:C00577"/>
+        <product id="169" name="cpd:C00111"/>
+    </reaction>
+    <reaction id="95" name="rn:R01059" type="irreversible">
+        <substrate id="134" name="cpd:C00577"/>
+        <product id="141" name="cpd:C00118"/>
+    </reaction>
+    <reaction id="96" name="rn:R01070" type="reversible">
+        <substrate id="158" name="cpd:C05378"/>
+        <product id="141" name="cpd:C00118"/>
+    </reaction>
 </pathway>

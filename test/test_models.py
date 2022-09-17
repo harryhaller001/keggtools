@@ -105,6 +105,11 @@ def test_subtype_parsing() -> None:
         Subtype.parse(ElementTree.fromstring("""<subtype name="invalid" value="test"></subtype>"""))
 
 
+    # Testing subtype instance to XML
+    assert subtype_parsed.to_xml().attrib["name"] == "activation"
+    assert subtype_parsed.to_xml().tag == "subtype"
+
+
 
 def test_graphics_parsing() -> None:
     """
@@ -168,6 +173,15 @@ def test_graphics_parsing() -> None:
         Graphics.parse(ElementTree.fromstring("""<graphics height="string" />"""))
 
 
+    # Testing coord parsing and xml dump
+    graphics_with_coords: Graphics = Graphics.parse(
+        ElementTree.fromstring("""<graphics coords="573,729,573,779" />""")
+    )
+
+    assert isinstance(graphics_with_coords.coords, str)
+    assert graphics_with_coords.to_xml().attrib["coords"] == "573,729,573,779"
+
+
 
 def test_component_parsing() -> None:
     """
@@ -221,6 +235,19 @@ def test_entry_parsing() -> None:
     with pytest.raises(ValueError):
         Entry(id="123", name="mmu:12048", type="invalid")
 
+
+
+def test_entry_parsing_multiple_names() -> None:
+    """
+    Testing function to parse entry object with multiple gene names.
+    """
+
+    # Test valid cases
+    entry_parsed: Entry = Entry.parse(ElementTree.fromstring(
+        """<entry id="123" name="mmu:12048 mmu:12049 mmu:12050" type="gene"></entry>"""
+    ))
+
+    assert entry_parsed.has_multiple_names is True
 
 
 
@@ -329,6 +356,10 @@ def test_reaction_parsing() -> None:
         Reaction(id="123", name="rn:R01274", type="invalid")
 
 
+    # Testing reaction to xml
+    reaction_string: str = ElementTree.tostring(parsed_reaction.to_xml()).decode("utf-8")
+
+    assert Reaction.parse(ElementTree.fromstring(reaction_string)).name == parsed_reaction.name
 
 
 def test_alt_element_parsing() -> None:
@@ -349,12 +380,12 @@ def test_alt_element_parsing() -> None:
     # Testing correct parsing from substrate element
     parsed_substrate: Substrate = Substrate.parse(ElementTree.fromstring("""
         <substrate id="87" name="cpd:C00249">
-            <alt name="cpd:C00154"></alt>
+            <alt name="cpd:C00155"></alt>
         </substrate>
     """))
 
     assert parsed_substrate.alt is not None and isinstance(parsed_substrate.alt, Alt)
-    assert parsed_substrate.alt.name == "cpd:C00154"
+    assert parsed_substrate.alt.name == "cpd:C00155"
 
 
     # Testing correct type of string conversion
@@ -372,6 +403,14 @@ def test_alt_element_parsing() -> None:
         Alt.parse(ElementTree.fromstring("<invalid-tag />"))
 
 
+    # Testing xml build of alt element
+    assert isinstance(ElementTree.tostring(parsed_substrate.to_xml()).decode("utf-8"), str)
+    assert parsed_substrate.alt.to_xml().tag == "alt"
+    assert parsed_substrate.alt.to_xml().attrib["name"] == parsed_substrate.alt.name
+
+    assert isinstance(ElementTree.tostring(parsed_product.to_xml()).decode("utf-8"), str)
+    assert parsed_product.alt.to_xml().tag == "alt"
+    assert parsed_product.alt.to_xml().attrib["name"] == parsed_product.alt.name
 
 
 def test_full_pathway_parsing() -> None:

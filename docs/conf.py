@@ -9,6 +9,10 @@ import sys
 
 import sphinx_rtd_theme
 
+# Import version from package
+from keggtools import __version__
+
+
 # https://github.com/sphinx-doc/sphinx/issues/4317
 sys.path.insert(0, os.path.abspath("../"))
 
@@ -17,7 +21,7 @@ sys.path.insert(0, os.path.abspath("../"))
 project = "keggtools"
 author = "harryhaller001"
 copyright = f'{datetime.now():%Y}, {author}.' # pylint: disable=redefined-builtin
-version = "0.5.0"
+version = __version__
 release = version
 
 extensions = [

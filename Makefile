@@ -45,6 +45,8 @@ freeze: ## Freeze package dependencies
 
 .PHONY: twine
 twine: ## Twine package upload and checks
+# Remove old keggtools package
+	@pip uninstall keggtools -y --quiet
 
 # Build package with flit backend
 	@$(FLIT_OPT) build --setup-py
@@ -80,9 +82,6 @@ mypy: ## Run static code analysis
 
 .PHONY: clean
 clean: ## Clean all build and caching directories
-
-# Remove old keggtools package
-	@pip uninstall keggtools -y --quiet
 
 # Remove package build folders
 	@rm -rf ./build

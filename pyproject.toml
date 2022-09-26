@@ -61,7 +61,8 @@ test = [
 
 doc = [
     "Sphinx",
-    "sphinx-rtd-theme",
+    # "sphinx-rtd-theme",
+    "furo",
 ]
 
 
@@ -89,7 +90,7 @@ warn_unused_configs = true
 [[tool.mypy.overrides]]
 module = [
     "pandas",
-    "sphinx_rtd_theme",
+    # "sphinx_rtd_theme",
     "setuptools",
     "scipy",
     "pydot",

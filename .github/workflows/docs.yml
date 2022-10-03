@@ -39,7 +39,7 @@ jobs:
             uses: cloudflare/wrangler-action@2.0.0
             with:
                 workingDirectory: ./docs
-                preCommands: yarn install
+                preCommands: cd ./cloudflare-workers && yarn install --frozen-lockfile && cd ..
                 apiToken: ${{ secrets.CF_API_TOKEN }}
                 accountId: ${{ secrets.CF_ACCOUNT_ID }}
 

@@ -15,13 +15,13 @@
     "python.linting.flake8Enabled": true,
     "python.linting.flake8Path": "./venv/bin/flake8",
     "python.linting.flake8Args": [
-        "--max-line-length 100",
+        "--max-line-length=120",
     ],
     "python.linting.mypyEnabled": true,
     "python.linting.mypyPath": "./venv/bin/mypy",
     "python.linting.enabled": true,
     "[python]": {
-        "editor.formatOnPaste": true,
+        "editor.formatOnPaste": false,
         "editor.formatOnSaveMode": "file",
         "editor.rulers": [
             120

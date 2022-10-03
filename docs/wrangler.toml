@@ -2,6 +2,8 @@ name = "keggtools_docs"
 type = "webpack"
 workers_dev = false
 route = "keggtools.org/*"
+compatibility_date = "2022-10-03"
+
 
 [site]
 bucket = "./_build/html"

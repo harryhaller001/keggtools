@@ -48,7 +48,6 @@ class EnrichmentResult:
         self.pathway_genes: list = pathway_genes
         self.pvalue: Optional[float] = None
 
-
     @property
     def pathway_genes_count(self) -> int:
         """
@@ -58,7 +57,6 @@ class EnrichmentResult:
         :return: Number of genes in pathway.
         """
         return len(self.pathway_genes)
-
 
     @property
     def study_count(self) -> int:
@@ -70,17 +68,16 @@ class EnrichmentResult:
         """
         return len(self.found_genes)
 
-
     def __str__(self) -> str:
         """
         Build string summary of KEGG path analysis result instance.
         :rtype: str
         :return: Returns string that describes the enrichment result instance.
         """
-        return f"<EnrichmentResult {self.organism}:{self.pathway_id}" \
-                f" ({self.pathway_name}) {len(self.found_genes)}/{self.pathway_genes_count}>"
-
-
+        return (
+            f"<EnrichmentResult {self.organism}:{self.pathway_id}"
+            f" ({self.pathway_name}) {len(self.found_genes)}/{self.pathway_genes_count}>"
+        )
 
     def json_summary(self, gene_delimiter: str = ",") -> Dict[str, Any]:
         """
@@ -98,9 +95,8 @@ class EnrichmentResult:
             "study_count": self.study_count,
             "pathway_genes": self.pathway_genes_count,
             "pvalue": self.pvalue,
-            "found_genes": gene_delimiter.join([str(a) for a in self.found_genes])
+            "found_genes": gene_delimiter.join([str(a) for a in self.found_genes]),
         }
-
 
     @staticmethod
     def get_header() -> List[str]:
@@ -120,8 +116,6 @@ class EnrichmentResult:
             "pvalue",
             "found_genes",
         ]
-
-
 
 
 class Enrichment:
@@ -150,8 +144,6 @@ class Enrichment:
         # Create pathway list
         self.all_pathways: List[Pathway] = pathways
 
-
-
     def _check_analysis_result_exist(self) -> None:
         """
         Check if summary exists.
@@ -160,8 +152,9 @@ class Enrichment:
         if not self.result or len(self.result) == 0:
             raise ValueError("need to 'run_analysis' first")
 
-
-    def get_subset(self, subset: List[str], inplace: bool = False) -> List[EnrichmentResult]:
+    def get_subset(
+        self, subset: List[str], inplace: bool = False
+    ) -> List[EnrichmentResult]:
         """
         Create subset of analysis result by list of pathway ids
 
@@ -183,7 +176,6 @@ class Enrichment:
 
         return buffer
 
-
     def run_analysis(self, gene_list: List[str]) -> List[EnrichmentResult]:
         """
         List of gene ids. Return list of EnrichmentResult instances
@@ -204,7 +196,6 @@ class Enrichment:
             all_pathways_genes = pathway.get_genes()
             absolute_pathway_genes += len(all_pathways_genes)
 
-
             # Check for intersection between gene list and genes in pathway
             for gene_id in all_pathways_genes:
                 if gene_id in gene_list:
@@ -219,7 +210,7 @@ class Enrichment:
                 pathway_name=pathway.name,
                 pathway_title=pathway.title,
                 found_genes=genes_found,
-                pathway_genes=all_pathways_genes
+                pathway_genes=all_pathways_genes,
             )
             self.result.append(pathway_result)
 
@@ -233,8 +224,9 @@ class Enrichment:
                 a_var: int = analysis.study_count
                 b_var: int = study_n - analysis.study_count
                 c_var: int = analysis.pathway_genes_count - analysis.study_count
-                d_var: int = absolute_pathway_genes - analysis.pathway_genes_count - b_var
-
+                d_var: int = (
+                    absolute_pathway_genes - analysis.pathway_genes_count - b_var
+                )
 
                 # Calculate p value with Fisher exact test
                 _, pval = stats.fisher_exact(
@@ -246,9 +238,7 @@ class Enrichment:
 
                 analysis.pvalue = pval
 
-
         return self.result
-
 
     def to_json(self) -> List[Dict[str, Any]]:
         """
@@ -267,13 +257,12 @@ class Enrichment:
 
         return result
 
-
     def to_csv(
         self,
         file_obj: Union[str, IOBase, Any],
         delimiter: str = "\t",
-        overwrite: bool = False
-        ) -> None:
+        overwrite: bool = False,
+    ) -> None:
         """
         Save result summary as file.
 
@@ -291,7 +280,7 @@ class Enrichment:
             # file is str (Name of file)
             if os.path.isfile(file_obj) and not overwrite:
                 raise RuntimeError(
-                    f"File {file_obj} does already exist." \
+                    f"File {file_obj} does already exist."
                     "To solve please set overwrite=True."
                 )
 
@@ -302,9 +291,9 @@ class Enrichment:
             csv_file = file_obj
 
         else:
-            raise TypeError("Argument 'file_obj' must be string or IOBase instance, like an open file object.")
-
-
+            raise TypeError(
+                "Argument 'file_obj' must be string or IOBase instance, like an open file object."
+            )
 
         # Delimiter of gene names
         child_delimiter = " "
@@ -314,17 +303,15 @@ class Enrichment:
             raise ValueError("This delimiter is reserved to seperate list of genes.")
 
         headers: List[str] = EnrichmentResult.get_header()
-        writer: DictWriter = DictWriter(csv_file, fieldnames=headers, delimiter=delimiter)
+        writer: DictWriter = DictWriter(
+            csv_file, fieldnames=headers, delimiter=delimiter
+        )
 
         for item in self.result:
             # Write lines
             writer.writerow(item.json_summary(gene_delimiter=child_delimiter))
 
         csv_file.close()
-
-
-
-
 
     def to_dataframe(self) -> Any:
         """

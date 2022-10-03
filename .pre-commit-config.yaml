@@ -29,34 +29,41 @@ repos:
         entry: jupyter nbconvert ./reproducibility/*.ipynb --ClearOutputPreprocessor.enabled=True --inplace
 
 
+
+-   repo: https://github.com/psf/black
+    rev: "22.8.0"
+    hooks:
+    -   id: black
+        name: Run formatting with black
+        files: (.*).py
+
+
+-   repo: https://github.com/PyCQA/flake8
+    rev: "5.0.4"
+    hooks:
+    -   id: flake8
+        name: Run linting with flake8
+        files: (.*).py
+        args: [--max-line-length=120]
+
+
+# -   repo: https://github.com/pre-commit/mirrors-mypy
+#     rev: v0.971
+#     hooks:
+#     -   id: mypy
+#         name: Static code analysis of backend
+#         files: ^(keggtools|test|docs)/(.*).py
+#         additional_dependencies: ["types-requests"]
+
 # add pytest hook
 -   repo: local
     hooks:
-    # -   id: mypy
-    #     name: Run static code analysis
-    #     stages: [commit]
-    #     language: system
-    #     entry: bash -c 'mypy "$@" || true' --
-    #     types: [python]
-    #     pass_filenames: true
-    #     always_run: false
-
-
-    # -   id: pylint
-    #     name: Run linting
-    #     stages: [commit]
-    #     language: system
-    #     entry: bash -c 'pylint "$@" || true' --
-    #     types: [python]
-    #     pass_filenames: true
-    #     always_run: false
-
-
     -   id: pytest
-        name: Run unittest
+        name: Run unittest on worker
         stages: [commit]
         language: system
-        entry: pytest -p keggtools --show-capture=log
+        entry: pytest
         types: [python]
         pass_filenames: false
         always_run: true
+

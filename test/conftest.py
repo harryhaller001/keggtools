@@ -34,9 +34,10 @@ def storage() -> Generator[Storage, None, None]:
     os.rmdir(CACHEDIR)
 
 
-
 @pytest.fixture(scope="function")
-def resolver(storage: Storage) -> Generator[Resolver, None, None]: # pylint: disable=redefined-outer-name
+def resolver(
+    storage: Storage,
+) -> Generator[Resolver, None, None]:  # pylint: disable=redefined-outer-name
     """
     generate resolver instance on top of storage fixtures. `@responses.activate` decorator must be placed at testing
     methods.
@@ -53,7 +54,9 @@ def pathway() -> Pathway:
     Return loaded and parsed pathway instance.
     """
 
-    with open(os.path.join(os.path.dirname(__file__), "pathway.kgml"), "r", encoding="utf-8") as file_obj:
+    with open(
+        os.path.join(os.path.dirname(__file__), "pathway.kgml"), "r", encoding="utf-8"
+    ) as file_obj:
         loaded_pathway: Pathway = Pathway.parse(file_obj.read())
 
     return loaded_pathway

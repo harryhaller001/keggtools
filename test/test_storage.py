@@ -9,7 +9,6 @@ from keggtools.storage import Storage
 from .conftest import CACHEDIR
 
 
-
 def test_storage() -> None:
     """
     Testing storage.
@@ -39,7 +38,6 @@ def test_cachedir_default() -> None:
     assert os.path.isdir(storage_instance.cachedir) is True
 
 
-
 def test_folder_generation(storage: Storage) -> None:
     """
     Testing generation of new cache folder.
@@ -50,7 +48,6 @@ def test_folder_generation(storage: Storage) -> None:
 
     # Test correct folder generation
     assert storage.build_cache_path("test.txt") == os.path.join(CACHEDIR, "test.txt")
-
 
 
 def test_folder_check_fails(storage: Storage) -> None:
@@ -64,10 +61,8 @@ def test_folder_check_fails(storage: Storage) -> None:
     with pytest.raises(NotADirectoryError):
         storage.check_cache_dir()
 
-
     # Regenerate folder to revent failing of fixture
     os.mkdir(CACHEDIR)
-
 
 
 def test_cache_readwrite(storage: Storage) -> None:
@@ -80,16 +75,16 @@ def test_cache_readwrite(storage: Storage) -> None:
 
     # Testing string file
     assert storage.exist(testing_filename) is False
-    assert storage.save(filename=testing_filename, data=testing_payload) == os.path.join(CACHEDIR, testing_filename)
+    assert storage.save(
+        filename=testing_filename, data=testing_payload
+    ) == os.path.join(CACHEDIR, testing_filename)
     assert storage.load(filename=testing_filename) == testing_payload
 
     # testing binary file
     assert storage.save_dump(
-        filename=testing_filename,
-        data=testing_payload
+        filename=testing_filename, data=testing_payload
     ) == os.path.join(CACHEDIR, testing_filename)
     assert storage.load_dump(filename=testing_filename) == testing_payload
-
 
     # Testing loading of none existing files
 

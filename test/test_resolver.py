@@ -21,14 +21,13 @@ def test_get_gene_names() -> None:
     Testing get gene names function.
     """
 
-
     # Filter warnings
     warnings.filterwarnings("ignore", category=UserWarning)
 
     gene_list: List[str] = [
         "mmu:11797",
         "mmu:266632",
-        "mmu:22033", # This item is not resolved by request
+        "mmu:22033",  # This item is not resolved by request
     ]
 
     # register mock response
@@ -36,27 +35,25 @@ def test_get_gene_names() -> None:
         mocked_response.add(
             method=HTTP_METHOD_GET,
             url="http://rest.kegg.jp/list/mmu:11797+mmu:266632+mmu:22033",
-            body="mmu:11797\tBirc2, AW146227, Api1, Api2, Birc3\n" \
-                "mmu:266632\tIrak4, 8430405M07Rik, 9330209D03Rik\n",
-            status=200
+            body="mmu:11797\tBirc2, AW146227, Api1, Api2, Birc3\n"
+            "mmu:266632\tIrak4, 8430405M07Rik, 9330209D03Rik\n",
+            status=200,
         )
-
 
         result_dict: Dict[str, str] = get_gene_names(genes=gene_list)
 
         # Check results are correctly parsed
-        assert result_dict["mmu:11797"] == "Birc2" and result_dict["mmu:266632"] == "Irak4"
-
+        assert (
+            result_dict["mmu:11797"] == "Birc2" and result_dict["mmu:266632"] == "Irak4"
+        )
 
     # Check Value error on too many items
     with pytest.raises(ValueError):
         get_gene_names(genes=["mmu:12345"] * 51)
 
-
     # Check Value error if no genes are provided
     with pytest.raises(ValueError):
         get_gene_names(genes=[])
-
 
 
 def test_resolver_init(storage: Storage) -> None:
@@ -71,7 +68,6 @@ def test_resolver_init(storage: Storage) -> None:
     assert Resolver(cache=CACHEDIR).storage.cachedir == CACHEDIR
 
 
-
 def test_resolver_cache_or_request(resolver: Resolver) -> None:
     """
     Testing resolve cache or request function.
@@ -81,34 +77,36 @@ def test_resolver_cache_or_request(resolver: Resolver) -> None:
     testing_url: str = "http://example.com/test.txt"
     testing_payload: str = "hello world!"
 
-
     # File should not exist
     assert resolver.storage.exist(filename=testing_filename) is False
 
-
     # Register response
     with RequestsMock() as mocked_response:
-        mocked_response.add(HTTP_METHOD_GET, url=testing_url, body=testing_payload, status=200)
+        mocked_response.add(
+            HTTP_METHOD_GET, url=testing_url, body=testing_payload, status=200
+        )
 
         # Resolver should request the url, because file does not exist
         # pylint: disable=protected-access
-        assert resolver._cache_or_request(filename=testing_filename, url=testing_url) == testing_payload
+        assert (
+            resolver._cache_or_request(filename=testing_filename, url=testing_url)
+            == testing_payload
+        )
 
         # File should exist now
         assert resolver.storage.exist(testing_filename) is True
-
-
 
     with patch("requests.get") as mock:
 
         # Resolver should access file from cache
         # pylint: disable=protected-access
-        assert resolver._cache_or_request(filename=testing_filename, url=testing_url) == testing_payload
+        assert (
+            resolver._cache_or_request(filename=testing_filename, url=testing_url)
+            == testing_payload
+        )
 
         # make sure that requests is not called !
         mock.assert_not_called()
-
-
 
 
 def test_get_pathway_list(resolver: Resolver) -> None:
@@ -120,16 +118,21 @@ def test_get_pathway_list(resolver: Resolver) -> None:
         mocked_response.add(
             HTTP_METHOD_GET,
             url="http://rest.kegg.jp/list/pathway/mmu",
-            body="""path:mmu00010\tGlycolysis / Gluconeogenesis - Mus musculus (house mouse)\n""" \
-                """path:mmu00020\tCitrate cycle (TCA cycle) - Mus musculus (house mouse)""",
+            body="""path:mmu00010\tGlycolysis / Gluconeogenesis - Mus musculus (house mouse)\n"""
+            """path:mmu00020\tCitrate cycle (TCA cycle) - Mus musculus (house mouse)""",
             status=200,
         )
 
         result: Dict[str, str] = resolver.get_pathway_list(organism=ORGANISM)
 
-    assert result["path:mmu00010"] == "Glycolysis / Gluconeogenesis - Mus musculus (house mouse)"
-    assert result["path:mmu00020"] == "Citrate cycle (TCA cycle) - Mus musculus (house mouse)"
-
+    assert (
+        result["path:mmu00010"]
+        == "Glycolysis / Gluconeogenesis - Mus musculus (house mouse)"
+    )
+    assert (
+        result["path:mmu00020"]
+        == "Citrate cycle (TCA cycle) - Mus musculus (house mouse)"
+    )
 
 
 def test_get_pathway(resolver: Resolver) -> None:
@@ -138,7 +141,9 @@ def test_get_pathway(resolver: Resolver) -> None:
     """
 
     # Load pathway from file
-    with open(os.path.join(os.path.dirname(__file__), "pathway.kgml"), "r", encoding="utf-8") as file_obj:
+    with open(
+        os.path.join(os.path.dirname(__file__), "pathway.kgml"), "r", encoding="utf-8"
+    ) as file_obj:
         response_content: str = file_obj.read()
 
     # Register response
@@ -152,7 +157,10 @@ def test_get_pathway(resolver: Resolver) -> None:
             status=200,
         )
 
-        assert isinstance(resolver.get_pathway(organism=ORGANISM, code="12345"), Pathway) is True
+        assert (
+            isinstance(resolver.get_pathway(organism=ORGANISM, code="12345"), Pathway)
+            is True
+        )
 
 
 def test_get_organism_list(resolver: Resolver) -> None:
@@ -165,9 +173,9 @@ def test_get_organism_list(resolver: Resolver) -> None:
         mocked_response.add(
             HTTP_METHOD_GET,
             url="http://rest.kegg.jp/list/organism",
-            body="""T01001\thsa\tHomo sapiens (human)\tEukaryotes;Animals;Vertebrates;Mammals\n""" \
-                """T01005\tptr\tPan troglodytes (chimpanzee)\tEukaryotes;Animals;Vertebrates;Mammals\n""" \
-                """T02283\tpps\tPan paniscus (bonobo)\tEukaryotes;Animals;Vertebrates;Mammals\n""",
+            body="""T01001\thsa\tHomo sapiens (human)\tEukaryotes;Animals;Vertebrates;Mammals\n"""
+            """T01005\tptr\tPan troglodytes (chimpanzee)\tEukaryotes;Animals;Vertebrates;Mammals\n"""
+            """T02283\tpps\tPan paniscus (bonobo)\tEukaryotes;Animals;Vertebrates;Mammals\n""",
             status=200,
         )
 
@@ -191,10 +199,10 @@ def test_get_compounds(resolver: Resolver) -> None:
         mocked_response.add(
             HTTP_METHOD_GET,
             url="http://rest.kegg.jp/list/compound",
-            body="""cpd:C00001\tH2O; Water\ncpd:C00002\tATP; Adenosine 5'-triphosphate\n""" \
-                """cpd:C00003\tNAD+; NAD; Nicotinamide adenine dinucleotide; DPN;\n""" \
-                """cpd:C00004\tNADH; DPNH; Reduced nicotinamide adenine dinucleotide\n""" \
-                """cpd:C00007\tOxygen; O2\n""",
+            body="""cpd:C00001\tH2O; Water\ncpd:C00002\tATP; Adenosine 5'-triphosphate\n"""
+            """cpd:C00003\tNAD+; NAD; Nicotinamide adenine dinucleotide; DPN;\n"""
+            """cpd:C00004\tNADH; DPNH; Reduced nicotinamide adenine dinucleotide\n"""
+            """cpd:C00007\tOxygen; O2\n""",
             status=200,
         )
 

@@ -17,12 +17,10 @@ from keggtools.utils import (
 )
 
 
-
 def test_xml_parsing_wrapper() -> None:
     """
     Testing function to wrap XML element parser.
     """
-
 
     xml_string: str = "<hello>world</hello>"
 
@@ -34,12 +32,10 @@ def test_xml_parsing_wrapper() -> None:
     assert isinstance(parse_xml(xml_object_or_string=element), Element)
 
 
-
 def test_attribute_checks() -> None:
     """
     Test XML element attribute check functions.
     """
-
 
 
 def test_color_gradient() -> None:
@@ -52,7 +48,6 @@ def test_color_gradient() -> None:
 
     # Test color tuple to hex color string
     assert ColorGradient.to_hex(color=(0, 0, 255)) == "#0000ff"
-
 
     grad: ColorGradient = ColorGradient(
         start=(0, 0, 0),
@@ -85,15 +80,12 @@ def test_parse_tsv() -> None:
     assert len(parsed_data) == 3
     assert parsed_data[0][1] == "header2"
 
-
     # Test parse to dict function
 
     parsed_dict: Dict[str, str] = parse_tsv_to_dict(data=tsv_data)
 
     assert parsed_dict["header1"] == "header2"
     assert parsed_dict["item3"] == "item4"
-
-
 
 
 def test_valid_pathway_org() -> None:
@@ -112,7 +104,6 @@ def test_valid_pathway_org() -> None:
     assert is_valid_pathway_org(value="hsaa") is False
 
 
-
 def test_valid_pathway_name() -> None:
     """
     Testing validation for combined pathway name.
@@ -125,7 +116,6 @@ def test_valid_pathway_name() -> None:
     assert is_valid_pathway_name(value="prefix:ko12345") is False
     assert is_valid_pathway_name(value="path:aaaa12345") is False
     assert is_valid_pathway_name(value="path:ko123456") is False
-
 
 
 def test_valid_pathway_number() -> None:
@@ -141,7 +131,6 @@ def test_valid_pathway_number() -> None:
     assert is_valid_pathway_number(value="1234") is False
 
 
-
 def test_valid_hex_color() -> None:
     """
     Testing validation of hex color.
@@ -155,7 +144,6 @@ def test_valid_hex_color() -> None:
 
     assert is_valid_hex_color(value="#00af4E00") is False
     assert is_valid_hex_color(value="#00af4K") is False
-
 
 
 def test_valid_gene_name() -> None:

@@ -27,7 +27,7 @@ IMMUNE_SYSTEM_PATHWAYS: Dict[str, str] = {
     "04666": "Fc gamma R-mediated phagocytosis",
     "04670": "Leukocyte transendothelial migration",
     "04672": "Intestinal immune network for IgA production",
-    "04062": "Chemokine signaling pathway"
+    "04062": "Chemokine signaling pathway",
 }
 
 
@@ -63,12 +63,7 @@ RELATION_TYPES: List[str] = [
     "maplink",
 ]
 
-GRAPHIC_TYPE: List[str] = [
-    "rectangle",
-    "circle",
-    "roundrectangle",
-    "line"
-]
+GRAPHIC_TYPE: List[str] = ["rectangle", "circle", "roundrectangle", "line"]
 
 ENTRY_TYPE: List[str] = [
     "ortholog",
@@ -79,7 +74,7 @@ ENTRY_TYPE: List[str] = [
     "compound",
     "map",
     "brite",
-    "other"
+    "other",
 ]
 
 

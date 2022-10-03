@@ -27,8 +27,6 @@ from .utils import (
 )
 
 
-
-
 class Subtype:
     """
     Subtype model class.
@@ -48,12 +46,12 @@ class Subtype:
 
         # check for valid subtype names in RELATION_SUBTYPES
         if name not in RELATION_SUBTYPES:
-            raise ValueError(f"Name of relation subtype '{name}' is not in list of valid subtypes.")
+            raise ValueError(
+                f"Name of relation subtype '{name}' is not in list of valid subtypes."
+            )
 
         self.name: str = name
         self.value: str = value
-
-
 
     @staticmethod
     def parse(item: Element) -> "Subtype":
@@ -71,9 +69,8 @@ class Subtype:
         # Generate and return subtype instance
         return Subtype(
             name=get_attribute(element=item, key="name"),
-            value=get_attribute(element=item, key="value")
+            value=get_attribute(element=item, key="value"),
         )
-
 
     def to_xml(self) -> Element:
         """
@@ -85,12 +82,8 @@ class Subtype:
 
         return Element(
             "subtype",
-            attrib={
-                "name": self.name,
-                "value": self.value
-            },
+            attrib={"name": self.name, "value": self.value},
         )
-
 
     def __str__(self) -> str:
         """
@@ -100,10 +93,6 @@ class Subtype:
         :rtype: str
         """
         return f"<Subtype name='{self.name}' value='{self.value}'>"
-
-
-
-
 
 
 class Relation:
@@ -134,7 +123,6 @@ class Relation:
         self.type: str = type
         self.subtypes: List[Subtype] = []
 
-
     @staticmethod
     def parse(item: Element) -> "Relation":
         """
@@ -148,7 +136,6 @@ class Relation:
         # Check tag of relation is correct
         assert item.tag == "relation"
 
-
         # Create relation instance from attributes
         relation: Relation = Relation(
             entry1=get_numeric_attribute(element=item, key="entry1"),
@@ -156,14 +143,11 @@ class Relation:
             type=get_attribute(element=item, key="type"),
         )
 
-
         # Parse Child items of xml element by iterating of child elements
         for child in item:
             relation.subtypes.append(Subtype.parse(item=child))
 
-
         return relation
-
 
     def to_xml(self) -> Element:
         """
@@ -192,8 +176,6 @@ class Relation:
         return f"<Relation {self.entry1}->{self.entry2} type='{self.type}'>"
 
 
-
-
 class Component:
     """
     Component model.
@@ -210,12 +192,10 @@ class Component:
         if id == "":
             raise ValueError("Component id can't be empty.")
 
-
         # TODO: Check pattern of component id
         # TODO: component id should reference an existing entry !
 
         self.id: str = id
-
 
     @staticmethod
     def parse(item: Element) -> "Component":
@@ -233,7 +213,6 @@ class Component:
         # Create component instance from id attribute
         return Component(id=get_attribute(element=item, key="id"))
 
-
     def to_xml(self) -> Element:
         """
         Generate XML string from Component element.
@@ -249,7 +228,6 @@ class Component:
             },
         )
 
-
     def __str__(self) -> str:
         """
         Build string of component instance.
@@ -258,7 +236,6 @@ class Component:
         :rtype: str
         """
         return f"<Component id='{self.id}'>"
-
 
 
 class Graphics:
@@ -307,7 +284,6 @@ class Graphics:
         self.fgcolor: Optional[str] = fgcolor
         self.bgcolor: Optional[str] = bgcolor
 
-
         # Validate parameter if not None
 
         # Check type is in list of valid types
@@ -321,7 +297,6 @@ class Graphics:
         if self.bgcolor is not None and is_valid_hex_color(value=self.bgcolor) is False:
             raise ValueError("Bgcolor is not a valid hex color.")
 
-
         # Check x,y,width and height are numeric (only if not None)
         if self.x is not None and str.isdigit(self.x) is False:
             raise ValueError("Value x is not a number.")
@@ -334,7 +309,6 @@ class Graphics:
 
         if self.height is not None and str.isdigit(self.height) is False:
             raise ValueError("Value height is not a number.")
-
 
     @staticmethod
     def parse(item: Element) -> "Graphics":
@@ -351,17 +325,16 @@ class Graphics:
 
         # Parse attributes from XML element
         return Graphics(
-            x = item.attrib.get("x"),
-            y = item.attrib.get("y"),
-            width = item.attrib.get("width"),
-            height = item.attrib.get("height"),
-            name = item.attrib.get("name"),
-            type = item.attrib.get("type"),
-            fgcolor = item.attrib.get("fgcolor"),
-            bgcolor = item.attrib.get("bgcolor"),
-            coords = item.attrib.get("coords"),
+            x=item.attrib.get("x"),
+            y=item.attrib.get("y"),
+            width=item.attrib.get("width"),
+            height=item.attrib.get("height"),
+            name=item.attrib.get("name"),
+            type=item.attrib.get("type"),
+            fgcolor=item.attrib.get("fgcolor"),
+            bgcolor=item.attrib.get("bgcolor"),
+            coords=item.attrib.get("coords"),
         )
-
 
     def to_xml(self) -> Element:
         """
@@ -404,7 +377,6 @@ class Graphics:
 
         return graphics_element
 
-
     def __str__(self) -> str:
         """
         Return Graphics instance summary string.
@@ -413,7 +385,6 @@ class Graphics:
         :rtype: str
         """
         return f"<Graphics name='{self.name}'>"
-
 
 
 class Entry:
@@ -448,10 +419,8 @@ class Entry:
 
         # TODO: validate entry id and name
 
-
         if self.type not in ENTRY_TYPE:
             raise ValueError(f"Type '{self.type}' is not in list of valid entry types.")
-
 
         # optional (implied)
         self.link: Optional[str] = link
@@ -459,11 +428,9 @@ class Entry:
 
         # TODO: validate reaction if not None
 
-
         # Implied child instances
         self.graphics: Optional[Graphics] = None
         self.components: List[Component] = []
-
 
     @property
     def has_multiple_names(self) -> bool:
@@ -475,8 +442,6 @@ class Entry:
         """
 
         return len(self.name.split(" ")) > 1
-
-
 
     @staticmethod
     def parse(item: Element) -> "Entry":
@@ -508,7 +473,6 @@ class Entry:
 
         return entry
 
-
     def to_xml(self) -> Element:
         """
         Generate XML string from Entry element.
@@ -518,12 +482,7 @@ class Entry:
         """
 
         entry_element: Element = Element(
-            "entry",
-            attrib={
-                "id": self.id,
-                "name": self.name,
-                "type": self.type
-            }
+            "entry", attrib={"id": self.id, "name": self.name, "type": self.type}
         )
 
         # Add optional attributes to xml element
@@ -539,16 +498,11 @@ class Entry:
         if self.graphics is not None:
             entry_element.append(self.graphics.to_xml())
 
-
         # Iterate over components and add to entry element
         for component in self.components:
             entry_element.append(component.to_xml())
 
-
         return entry_element
-
-
-
 
     def __str__(self) -> str:
         """
@@ -558,8 +512,6 @@ class Entry:
         :rtype: str
         """
         return f"<Entry id='{self.id}' name='{self.name}' type='{self.type}'>"
-
-
 
     def get_gene_id(self) -> List[str]:
         """
@@ -576,8 +528,6 @@ class Entry:
         return [value.split(":")[1] for value in self.name.split(" ")]
 
 
-
-
 class Alt:
     """
     Alt model.
@@ -592,7 +542,6 @@ class Alt:
 
         self.name: str = name
 
-
     @staticmethod
     def parse(item: Element) -> "Alt":
         """
@@ -605,7 +554,6 @@ class Alt:
         assert item.tag == "alt"
 
         return Alt(name=get_attribute(element=item, key="name"))
-
 
     def to_xml(self) -> Element:
         """
@@ -621,7 +569,6 @@ class Alt:
                 "name": self.name,
             },
         )
-
 
     def __str__(self) -> str:
         """
@@ -639,12 +586,7 @@ class Product:
     Reaction Product model.
     """
 
-    def __init__(
-        self,
-        id: str,
-        name: str,
-        alt: Optional[Alt] = None
-        ) -> None:
+    def __init__(self, id: str, name: str, alt: Optional[Alt] = None) -> None:
         """
         Init Product instance.
 
@@ -689,7 +631,6 @@ class Product:
 
         return parsed_product
 
-
     def to_xml(self) -> Element:
         """
         Generate XML string from Product element.
@@ -712,7 +653,6 @@ class Product:
 
         return product_element
 
-
     def __str__(self) -> str:
         """
         Build string from Product instance.
@@ -727,12 +667,13 @@ class Substrate:
     """
     reaction Substrate model
     """
+
     def __init__(
         self,
         id: str,
         name: str,
         alt: Optional[Alt] = None,
-        ) -> None:
+    ) -> None:
         """
         Init Substrate instance.
 
@@ -777,7 +718,6 @@ class Substrate:
 
         return parsed_substrate
 
-
     def to_xml(self) -> Element:
         """
         Generate XML string from Substrate element.
@@ -800,7 +740,6 @@ class Substrate:
 
         return substrate_element
 
-
     def __str__(self) -> str:
         """
         Build string from Substrate instance.
@@ -809,7 +748,6 @@ class Substrate:
         :rtype: str
         """
         return f"<Substrate id='{self.id}' name='{self.name}'>"
-
 
 
 class Reaction:
@@ -822,7 +760,7 @@ class Reaction:
         id: str,
         name: str,
         type: str,
-        ) -> None:
+    ) -> None:
         """
         Init Reaction model instance.
 
@@ -842,7 +780,6 @@ class Reaction:
         # Child elements of reaction
         self.products: List[Product] = []
         self.substrates: List[Substrate] = []
-
 
     @staticmethod
     def parse(item: Element) -> "Reaction":
@@ -872,7 +809,6 @@ class Reaction:
 
         return parsed_reaction
 
-
     def to_xml(self) -> Element:
         """
         Generate XML string from Reaction element.
@@ -898,9 +834,7 @@ class Reaction:
         for product in self.products:
             reaction_element.append(product.to_xml())
 
-
         return reaction_element
-
 
     def __str__(self) -> str:
         """
@@ -913,13 +847,12 @@ class Reaction:
         return f"<Reaction id='{self.id}' name='{self.name}'>"
 
 
-
-
 class Pathway:
     """
     KEGG Pathway object.
     The KEGG pathway object stores graphics information and related objects.
     """
+
     # pylint: disable=too-many-instance-attributes
 
     def __init__(
@@ -930,7 +863,7 @@ class Pathway:
         title: Optional[str] = None,
         image: Optional[str] = None,
         link: Optional[str] = None,
-        ) -> None:
+    ) -> None:
         """
         Init KEGG Pathway model.
 
@@ -959,11 +892,9 @@ class Pathway:
         if not is_valid_pathway_number(value=number):
             raise ValueError(f"Pathway number '{number}' is not a valid value.")
 
-
         # Check match of number, org and name
         if self.name != f"path:{self.org}{self.number}":
             raise ValueError("Mismatch of arguments name, org and number.")
-
 
         # implied
         self.title: Optional[str] = title
@@ -974,9 +905,6 @@ class Pathway:
         self.relations: List[Relation] = []
         self.entries: List[Entry] = []
         self.reactions: List[Reaction] = []
-
-
-
 
     @staticmethod
     def parse(data: Union[Element, str]) -> "Pathway":
@@ -991,7 +919,6 @@ class Pathway:
         # Generate correct format from string or XML element object
         item: Element = parse_xml(xml_object_or_string=data)
 
-
         # Init pathway instance with all required attributes
         pathway: Pathway = Pathway(
             name=get_attribute(element=item, key="name"),
@@ -1002,7 +929,6 @@ class Pathway:
             link=item.attrib.get("link"),
         )
 
-
         # Parse child items of pathway
         for child in item:
             if child.tag == "entry":
@@ -1012,9 +938,7 @@ class Pathway:
             elif child.tag == "reaction":
                 pathway.reactions.append(Reaction.parse(child))
 
-
         return pathway
-
 
     def to_xml(self) -> Element:
         """
@@ -1030,7 +954,7 @@ class Pathway:
                 "name": self.name,
                 "org": self.org,
                 "number": self.number,
-            }
+            },
         )
 
         # Adding optional attributes to pathway root element
@@ -1043,7 +967,6 @@ class Pathway:
         if self.image is not None:
             pathway_element.attrib["image"] = self.image
 
-
         # add children entries, relations and reactions
 
         for entry in self.entries:
@@ -1055,9 +978,7 @@ class Pathway:
         for reaction in self.reactions:
             pathway_element.append(reaction.to_xml())
 
-
         return pathway_element
-
 
     def to_xml_string(self) -> str:
         """
@@ -1069,18 +990,20 @@ class Pathway:
 
         # Generate xml header string
         # docstring is not supported by build-in xml builer
-        xml_timestamp: str = datetime.now().astimezone().strftime("%b %d, %Y %H:%M:%S (GMT%z)")
-        xml_header: str = "<?xml version=\"1.0\"?>\n" \
-            "<!DOCTYPE pathway SYSTEM \"http://www.kegg.jp/kegg/xml/KGML_v0.7.2_.dtd\">\n" \
+        xml_timestamp: str = (
+            datetime.now().astimezone().strftime("%b %d, %Y %H:%M:%S (GMT%z)")
+        )
+        xml_header: str = (
+            '<?xml version="1.0"?>\n'
+            '<!DOCTYPE pathway SYSTEM "http://www.kegg.jp/kegg/xml/KGML_v0.7.2_.dtd">\n'
             f"<!-- Creation date: {xml_timestamp} -->\n"
-
+        )
 
         pathway_element: Element = self.to_xml()
 
         xml_content: str = ElementTree.tostring(pathway_element).decode("utf-8")
 
         return xml_header + xml_content
-
 
     def get_entry_by_id(self, entry_id: str) -> Optional[Entry]:
         """
@@ -1095,8 +1018,6 @@ class Pathway:
             if item.id == entry_id:
                 return item
         return None
-
-
 
     def get_genes(self) -> List[str]:
         """
@@ -1121,7 +1042,6 @@ class Pathway:
                 #         if single_entry not in result:
                 #             result.append(single_entry)
 
-
                 # elif entry.name not in result:
                 #     result.append(entry.name)
 
@@ -1131,7 +1051,6 @@ class Pathway:
 
         return result
 
-
     def __str__(self) -> str:
         """
         Build string summary for KEGG pathway.
@@ -1140,7 +1059,6 @@ class Pathway:
         :rtype: str
         """
         return f"<Pathway path:{self.org}{self.number} title='{self.title}'>"
-
 
     # TODO: has to be implemented
     # def merge(self) -> "Pathway":

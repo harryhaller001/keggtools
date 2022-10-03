@@ -3,6 +3,7 @@
 # import logging
 from typing import Any, Dict, List, Optional, Tuple, Union
 from functools import lru_cache
+
 # from enum import Enum, unique
 
 from xml.etree.ElementTree import Element, SubElement
@@ -17,7 +18,6 @@ from .resolver import (
     # get_gene_names,
 )
 from .utils import ColorGradient
-
 
 
 # TODO: add hex string to int tuple function
@@ -49,15 +49,15 @@ from .utils import ColorGradient
 #         DASHED: str = ""
 
 
-
 # Helper functions for renderer
+
 
 def generate_embedded_html_table(
     items: Dict[str, str],
     border: int = 0,
     cellborder: int = 1,
     truncate: Optional[int] = None,
-    ) -> str:
+) -> str:
     """
     Generate HTML table in insert into label of dot node.
 
@@ -86,7 +86,6 @@ def generate_embedded_html_table(
         },
     )
 
-
     # TODO: implement multiple cols for longer lists (square format)
     for index, (key, value) in enumerate(items.items()):
 
@@ -107,8 +106,6 @@ def generate_embedded_html_table(
     return ElementTree.tostring(element_table).decode("utf-8")
 
 
-
-
 class Renderer:
     """
     Renderer for KEGG Pathway.
@@ -120,7 +117,6 @@ class Renderer:
         gene_dict: Optional[Dict[str, float]] = None,
         cache_or_resolver: Optional[Union[Storage, str, Resolver]] = None,
         # resolve_compounds: bool = True # TODO: Specify if renderer should resolver compounds in human readable text
-
         upper_color: Tuple[int, int, int] = (255, 0, 0),
         lower_color: Tuple[int, int, int] = (0, 0, 255),
     ) -> None:
@@ -144,14 +140,14 @@ class Renderer:
 
         # Generate pydot Graph instance
         self.graph: Dot = Dot(
-            'pathway',
-            graph_type='digraph',
-            bgcolor='#ffffff',
+            "pathway",
+            graph_type="digraph",
+            bgcolor="#ffffff",
             labelloc="t",
             label=self.pathway.title,
             fontsize=25,
             rankdir="TB",
-            splines="normal", # "ortho"/line
+            splines="normal",  # "ortho"/line
             arrowhead="normal",
         )
 
@@ -161,12 +157,10 @@ class Renderer:
         if gene_dict is not None:
             self.overlay = gene_dict
 
-
         # TODO: move to render function ??
         # Generate color map
         self.upper_color: tuple = upper_color
         self.lower_color: tuple = lower_color
-
 
         # Init resolver instance from pathway org code.
         resolver_buffer: Optional[Resolver] = None
@@ -177,11 +171,11 @@ class Renderer:
             resolver_buffer = cache_or_resolver
         else:
             # Raise error of type is not correct
-            raise TypeError("String to directory, storage instance or resolver instance must be passed.")
-
+            raise TypeError(
+                "String to directory, storage instance or resolver instance must be passed."
+            )
 
         self.resolver: Resolver = resolver_buffer
-
 
     # implement color gradient as properties with lru_cache decorator
     @property
@@ -189,34 +183,32 @@ class Renderer:
         """
         Generated color map as list of hexadecimal strings for upregulated genes in gene dict.
         """
+
         @lru_cache(maxsize=1)
         def cache_wrapper() -> List[str]:
             return ColorGradient(
-                start=(255, 255, 255),
-                stop=self.upper_color,
-                steps=100
+                start=(255, 255, 255), stop=self.upper_color, steps=100
             ).get_list()
 
         return cache_wrapper()
-
 
     @property
     def cmap_downreg(self) -> List[str]:
         """
         Generated color map as list of hexadecimal strings for downregulated genes in gene dict.
         """
+
         @lru_cache(maxsize=1)
         def cache_wrapper() -> List[str]:
             return ColorGradient(
-                start=(255, 255, 255),
-                stop=self.lower_color,
-                steps=100
+                start=(255, 255, 255), stop=self.lower_color, steps=100
             ).get_list()
 
         return cache_wrapper()
 
-
-    def get_gene_color(self, gene_id: str, default_color: Tuple[int, int, int] = (255, 255, 255)) -> str:
+    def get_gene_color(
+        self, gene_id: str, default_color: Tuple[int, int, int] = (255, 255, 255)
+    ) -> str:
         """
         Get overlay color for given gene.
 
@@ -231,8 +223,6 @@ class Renderer:
         if self.overlay.get(gene_id) in (None, 0.0):
             return ColorGradient.to_hex(color=default_color)
 
-
-
         # Get expression limits
         exp_min: float = min(self.overlay.values())
         exp_max: float = max(self.overlay.values())
@@ -243,7 +233,6 @@ class Renderer:
 
         # Expression above 0 (Upregulation)
         return self.cmap_upreg[abs(int(self.overlay[gene_id] / exp_max * 100))]
-
 
     # TODO: implement not here
     # def resolve_missing_gene_names(
@@ -289,13 +278,12 @@ class Renderer:
 
     #     return loopup_dict
 
-
     def render(
         self,
         # resolve_unlabeled_genes: bool = True,
         display_unlabeled_genes: bool = True,
         # truncate_gene_list: Optional[int] = None,
-        ) -> None:
+    ) -> None:
         """
         Render KEGG pathway.
 
@@ -331,11 +319,9 @@ class Renderer:
                 # case select for types gene, comp, group, ...
                 if entry.type == "gene":
 
-
                     # Get entry name by graphics element name attribute
                     if entry.graphics is not None and entry.graphics.name is not None:
                         entry_label = entry.graphics.name.split(", ")[0]
-
 
                     # Check if entry name contains multiple gene entries
                     # TODO: request the names of the entry names with .../find/gene1+gene2 ->
@@ -356,33 +342,40 @@ class Renderer:
                         #         entry_gene_list[index], entry_gene_list[index]
                         #     )
 
-
                         # Add node
-                        self.graph.add_node(Node(
-                            name=entry.id,
-                            label="<" + generate_embedded_html_table(
-                                items={ gene_id: self.get_gene_color(gene_id) for gene_id in entry_gene_list }
-                            ) + ">",
-                            shape="plaintext",
-                            style="filled",
-                            color="#000000",
-                            fillcolor="#ffffff",
-                        ))
-
+                        self.graph.add_node(
+                            Node(
+                                name=entry.id,
+                                label="<"
+                                + generate_embedded_html_table(
+                                    items={
+                                        gene_id: self.get_gene_color(gene_id)
+                                        for gene_id in entry_gene_list
+                                    }
+                                )
+                                + ">",
+                                shape="plaintext",
+                                style="filled",
+                                color="#000000",
+                                fillcolor="#ffffff",
+                            )
+                        )
 
                     else:
 
                         # Single node
-                        self.graph.add_node(Node(
-                            name=entry.id,
-                            label=entry_label,
-                            shape="rectangle",
-                            style="filled",
-                            color="#000000",
-                            fillcolor=self.get_gene_color(gene_id=entry.get_gene_id()[0]),
-                        ))
-
-
+                        self.graph.add_node(
+                            Node(
+                                name=entry.id,
+                                label=entry_label,
+                                shape="rectangle",
+                                style="filled",
+                                color="#000000",
+                                fillcolor=self.get_gene_color(
+                                    gene_id=entry.get_gene_id()[0]
+                                ),
+                            )
+                        )
 
                 elif entry.type == "group":
 
@@ -391,18 +384,25 @@ class Renderer:
                     # Iterate of components of group entry
                     for comp in entry.components:
 
-                        component_entry: Optional[Entry] = self.pathway.get_entry_by_id(comp.id)
+                        component_entry: Optional[Entry] = self.pathway.get_entry_by_id(
+                            comp.id
+                        )
 
-                        if component_entry is not None and \
-                            component_entry.graphics is not None and \
-                            component_entry.graphics.name is not None:
+                        if (
+                            component_entry is not None
+                            and component_entry.graphics is not None
+                            and component_entry.graphics.name is not None
+                        ):
 
                             # Append tuple of gene id and color to labels
-                            component_label.append((
+                            component_label.append(
+                                (
                                     component_entry.graphics.name.split(", ")[0],
-                                    self.get_gene_color(component_entry.get_gene_id()[0]),
-                            ))
-
+                                    self.get_gene_color(
+                                        component_entry.get_gene_id()[0]
+                                    ),
+                                )
+                            )
 
                     # Generate html table string from gene dict
                     # TODO: adjust cell spacing/padding, border
@@ -412,42 +412,42 @@ class Renderer:
                     )
 
                     # Add dot node to graph
-                    self.graph.add_node(Node(
-                        name=entry.id,
-                        label=f"<{html_table_string}>",
-                        # shape="rectangle",
-                        shape="plaintext",
-                        style="filled",
-                        color="#000000",
-                        fillcolor="#ffffff",
-                    ))
-
+                    self.graph.add_node(
+                        Node(
+                            name=entry.id,
+                            label=f"<{html_table_string}>",
+                            # shape="rectangle",
+                            shape="plaintext",
+                            style="filled",
+                            color="#000000",
+                            fillcolor="#ffffff",
+                        )
+                    )
 
                 elif entry.type == "compound":
 
                     # TODO: resolver compound with resolver
 
-
                     if entry.graphics is not None and entry.graphics.name is not None:
                         entry_label = entry.graphics.name.split(", ")[0]
 
                     # Add compound node to graph
-                    self.graph.add_node(Node(
-                        name=entry.id,
-                        label=entry_label,
-                        shape="oval",
-                        style="filled",
-                        color="#000000",
-                        fillcolor="#ffffff",
-                    ))
-
+                    self.graph.add_node(
+                        Node(
+                            name=entry.id,
+                            label=entry_label,
+                            shape="oval",
+                            style="filled",
+                            color="#000000",
+                            fillcolor="#ffffff",
+                        )
+                    )
 
                 elif entry.type == "reaction":
 
                     # TODO: implement reaction rendering
 
                     pass
-
 
                 # TODO: add pathway map to dot graph
                 # elif entry.type == "map":
@@ -465,8 +465,6 @@ class Renderer:
                 #         fillcolor="#ffffff",
                 #     ))
 
-
-
         for rel in self.pathway.relations:
 
             # Create edge instance from relation enties
@@ -478,7 +476,6 @@ class Renderer:
             # default line style
             line_style: str = "solid"
 
-
             # Check for type of interaction and set line style of edge
             if rel.type == "GErel":
                 # Gene expression interaction gets a distinct line style
@@ -487,8 +484,6 @@ class Renderer:
             elif rel.type == "PCrel":
                 # Protein-compound interaction gets a distinct line style
                 line_style = "dotted"
-
-
 
             # Add molecular events as edge labels
             molecular_event_dict: Dict[str, str] = {
@@ -519,9 +514,13 @@ class Renderer:
                         # A molecular event was already found. Append label to existing label
                         edge_label += ", " + molecular_event_dict[subtype.name]
 
-
                 # Check for quality of interaction to set arrow head of edge
-                if subtype.name in ("activation", "expression", "indirect effect", "binding/association"):
+                if subtype.name in (
+                    "activation",
+                    "expression",
+                    "indirect effect",
+                    "binding/association",
+                ):
                     arrowhead = "normal"
 
                 elif subtype.name in ("inhibition", "repression", "dissociation"):
@@ -530,10 +529,8 @@ class Renderer:
                 elif subtype.name == "state change":
                     arrowhead = "diamond"
 
-
             # set arrowhead to edge instance
             relation_edge.set(name="arrowhead", value=arrowhead)
-
 
             # Set label if molecular event is found in relation subtypes
             if edge_label is not None:
@@ -544,9 +541,6 @@ class Renderer:
 
             # Add edge to graph
             self.graph.add_edge(relation_edge)
-
-
-
 
     def to_string(self) -> str:
         """
@@ -559,14 +553,11 @@ class Renderer:
         # Generate dot string from pydot graph object
         render_string: Any = self.graph.to_string()
 
-
         # Check correct type of dot string
         if not isinstance(render_string, str):
             raise TypeError("Object returned from pydot graph object is not a string.")
 
         return render_string
-
-
 
     def to_binary(self, extension: str) -> bytes:
         """
@@ -583,10 +574,11 @@ class Renderer:
 
         # Type check of return value
         if not isinstance(graph_data, bytes):
-            raise TypeError("Failed to create binary file object from pydot graph instance.")
+            raise TypeError(
+                "Failed to create binary file object from pydot graph instance."
+            )
 
         return graph_data
-
 
     def to_file(self, filename: str, extension: str) -> None:
         """

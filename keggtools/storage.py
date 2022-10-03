@@ -21,17 +21,13 @@ class Storage:
             # Cachedir argument not given. Fallback to default cache directory
             cachedir = os.path.join(os.getcwd(), ".keggtools_cache")
 
-
         if os.path.isdir(cachedir) is False:
             # Directory does not exist. Auto-generate diretory
             os.mkdir(cachedir)
             # logging.info("Cache folder '%s' does not exist. Auto-generating folder.", cachedir)
             # raise NotADirectoryError(f"Directory '{cachedir}' does not exist.")
 
-
         self.cachedir = cachedir
-
-
 
     def check_cache_dir(self) -> None:
         """
@@ -42,8 +38,6 @@ class Storage:
 
         if os.path.isdir(self.cachedir) is False:
             raise NotADirectoryError(f"Directory '{self.cachedir}' does not exist.")
-
-
 
     def build_cache_path(self, filename: str) -> str:
         """
@@ -57,7 +51,6 @@ class Storage:
         self.check_cache_dir()
         return os.path.join(self.cachedir, filename)
 
-
     def exist(self, filename: str) -> bool:
         """
         Check if filename exist in caching dir.
@@ -69,7 +62,6 @@ class Storage:
 
         self.check_cache_dir()
         return os.path.isfile(os.path.join(self.cachedir, filename))
-
 
     def save(self, filename: str, data: str) -> str:
         """
@@ -90,7 +82,6 @@ class Storage:
 
         return path
 
-
     def save_dump(self, filename: str, data: Any) -> str:
         """
         Save binary dump as file in local storage. Returns absolute filename of save file.
@@ -109,7 +100,6 @@ class Storage:
 
         return path
 
-
     def load(self, filename: str) -> str:
         """
         Load string from file.
@@ -122,14 +112,15 @@ class Storage:
         path: str = self.build_cache_path(filename=filename)
 
         if not os.path.isfile(path):
-            raise FileNotFoundError(f"Can not load file. File at path '{path}' does not exist.")
+            raise FileNotFoundError(
+                f"Can not load file. File at path '{path}' does not exist."
+            )
 
         with open(path, "r", encoding="utf-8") as f_obj:
             data = f_obj.read()
             f_obj.close()
 
         return data
-
 
     def load_dump(self, filename: str) -> Any:
         """
@@ -143,7 +134,9 @@ class Storage:
         path: str = self.build_cache_path(filename=filename)
 
         if not os.path.isfile(path):
-            raise FileNotFoundError(f"Can not load file. File at path '{path}' does not exist.")
+            raise FileNotFoundError(
+                f"Can not load file. File at path '{path}' does not exist."
+            )
 
         with open(path, "rb") as input_file:
             return pickle.load(input_file)

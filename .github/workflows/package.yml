@@ -3,9 +3,9 @@ name: Package testing
 
 on:
     workflow_dispatch:
-    # push:
-    #     branches:
-    #     -   main
+    push:
+        branches:
+        -   main
 
     # Run action when pull request is opened
     pull_request:
@@ -38,7 +38,7 @@ jobs:
             run: |
                 sudo apt-get install -y graphviz
                 python -m pip install --upgrade pip
-                pip install mypy pylint pytest coverage twine setuptools types-requests responses flit
+                pip install mypy flake8 pytest coverage twine setuptools types-requests responses flit
                 pip install requests scipy pydot pandas
 
 
@@ -46,8 +46,8 @@ jobs:
         # Linting package
         -   name: Lint
             run: |
-                pylint ./keggtools
-                pylint ./test/*.py
+                flake8 --max-line-length 120 ./keggtools
+                flake8 --max-line-length 120 ./test/*.py
 
 
         # Install package from setup.py and static code analysis
@@ -77,7 +77,7 @@ jobs:
             run: |
                 pip install Sphinx furo
                 mypy ./docs/conf.py
-                pylint ./docs/conf.py
+                flake8 --max-line-length 120 ./docs/conf.py
                 python -m sphinx -M doctest ./docs ./docs/_build
                 python -m  sphinx -M coverage ./docs ./docs/_build
                 python -m  sphinx -M html ./docs ./docs/_build

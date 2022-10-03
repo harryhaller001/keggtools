@@ -15,10 +15,9 @@ from keggtools import __version__
 sys.path.insert(0, os.path.abspath("../"))
 
 
-
 project = "keggtools"
 author = "harryhaller001"
-copyright = f'{datetime.now():%Y}, {author}.' # pylint: disable=redefined-builtin
+copyright = f"{datetime.now():%Y}, {author}."  # pylint: disable=redefined-builtin
 version = __version__
 release = version
 
@@ -31,21 +30,17 @@ extensions = [
 
 # Mapping for intersphinx extension
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
-    'pandas': ('http://pandas.pydata.org/pandas-docs/dev', None),
+    "python": ("https://docs.python.org/3", None),
+    "pandas": ("http://pandas.pydata.org/pandas-docs/dev", None),
 }
 
 
-source_suffix = '.rst'
+source_suffix = ".rst"
 master_doc = "index"
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 
-exclude_trees = [
-    "_build",
-    "cloudflare-workers",
-    "dist"
-]
+exclude_trees = ["_build", "cloudflare-workers", "dist"]
 
 exclude_patterns = [
     "wrangler.toml",
@@ -70,8 +65,8 @@ html_theme = "furo"
 html_show_sphinx = False
 html_context = dict(
     display_github=True,
-    github_user='harryhaller001',
-    github_repo='keggtools',
-    github_version='main',
-    conf_py_path='/docs/',
+    github_user="harryhaller001",
+    github_repo="keggtools",
+    github_version="main",
+    conf_py_path="/docs/",
 )

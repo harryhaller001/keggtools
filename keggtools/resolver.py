@@ -29,7 +29,7 @@ def _request_to_dict(
     col_keys: int = 0,
     col_values: int = 1,
     **kwargs: Any,
-    ) -> Dict[str, str]:
+) -> Dict[str, str]:
     """
     Request TSV resource from Url and parse to dict.
 
@@ -42,9 +42,7 @@ def _request_to_dict(
     """
 
     return parse_tsv_to_dict(
-        data=_request(url=url, **kwargs),
-        col_keys=col_keys,
-        col_values=col_values
+        data=_request(url=url, **kwargs), col_keys=col_keys, col_values=col_values
     )
 
 
@@ -65,8 +63,7 @@ def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
     # Check maximum number of entries requests
     # TODO: build fallback to make multiple requests from long lists (iterate over list chunks)
     if len(genes) > max_genes:
-        raise ValueError(
-            f"Too many entries are requested at once ({len(genes)}/50).")
+        raise ValueError(f"Too many entries are requested at once ({len(genes)}/50).")
 
     # TODO check if pattern of identifer is correct
     # for item in genes:
@@ -80,7 +77,9 @@ def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
     query_string: str = "+".join(genes)
 
     # Request without cache
-    resolve_dict: Dict[str, str] = _request_to_dict(url=f"http://rest.kegg.jp/list/{query_string}")
+    resolve_dict: Dict[str, str] = _request_to_dict(
+        url=f"http://rest.kegg.jp/list/{query_string}"
+    )
 
     # Sanitize dict by splitting first entry of gene name
     result_dict: Dict[str, str] = {}
@@ -128,7 +127,6 @@ class Resolver:
         # Internal storage instance
         self.storage: Storage = _store
 
-
     def _cache_or_request(
         self,
         filename: str,
@@ -163,14 +161,13 @@ class Resolver:
 
         return file_data
 
-
     def _cache_or_request_to_dict(
         self,
         filename: str,
         url: str,
         col_keys: int = 0,
         col_values: int = 1,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> Dict[str, str]:
         """
         Load and parse TSV file from cache folder and return two columns as dict. If file does not exist, request
@@ -189,8 +186,9 @@ class Resolver:
         tsv_data: str = self._cache_or_request(filename=filename, url=url, **kwargs)
 
         # Parse tsv data to dict
-        return parse_tsv_to_dict(data=tsv_data, col_keys=col_keys, col_values=col_values)
-
+        return parse_tsv_to_dict(
+            data=tsv_data, col_keys=col_keys, col_values=col_values
+        )
 
     def get_pathway_list(self, organism: str, **kwargs: Any) -> Dict[str, str]:
         """
@@ -212,9 +210,8 @@ class Resolver:
         return self._cache_or_request_to_dict(
             filename=f"pathway_list_{organism}.tsv",
             url=f"http://rest.kegg.jp/list/pathway/{organism}",
-            **kwargs
+            **kwargs,
         )
-
 
     def get_pathway(self, organism: str, code: str, **kwargs: Any) -> Pathway:
         """
@@ -238,7 +235,6 @@ class Resolver:
         # Parse string
         return Pathway.parse(data)
 
-
     def get_compounds(self, **kwargs: Any) -> Dict[str, str]:
         """
         Get dict of components. Request from KEGG API if not in cache.
@@ -253,7 +249,6 @@ class Resolver:
             url="http://rest.kegg.jp/list/compound",
             **kwargs,
         )
-
 
     def get_organism_list(self, **kwargs: Any) -> Dict[str, str]:
         """
@@ -271,7 +266,6 @@ class Resolver:
             col_values=2,
             **kwargs,
         )
-
 
     def check_organism(self, organism: str) -> bool:
         """

@@ -8,7 +8,8 @@ BASE_DIR		= ${PWD}
 PYTHON_OPT		= python3
 PIP_OPT			= $(PYTHON_OPT) -m pip
 MYPY_OPT		= $(PYTHON_OPT) -m mypy
-LINT_OPT		= $(PYTHON_OPT) -m pylint
+FLAKE8_OPT		= $(PYTHON_OPT) -m flake8
+BLACK_OPT		= $(PYTHON_OPT) -m black
 TEST_OPT		= $(PYTHON_OPT) -m pytest
 TWINE_OPT		= $(PYTHON_OPT) -m twine
 SPHINX_OPT		= $(PYTHON_OPT) -m sphinx
@@ -31,10 +32,25 @@ help: ## This help.
 
 .PHONY: install
 install: ## install all python dependencies
-	@$(PIP_OPT) install mypy pylint pytest coverage twine setuptools types-requests responses flit pre-commit --upgrade
-	@$(PIP_OPT) install requests scipy pydot pandas --upgrade
-#	@$(PIP_OPT) install Sphinx sphinx-rtd-theme --upgrade
-	@$(PIP_OPT) install Sphinx furo --upgrade
+	@$(PIP_OPT) install \
+		mypy \
+		flake8 \
+		black \
+		pytest \
+		coverage \
+		twine \
+		setuptools \
+		types-requests \
+		responses \
+		flit \
+		pre-commit \
+		requests \
+		scipy \
+		pydot \
+		pandas \
+		Sphinx \
+		furo \
+		--upgrade
 
 
 
@@ -60,16 +76,22 @@ twine: ## Twine package upload and checks
 
 
 
-.PHONY: pylint
-pylint: ## Linting package
-	@$(LINT_OPT) keggtools
-	@$(LINT_OPT) ./test/*.py
-	@$(LINT_OPT) ./docs/conf.py
+.PHONY : format
+format: ## Lint and format code with flake8 and black
+	@$(BLACK_OPT) ./keggtools
+	@$(BLACK_OPT) ./test
+	@$(BLACK_OPT) ./docs/conf.py
+
+	@$(FLAKE8_OPT) --max-line-length 120 ./keggtools
+	@$(FLAKE8_OPT) --max-line-length 120 ./test
+	@$(FLAKE8_OPT) --max-line-length 120 ./docs/conf.py
+
+
 
 
 .PHONY: pytest
 pytest: ## Unittest of package
-	@$(TEST_OPT) -p keggtools --show-capture=log
+	@$(TEST_OPT) --show-capture=log
 
 
 .PHONY: mypy
@@ -133,7 +155,7 @@ docs: ## Build sphinx docs
 
 # Run all checks (always before committing!)
 .PHONY: check
-check: clean install freeze pylint mypy coverage twine docs precommit ## Full check of package
+check: install freeze format mypy coverage twine docs precommit ## Full check of package
 
 
 

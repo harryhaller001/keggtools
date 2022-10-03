@@ -32,7 +32,6 @@ def get_attribute(element: Element, key: str) -> str:
     return value
 
 
-
 def get_numeric_attribute(element: Element, key: str) -> str:
     """
     Get attribute from XML Element object. Raises KeyError is Attribute is not found or not valid.
@@ -53,7 +52,6 @@ def get_numeric_attribute(element: Element, key: str) -> str:
     return value
 
 
-
 def parse_xml(xml_object_or_string: Union[str, Element]) -> Element:
     """
     Returns XML Element object from string or XML Element.
@@ -67,8 +65,6 @@ def parse_xml(xml_object_or_string: Union[str, Element]) -> Element:
     return xml_object_or_string
 
 
-
-
 def parse_tsv(data: str) -> list:
     """
     Parse .tsv file from string
@@ -80,12 +76,11 @@ def parse_tsv(data: str) -> list:
     return list(csv.reader(StringIO(data), delimiter="\t"))
 
 
-
 def parse_tsv_to_dict(
     data: str,
     col_keys: int = 0,
     col_values: int = 1,
-    ) -> Dict[str, str]:
+) -> Dict[str, str]:
     """
     Parse .tsv file from string and build dict from first two columns. Other columns are ignored.
 
@@ -108,18 +103,12 @@ def parse_tsv_to_dict(
     return result
 
 
-
 class ColorGradient:
     """
     Create color gradient.
     """
 
-    def __init__(
-        self,
-        start: tuple,
-        stop: tuple,
-        steps: int = 100
-    ) -> None:
+    def __init__(self, start: tuple, stop: tuple, steps: int = 100) -> None:
         """
         Init ColorGradient instance.
 
@@ -130,7 +119,6 @@ class ColorGradient:
         self.start: tuple = start
         self.stop: tuple = stop
         self.steps: int = steps
-
 
     @staticmethod
     def to_css(color: tuple) -> str:
@@ -145,7 +133,6 @@ class ColorGradient:
         #     raise ValueError("Color must be a tuple of 3 integers.")
 
         return f"rgb({color[0]},{color[1]},{color[2]})".lower()
-
 
     @staticmethod
     def to_hex(color: tuple) -> str:
@@ -162,7 +149,6 @@ class ColorGradient:
 
         return f"#{color[0]:02x}{color[1]:02x}{color[2]:02x}".lower()
 
-
     def get_list(self) -> List[str]:
         """
         Get gradient color as list.
@@ -172,14 +158,13 @@ class ColorGradient:
         """
 
         step_list = [index / float(self.steps) for index in range(self.steps)]
-        result = [ColorGradient._intermediate(self.stop, self.start, step) for step in step_list]
+        result = [
+            ColorGradient._intermediate(self.stop, self.start, step)
+            for step in step_list
+        ]
         result.append(self.stop)
 
-
-        return [
-            ColorGradient.to_hex(code) for code in result
-        ]
-
+        return [ColorGradient.to_hex(code) for code in result]
 
     @staticmethod
     def _intermediate(a_var: tuple, b_var: tuple, ratio: float) -> tuple:
@@ -191,9 +176,6 @@ class ColorGradient:
         values: List[float] = list(map(sum, zip(a_component, b_component)))
 
         return tuple((int(item) for item in values))
-
-
-
 
 
 def is_valid_pathway_org(value: str) -> bool:
@@ -233,7 +215,9 @@ def is_valid_pathway_name(value: str) -> bool:
     :rtype: bool
     """
 
-    return re.match(pattern=r"^path:(ko|ec|[a-z]{3})([0-9]{5})$", string=value) is not None
+    return (
+        re.match(pattern=r"^path:(ko|ec|[a-z]{3})([0-9]{5})$", string=value) is not None
+    )
 
 
 def is_valid_hex_color(value: str) -> bool:
@@ -258,7 +242,6 @@ def is_valid_gene_name(value: str) -> bool:
 
     # TODO Support ko|ec entries ???
     return re.match(pattern=r"^([a-z]{3}):([0-9]{5})$", string=value) is not None
-
 
 
 # TODO: is a custom warning class needed

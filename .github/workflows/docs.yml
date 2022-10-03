@@ -27,7 +27,7 @@ jobs:
         # Test and build the docs for keggtools
         -   name: test and build docs
             run: |
-                pip install Sphinx furo
+                pip install mypy pylint Sphinx furo
                 mypy ./docs/conf.py
                 pylint ./docs/conf.py
                 python -m sphinx -M doctest ./docs ./docs/_build

@@ -49,7 +49,8 @@ Source = "https://github.com/harryhaller001/keggtools"
 # Optional dependencies for testing and docs
 [project.optional-dependencies]
 test = [
-    "pylint",
+    "flake8",
+    "black",
     "pytest",
     "coverage",
     "mypy",

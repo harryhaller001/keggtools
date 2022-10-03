@@ -1,0 +1,8 @@
+name = "keggtools_docs"
+type = "webpack"
+workers_dev = false
+route = "keggtools.org/*"
+
+[site]
+bucket = "./_build/html"
+entry-point = "cloudflare-workers"

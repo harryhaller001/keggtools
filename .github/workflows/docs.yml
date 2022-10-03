@@ -1,0 +1,46 @@
+
+name: Deploy docs
+
+on:
+    workflow_dispatch:
+    release:
+        branches:
+            - main
+
+
+# Jobs
+jobs:
+
+    docs:
+        # Run on ubuntu latest
+        runs-on: ubuntu-latest
+
+
+        steps:
+        -   uses: actions/checkout@v2
+        -   name: Set up Python 3.6
+            uses: actions/setup-python@v2
+            with:
+                python-version: "3.6"
+
+
+        # Test and build the docs for keggtools
+        -   name: test and build docs
+            run: |
+                pip install Sphinx furo
+                mypy ./docs/conf.py
+                pylint ./docs/conf.py
+                python -m sphinx -M doctest ./docs ./docs/_build
+                python -m  sphinx -M coverage ./docs ./docs/_build
+                python -m  sphinx -M html ./docs ./docs/_build
+
+        # Deploy with cloudflare workers
+        -   uses: actions/checkout@v2
+        -   name: Publish
+            uses: cloudflare/wrangler-action@2.0.0
+            with:
+                workingDirectory: ./docs
+                apiToken: ${{ secrets.CF_API_TOKEN }}
+                accountId: ${{ secrets.CF_ACCOUNT_ID }}
+
+

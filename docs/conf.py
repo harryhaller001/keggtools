@@ -7,9 +7,6 @@ import os
 from datetime import datetime
 import sys
 
-# import sphinx_rtd_theme
-# import furo
-
 # Import version from package
 from keggtools import __version__
 
@@ -29,7 +26,6 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
     "sphinx.ext.doctest",
-    # "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
 ]
 
@@ -68,9 +64,6 @@ autoapi_dirs = ["../keggtools"]
 coverage_show_missing_items = True
 
 
-# Configurate sphinx rtd theme
-# html_theme = "sphinx_rtd_theme"
-# html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 html_theme = "furo"
 
 
@@ -82,11 +75,3 @@ html_context = dict(
     github_version='main',
     conf_py_path='/docs/',
 )
-
-
-html_static_path = ['static']
-
-# Addind custom css script
-# html_css_files = [
-#     'css/custom.css',
-# ]

@@ -5,11 +5,11 @@ on:
     workflow_dispatch:
     push:
         branches:
-            - main
+        -   main
 
     # Run action when pull request is opened
     pull_request:
-        types:  [opened, reopened, synchronize]
+        types: [opened, reopened, synchronize]
 
 
 # Jobs
@@ -24,17 +24,17 @@ jobs:
             matrix:
                 # Check for all python versions >=3.6
                 # python-version: [3.6, 3.7, 3.8, 3.9]
-                python-version: [3.6]
+                python-version: ["3.6"]
 
         steps:
-          - uses: actions/checkout@v2
-          - name: Set up Python ${{ matrix.python-version }}
+        -   uses: actions/checkout@v2
+        -   name: Set up Python ${{ matrix.python-version }}
             uses: actions/setup-python@v2
             with:
                 python-version: ${{ matrix.python-version }}
 
-          # Install dependencies from freeze
-          - name: Install dependencies
+        # Install dependencies from freeze
+        -   name: Install dependencies
             run: |
                 sudo apt-get install -y graphviz
                 python -m pip install --upgrade pip
@@ -43,39 +43,39 @@ jobs:
 
 
 
-          # Linting package
-          - name: Lint
+        # Linting package
+        -   name: Lint
             run: |
                 pylint ./keggtools
                 pylint ./test/*.py
 
 
-          # Install package from setup.py and static code analysis
-          - name: Static code analysis
+        # Install package from setup.py and static code analysis
+        -   name: Static code analysis
             run: |
                 mypy ./test
                 mypy ./keggtools
 
 
-          # Run unittest on installed package
-          - name: Unit testing with pytest
+        # Run unittest on installed package
+        -   name: Unit testing with pytest
             run: |
                 pytest ./test --show-capture=log
 
 
 
-          # Build wheel and egg with flit backend
-          - name: Build package
+        # Build wheel and egg with flit backend
+        -   name: Build package
             run: |
                 flit build --setup-py
                 twine check --strict ./dist/*
                 flit install
 
 
-          # Test and build the docs for keggtools
-          - name: test and build docs
+        # Test and build the docs for keggtools
+        -   name: test and build docs
             run: |
-                pip install Sphinx sphinx-rtd-theme
+                pip install Sphinx furo
                 mypy ./docs/conf.py
                 pylint ./docs/conf.py
                 python -m sphinx -M doctest ./docs ./docs/_build

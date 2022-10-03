@@ -42,9 +42,8 @@ dynamic = ["version"]
 
 # Project urls
 [project.urls]
-# Documentation = "TODO"
+Documentation = "https://keggtools.org/"
 Source = "https://github.com/harryhaller001/keggtools"
-# Home-page = "TODO"
 
 
 # Optional dependencies for testing and docs
@@ -61,21 +60,8 @@ test = [
 
 doc = [
     "Sphinx",
-    # "sphinx-rtd-theme",
     "furo",
 ]
-
-
-# Entrypoints for flit
-# https://flit.pypa.io/en/latest/pyproject_toml.html#scripts-section
-# [project.scripts]
-# keggtools = "keggtools.cli:main"
-
-
-# Pylint config
-[tool.pylint.'MESSAGES CONTROL']
-max-line-length = 120
-disable = "fixme"
 
 
 # Mypy config
@@ -90,7 +76,6 @@ warn_unused_configs = true
 [[tool.mypy.overrides]]
 module = [
     "pandas",
-    # "sphinx_rtd_theme",
     "setuptools",
     "scipy",
     "pydot",
@@ -116,13 +101,23 @@ testpaths = [
 
 # Coverage config
 [tool.coverage.run]
-source = ["keggtools"]
-omit = ["*/test/*"]
+source = [
+    "keggtools"
+]
+omit = [
+    "*/test/*"
+]
 
 
 # Flit sdist config
 # https://flit.pypa.io/en/latest/pyproject_toml.html#sdist-section
 [tool.flit.sdist]
-include = ["keggtools/"]
-exclude = ["docs", "test", "reproducibility",]
+include = [
+    "keggtools/"
+]
+exclude = [
+    "docs",
+    "test",
+    "reproducibility",
+]
 

@@ -1,0 +1,35 @@
+{
+    "git.ignoreLimitWarning": true,
+    "settings": {
+        "files.exclude": {
+            "**/.DS_Store": true,
+            "**/venv": true,
+            "**/.mypy_cache": true,
+            "**/.pytest_cache": true,
+        }
+    },
+    "python.defaultInterpreterPath": "./venv/bin/python",
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "black",
+    "python.formatting.blackPath": "./venv/bin/black",
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Path": "./venv/bin/flake8",
+    "python.linting.flake8Args": [
+        "--max-line-length 100",
+    ],
+    "python.linting.mypyEnabled": true,
+    "python.linting.mypyPath": "./venv/bin/mypy",
+    "python.linting.enabled": true,
+    "[python]": {
+        "editor.formatOnPaste": true,
+        "editor.formatOnSaveMode": "file",
+        "editor.rulers": [
+            120
+        ],
+    },
+    "python.testing.pytestArgs": [
+        "test"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+}

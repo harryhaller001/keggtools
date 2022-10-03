@@ -64,6 +64,6 @@ Or install package from local source files
     cd keggtools
 
     # Install dependencies and package
-    python3 -m pip install -r requirements.txt
-    python3 setup.py install
+    python3 -m pip install -e .
+
 

@@ -1,6 +1,10 @@
 # keggtools
 Library for KEGG pathway enrichment analysis.
 
+Documentation: [https://keggtools.org/](https://keggtools.org/)
+PyPi: [https://pypi.org/project/keggtools/](https://pypi.org/project/keggtools/)
+
+
 ## Installation
 
 `keggtools` only supports `python` version greater than or equal `3.6`.

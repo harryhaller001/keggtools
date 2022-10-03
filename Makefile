@@ -63,7 +63,7 @@ freeze: ## Freeze package dependencies
 .PHONY: twine
 twine: ## Twine package upload and checks
 # Remove old keggtools package
-	@pip uninstall keggtools -y --quiet
+	@$(PIP_OPT) uninstall keggtools -y --quiet
 
 # Build package with flit backend
 	@$(FLIT_OPT) build --setup-py
@@ -72,7 +72,7 @@ twine: ## Twine package upload and checks
 	@$(TWINE_OPT) check --strict ./dist/*
 
 # Install package with flit
-	@$(FLIT_OPT) install
+	@$(FLIT_OPT) install --deps=production
 
 
 

@@ -140,10 +140,6 @@ dmypy.json
 *.dump
 /.cache
 
-# Ignore visual code settings
-/.vscode
-
-
 # Ignore TODO list
 TODO.md
 CHANGELOG.md

@@ -27,7 +27,8 @@ jobs:
         # Test and build the docs for keggtools
         -   name: test and build docs
             run: |
-                pip install Sphinx furo
+                pip install flit Sphinx furo
+                flit install
                 python -m sphinx -M doctest ./docs ./docs/_build
                 python -m  sphinx -M coverage ./docs ./docs/_build
                 python -m  sphinx -M html ./docs ./docs/_build

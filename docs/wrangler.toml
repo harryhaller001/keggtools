@@ -1,10 +1,10 @@
 name = "keggtools_docs"
-type = "webpack"
 workers_dev = false
-route = "keggtools.org/*"
 compatibility_date = "2022-10-03"
+main = "cloudflare-workers/index.js"
+route = "keggtools.org/*"
 
 
 [site]
 bucket = "./_build/html"
-entry-point = "cloudflare-workers"
+

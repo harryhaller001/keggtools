@@ -7,6 +7,6 @@
   "author": "harryhaller001 <harryhaller001@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@cloudflare/kv-asset-handler": "~0.0.11"
+    "@cloudflare/kv-asset-handler": "~0.1.2"
   }
 }

@@ -28,7 +28,7 @@ jobs:
         -   name: test and build docs
             run: |
                 pip install flit Sphinx furo
-                flit install
+                flit install --deps=production
                 python -m sphinx -M doctest ./docs ./docs/_build
                 python -m  sphinx -M coverage ./docs ./docs/_build
                 python -m  sphinx -M html ./docs ./docs/_build

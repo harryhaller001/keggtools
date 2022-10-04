@@ -65,6 +65,9 @@ twine: ## Twine package upload and checks
 # Remove old keggtools package
 	@$(PIP_OPT) uninstall keggtools -y --quiet
 
+# Remove dist folder
+	@rm -rf ./dist
+
 # Build package with flit backend
 	@$(FLIT_OPT) build --setup-py
 

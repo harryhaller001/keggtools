@@ -4,6 +4,7 @@ name: Deploy docs
 on:
     workflow_dispatch:
     release:
+        types: [published]
         branches:
             - main
 

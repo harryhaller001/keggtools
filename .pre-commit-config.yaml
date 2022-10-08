@@ -51,15 +51,16 @@ repos:
 #     rev: v0.971
 #     hooks:
 #     -   id: mypy
-#         name: Static code analysis of backend
+#         name: Static code analysis
 #         files: ^(keggtools|test|docs)/(.*).py
 #         additional_dependencies: ["types-requests"]
+
 
 # add pytest hook
 -   repo: local
     hooks:
     -   id: pytest
-        name: Run unittest on worker
+        name: Run unittest
         stages: [commit]
         language: system
         entry: pytest

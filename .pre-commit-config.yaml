@@ -44,7 +44,7 @@ repos:
     -   id: flake8
         name: Run linting with flake8
         files: (.*).py
-        args: [--max-line-length=120]
+        args: [--config=./.flake8]
 
 
 # -   repo: https://github.com/pre-commit/mirrors-mypy

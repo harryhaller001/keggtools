@@ -5,8 +5,13 @@ PACKAGE_NAME	= keggtools
 
 BASE_DIR		= ${PWD}
 
+PACKAGE_DIR		= $(BASE_DIR)/$(PACKAGE_NAME)
+TEST_DIR		= $(BASE_DIR)/test
+DOCS_DIR		= $(BASE_DIR)/docs
+
+
 PYTHON_OPT		= python3
-PIP_OPT			= $(PYTHON_OPT) -m pip
+PIP_OPT			= $(PYTHON_OPT) -m pip --require-virtualenv
 MYPY_OPT		= $(PYTHON_OPT) -m mypy
 FLAKE8_OPT		= $(PYTHON_OPT) -m flake8
 BLACK_OPT		= $(PYTHON_OPT) -m black
@@ -50,6 +55,11 @@ install: ## install all python dependencies
 		pandas \
 		Sphinx \
 		furo \
+		scanpy \
+		mygene \
+		ipykernel \
+		leidenalg \
+		umap-learn==0.5.1 \
 		--upgrade
 
 
@@ -66,7 +76,7 @@ twine: ## Twine package upload and checks
 	@$(PIP_OPT) uninstall keggtools -y --quiet
 
 # Remove dist folder
-	@rm -rf ./dist
+	@rm -rf ./dist/*
 
 # Build package with flit backend
 	@$(FLIT_OPT) build --setup-py
@@ -81,15 +91,9 @@ twine: ## Twine package upload and checks
 
 .PHONY : format
 format: ## Lint and format code with flake8 and black
-	@$(BLACK_OPT) ./keggtools
-	@$(BLACK_OPT) ./test
-	@$(BLACK_OPT) ./docs/conf.py
+	@$(BLACK_OPT) $(PACKAGE_DIR) $(TEST_DIR) $(DOCS_DIR)/conf.py
 
-	@$(FLAKE8_OPT) --max-line-length 120 ./keggtools
-	@$(FLAKE8_OPT) --max-line-length 120 ./test
-	@$(FLAKE8_OPT) --max-line-length 120 ./docs/conf.py
-
-
+	@$(FLAKE8_OPT) $(PACKAGE_DIR) $(TEST_DIR) $(DOCS_DIR)/conf.py
 
 
 .PHONY: pytest
@@ -99,10 +103,7 @@ pytest: ## Unittest of package
 
 .PHONY: mypy
 mypy: ## Run static code analysis
-	@$(MYPY_OPT) ./test/*.py
-	@$(MYPY_OPT) ./docs/conf.py
-	@$(MYPY_OPT) -p keggtools
-
+	@$(MYPY_OPT) $(PACKAGE_DIR) $(TEST_DIR) $(DOCS_DIR)/conf.py
 
 
 
@@ -142,15 +143,15 @@ docs: ## Build sphinx docs
 	cp ./reproducibility/figures/figure5.png ./docs/media/keggtools-pathway.png
 
 
-	@$(SPHINX_OPT) -M doctest ./docs ./docs/_build
-	@$(SPHINX_OPT) -M coverage ./docs ./docs/_build
+	@$(SPHINX_OPT) -M doctest $(DOCS_DIR) $(DOCS_DIR)/_build
+	@$(SPHINX_OPT) -M coverage $(DOCS_DIR) $(DOCS_DIR)/_build
 
 # TODO: add latex pdf version of docs and copy to static files to include in HTML version
 #	@$(SPHINX_OPT) -M latexpdf ./docs ./docs/_build && cp ./docs/_build/latex/keggtools.pdf ./docs/static/keggtools.pdf
 
 
 # Build HTML version
-	@$(SPHINX_OPT) -M html ./docs ./docs/_build
+	@$(SPHINX_OPT) -M html $(DOCS_DIR) $(DOCS_DIR)/_build
 
 
 

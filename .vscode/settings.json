@@ -1,12 +1,12 @@
 {
     "git.ignoreLimitWarning": true,
-    "settings": {
-        "files.exclude": {
-            "**/.DS_Store": true,
-            "**/venv": true,
-            "**/.mypy_cache": true,
-            "**/.pytest_cache": true,
-        }
+    "files.exclude": {
+        "**/.DS_Store": true,
+        "**/venv": true,
+        "**/.mypy_cache": true,
+        "**/.pytest_cache": true,
+        "**/.coverage": true,
+        "**/coverage": true,
     },
     "python.defaultInterpreterPath": "./venv/bin/python",
     "editor.formatOnSave": true,

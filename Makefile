@@ -73,7 +73,7 @@ freeze: ## Freeze package dependencies
 .PHONY: twine
 twine: ## Twine package upload and checks
 # Remove old keggtools package
-	@$(PIP_OPT) uninstall keggtools -y --quiet
+	@$(PIP_OPT) uninstall $(PACKAGE_NAME) -y --quiet
 
 # Remove dist folder
 	@rm -rf ./dist/*
@@ -85,7 +85,7 @@ twine: ## Twine package upload and checks
 	@$(TWINE_OPT) check --strict ./dist/*
 
 # Install package with flit
-	@$(FLIT_OPT) install --deps=production
+	@$(FLIT_OPT) install --deps=none
 
 
 

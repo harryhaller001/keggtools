@@ -22,9 +22,8 @@ jobs:
         # Matrix testing
         strategy:
             matrix:
-                # Check for all python versions >=3.6
-                # python-version: [3.6, 3.7, 3.8, 3.9]
-                python-version: ["3.6"]
+                # Check for all python versions >=3.8
+                python-version: ["3.8", "3.9", "3.10"]
 
         steps:
         -   uses: actions/checkout@v2

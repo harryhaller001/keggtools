@@ -26,7 +26,6 @@ class EnrichmentResult:
         pathway_genes: list,
         pathway_title: Optional[str] = None,
     ) -> None:
-
         """
         Init Result of KEGG pathway enrichment analysis.
 
@@ -191,7 +190,6 @@ class Enrichment:
         study_n: int = len(gene_list)
 
         for pathway in self.all_pathways:
-
             genes_found: List[str] = []
             all_pathways_genes = pathway.get_genes()
             absolute_pathway_genes += len(all_pathways_genes)
@@ -217,10 +215,8 @@ class Enrichment:
         # Perform Fisher exact test
         # http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.stats.fisher_exact.html
         for analysis in self.result:
-
             # Skip p value calculation if no genes are found
             if analysis.study_count > 0:
-
                 a_var: int = analysis.study_count
                 b_var: int = study_n - analysis.study_count
                 c_var: int = analysis.pathway_genes_count - analysis.study_count

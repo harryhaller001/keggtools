@@ -9,7 +9,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "keggtools"
 description = "Enrichment analysis and visualisation toolkit for KEGG pathways"
-requires-python = '>=3.6'
+requires-python = '>=3.8'
 license = {file = "LICENSE"}
 
 authors = [
@@ -24,17 +24,16 @@ readme = {file = "README.md", content-type="text/markdown"}
 
 classifiers=[
     "Development Status :: 3 - Alpha",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "pydot >= 1.4.2",
-    "requests >= 2.27.1",
-    "scipy >= 1.5.4",
+    "pydot",
+    "requests",
+    "scipy",
 ]
 
 dynamic = ["version"]
@@ -68,7 +67,7 @@ doc = [
 # Mypy config
 # https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
 [tool.mypy]
-python_version = "3.6"
+python_version = "3.8"
 warn_return_any = true
 warn_unused_configs = true
 

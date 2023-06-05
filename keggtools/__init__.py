@@ -1,7 +1,7 @@
 """ Init keggtools module """
 
 
-__version__: str = "1.0.1"
+__version__: str = "1.0.2"
 
 from .analysis import EnrichmentResult, Enrichment  # noqa: F401
 from .const import (  # noqa: F401

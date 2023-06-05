@@ -88,13 +88,11 @@ def generate_embedded_html_table(
 
     # TODO: implement multiple cols for longer lists (square format)
     for index, (key, value) in enumerate(items.items()):
-
         element_row: Element = SubElement(element_table, "tr", attrib={})
 
         element_col: Element = SubElement(element_row, "td")
 
         if truncate is not None and index >= truncate:
-
             element_col.text = f"{len(items.items()) - truncate} more genes..."
             break
 
@@ -309,7 +307,6 @@ class Renderer:
         related_entries.extend([int(p.entry2) for p in self.pathway.relations])
 
         for entry in self.pathway.entries:
-
             # Use entry id as default label
             # TODO: use different default label as fallback
             entry_label: str = entry.id
@@ -318,7 +315,6 @@ class Renderer:
             if int(entry.id) in related_entries:
                 # case select for types gene, comp, group, ...
                 if entry.type == "gene":
-
                     # Get entry name by graphics element name attribute
                     if entry.graphics is not None and entry.graphics.name is not None:
                         entry_label = entry.graphics.name.split(", ")[0]
@@ -362,7 +358,6 @@ class Renderer:
                         )
 
                     else:
-
                         # Single node
                         self.graph.add_node(
                             Node(
@@ -378,12 +373,10 @@ class Renderer:
                         )
 
                 elif entry.type == "group":
-
                     component_label: List[Tuple[str, str]] = []
 
                     # Iterate of components of group entry
                     for comp in entry.components:
-
                         component_entry: Optional[Entry] = self.pathway.get_entry_by_id(
                             comp.id
                         )
@@ -393,7 +386,6 @@ class Renderer:
                             and component_entry.graphics is not None
                             and component_entry.graphics.name is not None
                         ):
-
                             # Append tuple of gene id and color to labels
                             component_label.append(
                                 (
@@ -425,7 +417,6 @@ class Renderer:
                     )
 
                 elif entry.type == "compound":
-
                     # TODO: resolver compound with resolver
 
                     if entry.graphics is not None and entry.graphics.name is not None:
@@ -444,7 +435,6 @@ class Renderer:
                     )
 
                 elif entry.type == "reaction":
-
                     # TODO: implement reaction rendering
 
                     pass
@@ -466,7 +456,6 @@ class Renderer:
                 #     ))
 
         for rel in self.pathway.relations:
-
             # Create edge instance from relation enties
             relation_edge: Edge = Edge(
                 src=rel.entry1,
@@ -501,10 +490,8 @@ class Renderer:
             arrowhead: str = "none"
 
             for subtype in rel.subtypes:
-
                 # Check if subtype is molecular event to set label of edge
                 if subtype.name in molecular_event_dict:
-
                     # Check if label is none (no subtype found in prior iter steps)
                     if edge_label is None:
                         edge_label = molecular_event_dict[subtype.name]

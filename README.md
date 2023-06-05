@@ -8,7 +8,7 @@ PyPi: [https://pypi.org/project/keggtools/](https://pypi.org/project/keggtools/)
 
 ## Installation
 
-`keggtools` only supports `python` version greater than or equal `3.6`.
+`keggtools` only supports `python` version greater than or equal `3.8`.
 
 Dependencies
 
@@ -18,7 +18,7 @@ Dependencies
 
 * `requests`
 * `pydot`
-* `scipy>=1.5.4`
+* `scipy`
 
 
 Installation `keggtools` package using `pip`:

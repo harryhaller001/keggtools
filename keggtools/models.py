@@ -621,7 +621,6 @@ class Product:
         # Parse child alt elements
         for child in item:
             if child.tag == "alt":
-
                 # TODO warn if overwrite
                 # TODO: or raise exception (only 1 alt should be presnet)
                 # if parsed_product.alt is not None:
@@ -708,7 +707,6 @@ class Substrate:
         # Parse child alt elements
         for child in item:
             if child.tag == "alt":
-
                 # TODO warn if overwrite
                 # TODO: or raise exception (only 1 alt should be presnet)
                 # if parsed_substrate.alt is not None:
@@ -1033,7 +1031,6 @@ class Pathway:
         # Keep list of genes unique
         for entry in self.entries:
             if entry.type == "gene":
-
                 # Get name of entry (KEGG identifier)
                 # if " " in entry.name:
                 #     # Check if name contains a space, which indicates list of multiple identifier

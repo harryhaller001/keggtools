@@ -146,12 +146,10 @@ class Resolver:
         file_data: Optional[str] = None
 
         if self.storage.exist(filename=filename):
-
             # return pathway list dump
             file_data = self.storage.load(filename=filename)
 
         else:
-
             # Data not found in cache. Request from REST api
 
             file_data = _request(url=url, **kwargs)

@@ -97,7 +97,6 @@ def test_resolver_cache_or_request(resolver: Resolver) -> None:
         assert resolver.storage.exist(testing_filename) is True
 
     with patch("requests.get") as mock:
-
         # Resolver should access file from cache
         # pylint: disable=protected-access
         assert (
@@ -148,7 +147,6 @@ def test_get_pathway(resolver: Resolver) -> None:
 
     # Register response
     with RequestsMock() as mocked_response:
-
         # Add endpoint to mock
         mocked_response.add(
             HTTP_METHOD_GET,

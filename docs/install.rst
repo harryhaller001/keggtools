@@ -16,7 +16,7 @@ Installation
 Dependencies
 ------------
 
-The ``keggtools`` package only supports ``python>=3.6``.
+The ``keggtools`` package only supports ``python>=3.8``.
 
 The dependencies used for this package are ``pydot``, ``requests`` and ``scipy``.
 

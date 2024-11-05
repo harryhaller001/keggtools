@@ -56,11 +56,25 @@ jobs:
                 mypy ./keggtools
 
 
-        # Run unittest on installed package
-        -   name: Unit testing with pytest
+        # Running unittest
+        -   name: Test
+            env:
+                MPLBACKEND: agg
+                PLATFORM: ${{ matrix.os }}
+                DISPLAY: :42
             run: |
-                pytest ./test --show-capture=log
+                coverage run -m pytest -v --color=yes
 
+        # generation of coverage report
+        -   name: Report coverage
+            run: |
+                coverage report
+
+        # Upload to codecov
+        -   name: Upload coverage reports to Codecov
+            uses: codecov/codecov-action@v4
+            with:
+                token: ${{ secrets.CODECOV_TOKEN }}
 
 
         # Build wheel and egg with flit backend

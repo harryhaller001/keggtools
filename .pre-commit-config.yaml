@@ -24,9 +24,9 @@ repos:
     -   id: jupyter-nb-clear-output
         name: Check notebook cells
         files: \.ipynb$
-        stages: [commit]
+        stages: [pre-commit]
         language: system
-        entry: jupyter nbconvert ./reproducibility/*.ipynb --ClearOutputPreprocessor.enabled=True --inplace
+        entry: jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace ./reproducibility/*.ipynb
 
 
 
@@ -61,7 +61,7 @@ repos:
     hooks:
     -   id: pytest
         name: Run unittest
-        stages: [commit]
+        stages: [pre-commit]
         language: system
         entry: pytest
         types: [python]

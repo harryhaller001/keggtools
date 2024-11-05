@@ -10,31 +10,25 @@ build-backend = "flit_core.buildapi"
 name = "keggtools"
 description = "Enrichment analysis and visualisation toolkit for KEGG pathways"
 requires-python = '>=3.8'
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 
-authors = [
-    {name="harryhaller001", email = "harryhaller001@gmail.com"}
-]
+authors = [{ name = "harryhaller001", email = "harryhaller001@gmail.com" }]
 
-maintainers = [
-    {name="harryhaller001", email = "harryhaller001@gmail.com"}
-]
+maintainers = [{ name = "harryhaller001", email = "harryhaller001@gmail.com" }]
 
-readme = {file = "README.md", content-type="text/markdown"}
+readme = { file = "README.md", content-type = "text/markdown" }
 
-classifiers=[
+classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = [
-    "pydot",
-    "requests",
-    "scipy",
-]
+dependencies = ["pydot", "requests", "scipy"]
 
 dynamic = ["version"]
 
@@ -58,10 +52,7 @@ test = [
     "pandas",
 ]
 
-doc = [
-    "Sphinx",
-    "furo",
-]
+doc = ["Sphinx", "furo"]
 
 
 # Mypy config
@@ -74,13 +65,7 @@ warn_unused_configs = true
 
 # Ignore libs which are not PEP 561 compliant
 [[tool.mypy.overrides]]
-module = [
-    "pandas",
-    "setuptools",
-    "scipy",
-    "pydot",
-
-]
+module = ["pandas", "setuptools", "scipy", "pydot"]
 ignore_missing_imports = true
 
 
@@ -94,30 +79,17 @@ log_level = "DEBUG"
 log_cli = true
 
 python_files = "test_*.py"
-testpaths = [
-    "test",
-]
+testpaths = ["test"]
 
 
 # Coverage config
 [tool.coverage.run]
-source = [
-    "keggtools"
-]
-omit = [
-    "*/test/*"
-]
+source = ["keggtools"]
+omit = ["*/test/*"]
 
 
 # Flit sdist config
 # https://flit.pypa.io/en/latest/pyproject_toml.html#sdist-section
 [tool.flit.sdist]
-include = [
-    "keggtools/"
-]
-exclude = [
-    "docs",
-    "test",
-    "reproducibility",
-]
-
+include = ["keggtools/"]
+exclude = ["docs", "test", "reproducibility"]

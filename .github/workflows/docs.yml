@@ -18,12 +18,12 @@ jobs:
 
 
         steps:
-        -   uses: actions/checkout@v3
+        -   uses: actions/checkout@v4
 
-        -   name: Set up Python 3.8
-            uses: actions/setup-python@v4
+        -   name: Set up Python 3.10
+            uses: actions/setup-python@v5
             with:
-                python-version: "3.8"
+                python-version: "3.10"
 
 
         # Test and build the docs for keggtools

@@ -60,6 +60,7 @@ install: ## install all python dependencies
 		ipykernel \
 		leidenalg \
 		umap-learn==0.5.1 \
+		nbconvert \
 		--upgrade
 
 

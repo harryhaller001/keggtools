@@ -1,6 +1,5 @@
 """ Global constants """
 
-
 # Example list for immune system pathways
 
 

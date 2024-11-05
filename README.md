@@ -1,4 +1,11 @@
 # keggtools
+
+[![Version](https://img.shields.io/pypi/v/keggtools)](https://pypi.org/project/keggtools/)
+[![codecov](https://codecov.io/gh/harryhaller001/keggtools/graph/badge.svg?token=3VBDIALBLK)](https://codecov.io/gh/harryhaller001/keggtools)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/keggtools)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/harryhaller001/keggtools/package.yml)
+
+
 Library for KEGG pathway enrichment analysis.
 
 Documentation: [https://keggtools.org/](https://keggtools.org/)

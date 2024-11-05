@@ -27,6 +27,10 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Natural Language :: English",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Science/Research",
+    "Typing :: Typed",
 ]
 dependencies = ["pydot", "requests", "scipy"]
 
@@ -37,6 +41,7 @@ dynamic = ["version"]
 [project.urls]
 Documentation = "https://keggtools.org/"
 Source = "https://github.com/harryhaller001/keggtools"
+Homepage = "https://github.com/harryhaller001/keggtools"
 
 
 # Optional dependencies for testing and docs

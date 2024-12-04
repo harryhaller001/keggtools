@@ -1,6 +1,6 @@
 {
     "recommendations": [
-        "charliermarsh.ruff",
+        "ms-python.black-formatter",
         "ms-python.python",
         "ms-python.vscode-pylance",
         "ms-python.vscode-pylance-extra-types",
@@ -8,6 +8,7 @@
         "ms-python.vscode-pylance-pack",
         "njpwerner.autodocstring",
         "shardulm94.trailing-spaces",
-        "ms-vscode.makefile-tools"
+        "ms-vscode.makefile-tools",
+        "ms-python.flake8",
     ]
 }

@@ -1,26 +1,23 @@
-""" Testing keggtools resolver module """
+"""Testing keggtools resolver module."""
 
-import warnings
 import os
+import warnings
 from typing import Dict, List
 from unittest.mock import patch
+
 import pytest
+from responses import GET as HTTP_METHOD_GET
+from responses import RequestsMock
 
-
-from responses import RequestsMock, GET as HTTP_METHOD_GET
-
+from keggtools.models import Pathway
 from keggtools.resolver import Resolver, get_gene_names
 from keggtools.storage import Storage
-from keggtools.models import Pathway
 
 from .conftest import CACHEDIR, ORGANISM
 
 
 def test_get_gene_names() -> None:
-    """
-    Testing get gene names function.
-    """
-
+    """Testing get gene names function."""
     # Filter warnings
     warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -57,10 +54,7 @@ def test_get_gene_names() -> None:
 
 
 def test_resolver_init(storage: Storage) -> None:
-    """
-    Testing init function of resolver with different arugment types.
-    """
-
+    """Testing init function of resolver with different arugment types."""
     assert Resolver(cache=None).storage.cachedir == Storage().cachedir
 
     assert Resolver(cache=storage).storage.cachedir == CACHEDIR
@@ -69,10 +63,7 @@ def test_resolver_init(storage: Storage) -> None:
 
 
 def test_resolver_cache_or_request(resolver: Resolver) -> None:
-    """
-    Testing resolve cache or request function.
-    """
-
+    """Testing resolve cache or request function."""
     testing_filename: str = "test.txt"
     testing_url: str = "http://example.com/test.txt"
     testing_payload: str = "hello world!"
@@ -87,7 +78,6 @@ def test_resolver_cache_or_request(resolver: Resolver) -> None:
         )
 
         # Resolver should request the url, because file does not exist
-        # pylint: disable=protected-access
         assert (
             resolver._cache_or_request(filename=testing_filename, url=testing_url)
             == testing_payload
@@ -98,7 +88,6 @@ def test_resolver_cache_or_request(resolver: Resolver) -> None:
 
     with patch("requests.get") as mock:
         # Resolver should access file from cache
-        # pylint: disable=protected-access
         assert (
             resolver._cache_or_request(filename=testing_filename, url=testing_url)
             == testing_payload
@@ -109,10 +98,7 @@ def test_resolver_cache_or_request(resolver: Resolver) -> None:
 
 
 def test_get_pathway_list(resolver: Resolver) -> None:
-    """
-    Testing request of pathway list.
-    """
-
+    """Testing request of pathway list."""
     with RequestsMock() as mocked_response:
         mocked_response.add(
             HTTP_METHOD_GET,
@@ -135,13 +121,10 @@ def test_get_pathway_list(resolver: Resolver) -> None:
 
 
 def test_get_pathway(resolver: Resolver) -> None:
-    """
-    Testing request of KGML pathway.
-    """
-
+    """Testing request of KGML pathway."""
     # Load pathway from file
     with open(
-        os.path.join(os.path.dirname(__file__), "pathway.kgml"), "r", encoding="utf-8"
+        os.path.join(os.path.dirname(__file__), "pathway.kgml"), encoding="utf-8"
     ) as file_obj:
         response_content: str = file_obj.read()
 
@@ -162,10 +145,7 @@ def test_get_pathway(resolver: Resolver) -> None:
 
 
 def test_get_organism_list(resolver: Resolver) -> None:
-    """
-    Testing request of org list.
-    """
-
+    """Testing request of org list."""
     # Register response for list of organisms
     with RequestsMock() as mocked_response:
         mocked_response.add(
@@ -188,10 +168,7 @@ def test_get_organism_list(resolver: Resolver) -> None:
 
 
 def test_get_compounds(resolver: Resolver) -> None:
-    """
-    Testing get compund function.
-    """
-
+    """Testing get compund function."""
     # Add mock for compound endpoint
     with RequestsMock() as mocked_response:
         mocked_response.add(

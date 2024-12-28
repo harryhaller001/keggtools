@@ -113,12 +113,7 @@ make install
 
 ### Linting
 
-Run linting with `pylint` for `keggtools` package.
-
-```bash
-# Run linting for package
-make pylint
-```
+TODO
 
 ### Static code analysis
 

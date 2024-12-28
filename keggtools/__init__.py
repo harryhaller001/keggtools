@@ -1,26 +1,53 @@
-""" Init keggtools module """
-
-__version__: str = "1.0.2"
-
-from .analysis import EnrichmentResult, Enrichment  # noqa: F401
-from .const import (  # noqa: F401
-    IMMUNE_SYSTEM_PATHWAYS,
-    GLOBAL_AND_OVERVIEW_MAPS,
-    CARBOHYDRATE_METABOLISM,
-    ENERGY_METABOLISM,
-    LIPID_METABOLISM,
-    NUCLEOTIDE_METABOLISM,
+from ._version import __version__
+from .analysis import Enrichment, EnrichmentResult
+from .const import (
     AMINO_ACID_METABOLISM,
-    METABOLISM_OF_OTHER_AMINO_ACIDS,
-    GLYCAN_BIOSYNTHESIS_AND_METABOLISM,
-    METABOLISM_OF_COFACTORS_AND_VITAMINS,
-    METABOLISM_OF_TERPENOIDS_AND_POLYKETIDES,
     BIOSYNTHESIS_OF_OTHER_SECONDARY_METABOLITES,
-    XENOBIOTICS_BIODEGRADATION_AND_METABOLISM,
+    CARBOHYDRATE_METABOLISM,
     CHEMICAL_STRUCTURE_TRANSFORMATION_MAPS,
+    ENERGY_METABOLISM,
+    GLOBAL_AND_OVERVIEW_MAPS,
+    GLYCAN_BIOSYNTHESIS_AND_METABOLISM,
+    IMMUNE_SYSTEM_PATHWAYS,
+    LIPID_METABOLISM,
+    METABOLISM_OF_COFACTORS_AND_VITAMINS,
+    METABOLISM_OF_OTHER_AMINO_ACIDS,
+    METABOLISM_OF_TERPENOIDS_AND_POLYKETIDES,
+    NUCLEOTIDE_METABOLISM,
+    XENOBIOTICS_BIODEGRADATION_AND_METABOLISM,
 )
-from .models import Pathway, Relation, Entry, Graphics, Subtype, Component  # noqa: F401
-from .render import Renderer  # noqa: F401
-from .resolver import Resolver  # noqa: F401
-from .storage import Storage  # noqa: F401
-from .utils import ColorGradient  # noqa: F401
+from .models import Component, Entry, Graphics, Pathway, Relation, Subtype
+from .render import Renderer
+from .resolver import Resolver
+from .storage import Storage
+from .utils import ColorGradient
+
+__all__ = [
+    "__version__",
+    "EnrichmentResult",
+    "Enrichment",
+    "AMINO_ACID_METABOLISM",
+    "BIOSYNTHESIS_OF_OTHER_SECONDARY_METABOLITES",
+    "CARBOHYDRATE_METABOLISM",
+    "CHEMICAL_STRUCTURE_TRANSFORMATION_MAPS",
+    "ENERGY_METABOLISM",
+    "GLOBAL_AND_OVERVIEW_MAPS",
+    "GLYCAN_BIOSYNTHESIS_AND_METABOLISM",
+    "IMMUNE_SYSTEM_PATHWAYS",
+    "LIPID_METABOLISM",
+    "METABOLISM_OF_COFACTORS_AND_VITAMINS",
+    "METABOLISM_OF_OTHER_AMINO_ACIDS",
+    "METABOLISM_OF_TERPENOIDS_AND_POLYKETIDES",
+    "NUCLEOTIDE_METABOLISM",
+    "XENOBIOTICS_BIODEGRADATION_AND_METABOLISM",
+    "Component",
+    "Entry",
+    "Graphics",
+    "Pathway",
+    "Relation",
+    "Subtype",
+    "Renderer",
+    "Resolver",
+    "Storage",
+    "ColorGradient",
+]

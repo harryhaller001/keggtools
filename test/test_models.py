@@ -1,4 +1,4 @@
-""" Testing parsing models """
+"""Testing parsing models."""
 
 import os
 from typing import List, Optional
@@ -7,24 +7,21 @@ from xml.etree import ElementTree
 import pytest
 
 from keggtools.models import (
-    Relation,
-    Entry,
-    Pathway,
-    Subtype,
-    Component,
-    Graphics,
     Alt,
+    Component,
+    Entry,
+    Graphics,
+    Pathway,
     Product,
-    Substrate,
     Reaction,
+    Relation,
+    Substrate,
+    Subtype,
 )
 
 
 def test_relation_model_parsing() -> None:
-    """
-    Testing parsing function of relation model.
-    """
-
+    """Testing parsing function of relation model."""
     # Check correct parsing
 
     relation_object: Relation = Relation.parse(
@@ -70,10 +67,7 @@ def test_relation_model_parsing() -> None:
 
 
 def test_relation_with_subtype_parsing() -> None:
-    """
-    Test relation parsing function with one or more subtypes.
-    """
-
+    """Test relation parsing function with one or more subtypes."""
     relation_parsed: Relation = Relation.parse(
         ElementTree.fromstring(
             """<relation entry1="44" entry2="50" type="ECrel">
@@ -87,10 +81,7 @@ def test_relation_with_subtype_parsing() -> None:
 
 
 def test_subtype_parsing() -> None:
-    """
-    testing parsing function of subtype object.
-    """
-
+    """Testing parsing function of subtype object."""
     # Test valid cases
     subtype_parsed: Subtype = Subtype.parse(
         ElementTree.fromstring("""<subtype name="activation" value="--&gt;"/>""")
@@ -118,10 +109,7 @@ def test_subtype_parsing() -> None:
 
 
 def test_graphics_parsing() -> None:
-    """
-    Testing parsing function of graphics object.
-    """
-
+    """Testing parsing function of graphics object."""
     # test valid cases
 
     graphics_parsed: Graphics = Graphics.parse(
@@ -184,10 +172,7 @@ def test_graphics_parsing() -> None:
 
 
 def test_component_parsing() -> None:
-    """
-    Testing function to parse component object.
-    """
-
+    """Testing function to parse component object."""
     # Test valid case
     component_parsed: Component = Component.parse(
         item=ElementTree.fromstring("""<component id="123" />""")
@@ -209,10 +194,7 @@ def test_component_parsing() -> None:
 
 
 def test_entry_parsing() -> None:
-    """
-    Testing function to parse entry object.
-    """
-
+    """Testing function to parse entry object."""
     # Test valid cases
 
     entry_parsed: Entry = Entry.parse(
@@ -237,10 +219,7 @@ def test_entry_parsing() -> None:
 
 
 def test_entry_parsing_multiple_names() -> None:
-    """
-    Testing function to parse entry object with multiple gene names.
-    """
-
+    """Testing function to parse entry object with multiple gene names."""
     # Test valid cases
     entry_parsed: Entry = Entry.parse(
         ElementTree.fromstring(
@@ -252,10 +231,7 @@ def test_entry_parsing_multiple_names() -> None:
 
 
 def test_pathway_parsing() -> None:
-    """
-    Testing function to parse pathway object.
-    """
-
+    """Testing function to parse pathway object."""
     # Test valid cases
 
     pathway_parsed: Pathway = Pathway.parse(
@@ -320,10 +296,7 @@ def test_pathway_parsing() -> None:
 
 
 def test_reaction_parsing() -> None:
-    """
-    Testing function to parse XML to reaction.
-    """
-
+    """Testing function to parse XML to reaction."""
     # test correct parsing
     parsed_reaction: Reaction = Reaction.parse(
         ElementTree.fromstring(
@@ -373,10 +346,7 @@ def test_reaction_parsing() -> None:
 
 
 def test_alt_element_parsing() -> None:
-    """
-    Testing parsing function of Alt element.
-    """
-
+    """Testing parsing function of Alt element."""
     # Testing correct parsing of element
     parsed_product: Product = Product.parse(
         ElementTree.fromstring(
@@ -433,16 +403,13 @@ def test_alt_element_parsing() -> None:
 
 
 def test_full_pathway_parsing() -> None:
-    """
-    Testing parsing functions by loading full KGML pathway.
-    """
-
+    """Testing parsing functions by loading full KGML pathway."""
     # TODO: add parsing of reaction, products and substrates
 
     basedir: str = os.path.dirname(__file__)
 
     # Open pathway file and load content as string
-    with open(os.path.join(basedir, "pathway.kgml"), "r", encoding="utf-8") as file_obj:
+    with open(os.path.join(basedir, "pathway.kgml"), encoding="utf-8") as file_obj:
         pathway_parsed: Pathway = Pathway.parse(file_obj.read())
 
     # Test search for entry in pathway
@@ -465,10 +432,7 @@ def test_full_pathway_parsing() -> None:
 
 
 def test_kgml_to_xml(pathway: Pathway) -> None:
-    """
-    Testing generate and parsing from pathway instance.
-    """
-
+    """Testing generate and parsing from pathway instance."""
     # Testing KGML model to xml string
     xml_string: str = pathway.to_xml_string()
     assert isinstance(xml_string, str)

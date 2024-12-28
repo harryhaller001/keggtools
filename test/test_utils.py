@@ -1,27 +1,23 @@
-""" Testing utils module """
+"""Testing utils module."""
 
 from typing import Dict, List
 from xml.etree.ElementTree import Element
 
-
 from keggtools.utils import (
     ColorGradient,
-    parse_tsv,
-    parse_xml,
-    parse_tsv_to_dict,
+    is_valid_gene_name,
+    is_valid_hex_color,
     is_valid_pathway_name,
     is_valid_pathway_number,
     is_valid_pathway_org,
-    is_valid_hex_color,
-    is_valid_gene_name,
+    parse_tsv,
+    parse_tsv_to_dict,
+    parse_xml,
 )
 
 
 def test_xml_parsing_wrapper() -> None:
-    """
-    Testing function to wrap XML element parser.
-    """
-
+    """Testing function to wrap XML element parser."""
     xml_string: str = "<hello>world</hello>"
 
     element: Element = parse_xml(xml_object_or_string=xml_string)
@@ -33,16 +29,11 @@ def test_xml_parsing_wrapper() -> None:
 
 
 def test_attribute_checks() -> None:
-    """
-    Test XML element attribute check functions.
-    """
+    """Test XML element attribute check functions."""
 
 
 def test_color_gradient() -> None:
-    """
-    Testing color gradient class.
-    """
-
+    """Testing color gradient class."""
     # Test color tuple to css color string
     assert ColorGradient.to_css(color=(0, 0, 255)) == "rgb(0,0,255)"
 
@@ -69,10 +60,7 @@ def test_color_gradient() -> None:
 
 
 def test_parse_tsv() -> None:
-    """
-    Testing TSV parsing function.
-    """
-
+    """Testing TSV parsing function."""
     tsv_data: str = "header1\theader2\nitem1\titem2\nitem3\titem4\n"
 
     parsed_data: list = parse_tsv(data=tsv_data)
@@ -89,10 +77,7 @@ def test_parse_tsv() -> None:
 
 
 def test_valid_pathway_org() -> None:
-    """
-    Testing org code validation function.
-    """
-
+    """Testing org code validation function."""
     # Testing valid cases
     assert is_valid_pathway_org(value="ko")
     assert is_valid_pathway_org(value="ec")
@@ -105,10 +90,7 @@ def test_valid_pathway_org() -> None:
 
 
 def test_valid_pathway_name() -> None:
-    """
-    Testing validation for combined pathway name.
-    """
-
+    """Testing validation for combined pathway name."""
     # testing valid cases
     assert is_valid_pathway_name(value="path:ko12345")
 
@@ -119,10 +101,7 @@ def test_valid_pathway_name() -> None:
 
 
 def test_valid_pathway_number() -> None:
-    """
-    Testing validation of pathway number.
-    """
-
+    """Testing validation of pathway number."""
     # Testing valid cases
     assert is_valid_pathway_number(value="12345")
 
@@ -132,10 +111,7 @@ def test_valid_pathway_number() -> None:
 
 
 def test_valid_hex_color() -> None:
-    """
-    Testing validation of hex color.
-    """
-
+    """Testing validation of hex color."""
     # testing valid cases
     assert is_valid_hex_color(value="#00af4e")
     assert is_valid_hex_color(value="#00FFA4")
@@ -147,10 +123,7 @@ def test_valid_hex_color() -> None:
 
 
 def test_valid_gene_name() -> None:
-    """
-    Testing function to check if gene name is valid.
-    """
-
+    """Testing function to check if gene name is valid."""
     # Test valid cases
     assert is_valid_gene_name(value="mmu:12345")
     assert is_valid_gene_name(value="hsa:00001")

@@ -1,50 +1,42 @@
-""" KEGG pathway models to parse object relational """
-
-# pylint: disable=invalid-name,redefined-builtin,too-many-lines
-
+"""KEGG pathway models to parse object relational."""
 
 # from warnings import warn
 from datetime import datetime
+from typing import List, Optional, Union
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
-from typing import List, Union, Optional
 
 from .const import (
-    REACTION_TYPE,
-    RELATION_TYPES,
-    RELATION_SUBTYPES,
     ENTRY_TYPE,
     GRAPHIC_TYPE,
+    REACTION_TYPE,
+    RELATION_SUBTYPES,
+    RELATION_TYPES,
 )
-
 from .utils import (
     get_attribute,
     get_numeric_attribute,
-    parse_xml,
-    is_valid_pathway_number,
     is_valid_hex_color,
     is_valid_pathway_name,
+    is_valid_pathway_number,
     is_valid_pathway_org,
+    parse_xml,
 )
 
 
 class Subtype:
-    """
-    Subtype model class.
-    """
+    """Subtype model class."""
 
     def __init__(
         self,
         name: str,
         value: str,
     ) -> None:
-        """
-        Init Subtype model instance.
+        """Init Subtype model instance.
 
         :param str name: Name of subtype. Must match list of valid subtypes.
         :param str value: Value of subtype.
         """
-
         # check for valid subtype names in RELATION_SUBTYPES
         if name not in RELATION_SUBTYPES:
             raise ValueError(
@@ -56,14 +48,12 @@ class Subtype:
 
     @staticmethod
     def parse(item: Element) -> "Subtype":
-        """
-        Parse Subtype XML element.
+        """Parse Subtype XML element.
 
         :param xml.etree.ElementTree.Element item: XML element.
         :return: Parsed Subtype instance.
         :rtype: Subtype
         """
-
         # check correct type
         assert item.tag == "subtype"
 
@@ -74,21 +64,18 @@ class Subtype:
         )
 
     def to_xml(self) -> Element:
-        """
-        Generate XML string from Subtype element.
+        """Generate XML string from Subtype element.
 
         :return: XML string.
         :rtype: xml.etree.ElementTree.Element
         """
-
         return Element(
             "subtype",
             attrib={"name": self.name, "value": self.value},
         )
 
     def __str__(self) -> str:
-        """
-        Generate string from Subtype instance.
+        """Generate string from Subtype instance.
 
         :return: String of Subtype instance.
         :rtype: str
@@ -97,9 +84,7 @@ class Subtype:
 
 
 class Relation:
-    """
-    Relation model class.
-    """
+    """Relation model class."""
 
     def __init__(
         self,
@@ -107,14 +92,12 @@ class Relation:
         entry2: str,
         type: str,
     ) -> None:
-        """
-        Init relation model instance.
+        """Init relation model instance.
 
         :param str entry1: Source entry of relation.
         :param str entry2: Destination entry of relation.
         :param str type: Type of Relation. Must be contained in list of valid relation types.
         """
-
         # Check if type is in valid relation types
         if type not in RELATION_TYPES:
             raise ValueError(f"Relation type '{type}' not in list of valid types.")
@@ -126,14 +109,12 @@ class Relation:
 
     @staticmethod
     def parse(item: Element) -> "Relation":
-        """
-        Parse XML element into Relation instance.
+        """Parse XML element into Relation instance.
 
         :param xml.etree.ElementTree.Element item: XML element to parse.
         :return: Relation instance.
         :rtype: Relation
         """
-
         # Check tag of relation is correct
         assert item.tag == "relation"
 
@@ -151,13 +132,11 @@ class Relation:
         return relation
 
     def to_xml(self) -> Element:
-        """
-        Generate XML string from Relation element.
+        """Generate XML string from Relation element.
 
         :return: XML string.
         :rtype: xml.etree.ElementTree.Element
         """
-
         return Element(
             "relation",
             attrib={
@@ -168,8 +147,7 @@ class Relation:
         )
 
     def __str__(self) -> str:
-        """
-        Generate string from relation instance.
+        """Generate string from relation instance.
 
         :return: String of Relation instance.
         :rtype: str
@@ -178,17 +156,13 @@ class Relation:
 
 
 class Component:
-    """
-    Component model.
-    """
+    """Component model."""
 
     def __init__(self, id: str) -> None:
-        """
-        Init Component model.
+        """Init Component model.
 
         :param str id: Id of component.
         """
-
         # id can't be empty
         if id == "":
             raise ValueError("Component id can't be empty.")
@@ -200,14 +174,12 @@ class Component:
 
     @staticmethod
     def parse(item: Element) -> "Component":
-        """
-        Parsing ElementTree into Component.
+        """Parsing ElementTree into Component.
 
         :param xml.etree.ElementTree.Element item: XML element to parse.
         :return: Parsed Component instance.
         :rtype: Component
         """
-
         # Check for correct xml tag
         assert item.tag == "component"
 
@@ -215,13 +187,11 @@ class Component:
         return Component(id=get_attribute(element=item, key="id"))
 
     def to_xml(self) -> Element:
-        """
-        Generate XML string from Component element.
+        """Generate XML string from Component element.
 
         :return: XML string.
         :rtype: xml.etree.ElementTree.Element
         """
-
         return Element(
             "component",
             attrib={
@@ -230,8 +200,7 @@ class Component:
         )
 
     def __str__(self) -> str:
-        """
-        Build string of component instance.
+        """Build string of component instance.
 
         :return: String of Component instance.
         :rtype: str
@@ -240,11 +209,7 @@ class Component:
 
 
 class Graphics:
-    """
-    Graphics information for rendering.
-    """
-
-    # pylint: disable=too-many-instance-attributes
+    """Graphics information for rendering."""
 
     def __init__(
         self,
@@ -258,8 +223,7 @@ class Graphics:
         fgcolor: Optional[str] = None,
         bgcolor: Optional[str] = None,
     ) -> None:
-        """
-        Init Graphics model instance.
+        """Init Graphics model instance.
 
         :param typing.Optional[str] x:
         :param typing.Optional[str] y:
@@ -271,9 +235,6 @@ class Graphics:
         :param typing.Optional[str] fgcolor:
         :param typing.Optional[str] bgcolor:
         """
-
-        # pylint: disable=too-many-arguments
-
         # All parameter are implied (optional)
         self.x: Optional[str] = x
         self.y: Optional[str] = y
@@ -313,14 +274,12 @@ class Graphics:
 
     @staticmethod
     def parse(item: Element) -> "Graphics":
-        """
-        Parse XML element into Graphics instance.
+        """Parse XML element into Graphics instance.
 
         :param xml.etree.ElementTree.Element item: XML element to parse.
         :return: Parsed Graphics instance.
         :rtype: Graphics
         """
-
         # Check xml tag
         assert item.tag == "graphics"
 
@@ -338,13 +297,11 @@ class Graphics:
         )
 
     def to_xml(self) -> Element:
-        """
-        Generate XML string from Graphics element.
+        """Generate XML string from Graphics element.
 
         :return: XML string.
         :rtype: xml.etree.ElementTree.Element
         """
-
         graphics_element: Element = Element(
             "graphics",
         )
@@ -379,8 +336,7 @@ class Graphics:
         return graphics_element
 
     def __str__(self) -> str:
-        """
-        Return Graphics instance summary string.
+        """Return Graphics instance summary string.
 
         :return: String of Graphics instance.
         :rtype: str
@@ -389,9 +345,7 @@ class Graphics:
 
 
 class Entry:
-    """
-    Entry model class.
-    """
+    """Entry model class."""
 
     def __init__(
         self,
@@ -401,8 +355,7 @@ class Entry:
         link: Optional[str] = None,
         reaction: Optional[str] = None,
     ) -> None:
-        """
-        Init entry model instance.
+        """Init entry model instance.
 
         :param str id: Id of Entry.
         :param str name: Name of Entry.
@@ -410,9 +363,6 @@ class Entry:
         :param typing.Optional[str] link: Link to KEGG database with reference to entry.
         :param typing.Optional[str] reaction: Reaction TODO: specify. Is str format correct?
         """
-
-        # pylint: disable=too-many-arguments
-
         # required
         self.id: str = id
         self.name: str = name
@@ -435,25 +385,21 @@ class Entry:
 
     @property
     def has_multiple_names(self) -> bool:
-        """
-        Checks if entry has multiple names that are space seperated.
+        """Checks if entry has multiple names that are space seperated.
 
         :return: Retruns True if entry has multiple names.
         :rtype: bool
         """
-
         return len(self.name.split(" ")) > 1
 
     @staticmethod
     def parse(item: Element) -> "Entry":
-        """
-        Parsing XML element into Entry instance.
+        """Parsing XML element into Entry instance.
 
         :param xml.etree.ElementTree.Element item: XML element to parse.
         :return: Parsed Entry instance.
         :rtype: Entry
         """
-
         assert item.tag == "entry"
 
         # Generate entry instance from required attributes
@@ -475,13 +421,11 @@ class Entry:
         return entry
 
     def to_xml(self) -> Element:
-        """
-        Generate XML string from Entry element.
+        """Generate XML string from Entry element.
 
         :return: XML string.
         :rtype: xml.etree.ElementTree.Element
         """
-
         entry_element: Element = Element(
             "entry", attrib={"id": self.id, "name": self.name, "type": self.type}
         )
@@ -506,8 +450,7 @@ class Entry:
         return entry_element
 
     def __str__(self) -> str:
-        """
-        Build Entry summary string.
+        """Build Entry summary string.
 
         :return: String of Entry instance.
         :rtype: str
@@ -515,13 +458,11 @@ class Entry:
         return f"<Entry id='{self.id}' name='{self.name}' type='{self.type}'>"
 
     def get_gene_id(self) -> List[str]:
-        """
-        Parse variable 'name' of Entry into KEGG id.
+        """Parse variable 'name' of Entry into KEGG id.
 
         :return: List of KEGG identifier.
         :rtype: typing.List[str]
         """
-
         # TODO: validate return valid !!
         # r"^([a-z]){3}([0-9]){5}$"
 
@@ -530,23 +471,18 @@ class Entry:
 
 
 class Alt:
-    """
-    Alt model.
-    """
+    """Alt model."""
 
     def __init__(self, name: str) -> None:
-        """
-        Init Alt instance.
+        """Init Alt instance.
 
         :param str name: Alt element name.
         """
-
         self.name: str = name
 
     @staticmethod
     def parse(item: Element) -> "Alt":
-        """
-        Parse Alt instance from XML element.
+        """Parse Alt instance from XML element.
 
         :param xml.etree.ElementTree.Element item: XML element to parse.
         :rtype: Alt
@@ -557,13 +493,11 @@ class Alt:
         return Alt(name=get_attribute(element=item, key="name"))
 
     def to_xml(self) -> Element:
-        """
-        Generate XML string from Alt element.
+        """Generate XML string from Alt element.
 
         :return: XML string.
         :rtype: xml.etree.ElementTree.Element
         """
-
         return Element(
             "alt",
             attrib={
@@ -572,30 +506,24 @@ class Alt:
         )
 
     def __str__(self) -> str:
-        """
-        Build string from Alt instance.
+        """Build string from Alt instance.
 
         :return: String of Alt instance.
         :rtype: str
         """
-
         return f"<Alt name='{self.name}'>"
 
 
 class Product:
-    """
-    Reaction Product model.
-    """
+    """Reaction Product model."""
 
     def __init__(self, id: str, name: str, alt: Optional[Alt] = None) -> None:
-        """
-        Init Product instance.
+        """Init Product instance.
 
         :param str id: Identifier of Product in pathway.
         :param str name: KEGG identifier of compound.
         :param Alt alt: Alternative name of element.
         """
-
         # TODO: verify correct format
 
         self.id: str = id
@@ -604,14 +532,12 @@ class Product:
 
     @staticmethod
     def parse(item: Element) -> "Product":
-        """
-        Parse XML element instance to Product model instance.
+        """Parse XML element instance to Product model instance.
 
         :param xml.etree.ElementTree.Element item: XML element to parse.
         :return: Parsed Product model.
         :rtype: Product
         """
-
         assert item.tag == "product"
 
         parsed_product: Product = Product(
@@ -632,13 +558,11 @@ class Product:
         return parsed_product
 
     def to_xml(self) -> Element:
-        """
-        Generate XML string from Product element.
+        """Generate XML string from Product element.
 
         :return: XML string.
         :rtype: xml.etree.ElementTree.Element
         """
-
         product_element: Element = Element(
             "product",
             attrib={
@@ -654,8 +578,7 @@ class Product:
         return product_element
 
     def __str__(self) -> str:
-        """
-        Build string from Product instance.
+        """Build string from Product instance.
 
         :return: String of Product instance.
         :rtype: str
@@ -664,9 +587,7 @@ class Product:
 
 
 class Substrate:
-    """
-    reaction Substrate model
-    """
+    """reaction Substrate model."""
 
     def __init__(
         self,
@@ -674,14 +595,12 @@ class Substrate:
         name: str,
         alt: Optional[Alt] = None,
     ) -> None:
-        """
-        Init Substrate instance.
+        """Init Substrate instance.
 
         :param str id: Identifier of Substrate in pathway.
         :param str name: KEGG identifier of compound.
         :param Alt alt: Alternative name of element.
         """
-
         # TODO: verify correct format
 
         self.id: str = id
@@ -690,14 +609,12 @@ class Substrate:
 
     @staticmethod
     def parse(item: Element) -> "Substrate":
-        """
-        Parse XML element instance to Substrate model instance.
+        """Parse XML element instance to Substrate model instance.
 
         :param xml.etree.ElementTree.Element item: XML element to parse.
         :return: Parsed Substrate model.
         :rtype: Substrate
         """
-
         assert item.tag == "substrate"
 
         parsed_substrate: Substrate = Substrate(
@@ -718,13 +635,11 @@ class Substrate:
         return parsed_substrate
 
     def to_xml(self) -> Element:
-        """
-        Generate XML string from Substrate element.
+        """Generate XML string from Substrate element.
 
         :return: XML string.
         :rtype: xml.etree.ElementTree.Element
         """
-
         substrate_element: Element = Element(
             "substrate",
             attrib={
@@ -740,8 +655,7 @@ class Substrate:
         return substrate_element
 
     def __str__(self) -> str:
-        """
-        Build string from Substrate instance.
+        """Build string from Substrate instance.
 
         :return: String of Substrate instance.
         :rtype: str
@@ -750,9 +664,7 @@ class Substrate:
 
 
 class Reaction:
-    """
-    Reaction model.
-    """
+    """Reaction model."""
 
     def __init__(
         self,
@@ -760,14 +672,12 @@ class Reaction:
         name: str,
         type: str,
     ) -> None:
-        """
-        Init Reaction model instance.
+        """Init Reaction model instance.
 
         :param str id: Identifier of reaction.
         :param str name: KEGG identifer of reaction.
         :param str type: Type of reaction. Must be contained in list of valid reaction types.
         """
-
         if type not in REACTION_TYPE:
             raise ValueError("Type of reaction is not in list of valid reaction types.")
 
@@ -782,14 +692,12 @@ class Reaction:
 
     @staticmethod
     def parse(item: Element) -> "Reaction":
-        """
-        Parse XML element instance to Reaction model instance.
+        """Parse XML element instance to Reaction model instance.
 
         :param xml.etree.ElementTree.Element item: XML element to parse.
         :return: Parsed Reaction model.
         :rtype: Reaction
         """
-
         assert item.tag == "reaction"
 
         # Parse reaction instance from xml attributes
@@ -809,13 +717,11 @@ class Reaction:
         return parsed_reaction
 
     def to_xml(self) -> Element:
-        """
-        Generate XML string from Reaction element.
+        """Generate XML string from Reaction element.
 
         :return: XML string.
         :rtype: xml.etree.ElementTree.Element
         """
-
         reaction_element: Element = Element(
             "reaction",
             attrib={
@@ -836,23 +742,19 @@ class Reaction:
         return reaction_element
 
     def __str__(self) -> str:
-        """
-        Build string of reaction instance.
+        """Build string of reaction instance.
 
         :return: String of Reaction instance.
         :rtype: str
         """
-
         return f"<Reaction id='{self.id}' name='{self.name}'>"
 
 
 class Pathway:
-    """
-    KEGG Pathway object.
+    """KEGG Pathway object.
+
     The KEGG pathway object stores graphics information and related objects.
     """
-
-    # pylint: disable=too-many-instance-attributes
 
     def __init__(
         self,
@@ -863,8 +765,7 @@ class Pathway:
         image: Optional[str] = None,
         link: Optional[str] = None,
     ) -> None:
-        """
-        Init KEGG Pathway model.
+        """Init KEGG Pathway model.
 
         :param str name: Name of pathway, which is the full KEGG identifier.
         :param str org: Organism code.
@@ -873,9 +774,6 @@ class Pathway:
         :param typing.Optional[str] image: Image for pathway provided by KEGG database.
         :param typing.Optional[str] link: Link to pathway in KEGG database.
         """
-
-        # pylint: disable=too-many-arguments
-
         # required parameter of pathway element
         self.name: str = name
         self.org: str = org
@@ -907,14 +805,12 @@ class Pathway:
 
     @staticmethod
     def parse(data: Union[Element, str]) -> "Pathway":
-        """
-        Parsing XML string or element in Pathway instance.
+        """Parsing XML string or element in Pathway instance.
 
         :param typing.Union[xml.etree.ElementTree.Element, str] data: String or XML element to parse.
         :return: Parsed Pathway instance.
         :rtype: Pathway
         """
-
         # Generate correct format from string or XML element object
         item: Element = parse_xml(xml_object_or_string=data)
 
@@ -940,13 +836,11 @@ class Pathway:
         return pathway
 
     def to_xml(self) -> Element:
-        """
-        Generate XML element from Pathway instance and its children.
+        """Generate XML element from Pathway instance and its children.
 
         :return: XML element in KGML format.
         :rtype: xml.etree.ElementTree.Element
         """
-
         pathway_element: Element = Element(
             "pathway",
             attrib={
@@ -980,13 +874,11 @@ class Pathway:
         return pathway_element
 
     def to_xml_string(self) -> str:
-        """
-        Generate XML string from pathway instance.
+        """Generate XML string from pathway instance.
 
         :return: XML string in KGML format.
         :rtype: str
         """
-
         # Generate xml header string
         # docstring is not supported by build-in xml builer
         xml_timestamp: str = (
@@ -1005,27 +897,23 @@ class Pathway:
         return xml_header + xml_content
 
     def get_entry_by_id(self, entry_id: str) -> Optional[Entry]:
-        """
-        Get pathway Entry object by id.
+        """Get pathway Entry object by id.
 
         :param str entry_id: Id of Entry.
         :return: Returns Entry instance if id is found in Pathway. Otherwise returns None.
         :rtype: typing.Optional[Entry]
         """
-
         for item in self.entries:
             if item.id == entry_id:
                 return item
         return None
 
     def get_genes(self) -> List[str]:
-        """
-        List all genes from pathway.
+        """List all genes from pathway.
 
         :return: List of entry ids with type gene.
         :rtype: typing.List[str]
         """
-
         result: List[str] = []
 
         # Iterate of entries and get all gene type
@@ -1050,8 +938,7 @@ class Pathway:
         return result
 
     def __str__(self) -> str:
-        """
-        Build string summary for KEGG pathway.
+        """Build string summary for KEGG pathway.
 
         :return: String of Pathway instance.
         :rtype: str

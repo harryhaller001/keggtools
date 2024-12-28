@@ -1,7 +1,4 @@
-""" sphinx docs configuration """
-
-# Must be disabled for copyright variable
-# pylint: disable=invalid-name
+"""sphinx docs configuration."""
 
 import os
 from datetime import datetime
@@ -17,7 +14,7 @@ sys.path.insert(0, os.path.abspath("../"))
 
 project = "keggtools"
 author = "harryhaller001"
-copyright = f"{datetime.now():%Y}, {author}."  # pylint: disable=redefined-builtin
+copyright = f"{datetime.now():%Y}, {author}."
 version = __version__
 release = version
 
@@ -63,10 +60,10 @@ html_theme = "furo"
 
 
 html_show_sphinx = False
-html_context = dict(
-    display_github=True,
-    github_user="harryhaller001",
-    github_repo="keggtools",
-    github_version="main",
-    conf_py_path="/docs/",
-)
+html_context = {
+    "display_github": True,
+    "github_user": "harryhaller001",
+    "github_repo": "keggtools",
+    "github_version": "main",
+    "conf_py_path": "/docs/",
+}

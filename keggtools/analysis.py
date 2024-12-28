@@ -1,10 +1,9 @@
-""" KEGG Enrichment analysis core """
+"""KEGG Enrichment analysis core."""
 
-from csv import DictWriter
 import os
-from typing import Dict, List, Any, Union, Optional
+from csv import DictWriter
 from io import IOBase
-
+from typing import Any, Dict, List, Optional, Union
 
 from scipy import stats
 
@@ -12,11 +11,8 @@ from .models import Pathway
 
 
 class EnrichmentResult:
-    """
-    Results of KEGG pathway enrichment analysis.
-    """
+    """Results of KEGG pathway enrichment analysis."""
 
-    # pylint: disable=too-many-instance-attributes,too-many-arguments
     def __init__(
         self,
         org: str,
@@ -26,8 +22,7 @@ class EnrichmentResult:
         pathway_genes: list,
         pathway_title: Optional[str] = None,
     ) -> None:
-        """
-        Init Result of KEGG pathway enrichment analysis.
+        """Init Result of KEGG pathway enrichment analysis.
 
         :param str org: 3 letter code of organism used by KEGG database.
         :param str pathway_id: Identifier of KEGG pathway.
@@ -35,7 +30,6 @@ class EnrichmentResult:
         :param list found_genes: List of found genes.
         :param list pathway_genes: List of all genes in pathway.
         """
-
         # Pathway descriptions
         self.organism: str = org
         self.pathway_id: str = pathway_id
@@ -49,8 +43,7 @@ class EnrichmentResult:
 
     @property
     def pathway_genes_count(self) -> int:
-        """
-        Count of pathway genes.
+        """Count of pathway genes.
 
         :rtype: int
         :return: Number of genes in pathway.
@@ -59,8 +52,7 @@ class EnrichmentResult:
 
     @property
     def study_count(self) -> int:
-        """
-        Count of study genes.
+        """Count of study genes.
 
         :rtype: int
         :return: Number of genes found in analysis of pathway.
@@ -68,8 +60,8 @@ class EnrichmentResult:
         return len(self.found_genes)
 
     def __str__(self) -> str:
-        """
-        Build string summary of KEGG path analysis result instance.
+        """Build string summary of KEGG path analysis result instance.
+
         :rtype: str
         :return: Returns string that describes the enrichment result instance.
         """
@@ -79,14 +71,12 @@ class EnrichmentResult:
         )
 
     def json_summary(self, gene_delimiter: str = ",") -> Dict[str, Any]:
-        """
-        Build json summary for enrichment analysis.
+        """Build json summary for enrichment analysis.
 
         :param str gene_delimiter: Delimiter to seperate genes in gene list.
         :rtype: typing.Dict[str, typing.Any]
         :return: Summary of enrichment result instance as dict.
         """
-
         return {
             "pathway_name": self.pathway_name,
             "pathway_title": self.pathway_title,
@@ -99,13 +89,11 @@ class EnrichmentResult:
 
     @staticmethod
     def get_header() -> List[str]:
-        """
-        Build default header for enrichment analysis.
+        """Build default header for enrichment analysis.
 
         :rtype: typing.List[str]
         :return: List of header names as string.
         """
-
         return [
             "pathway_name",
             "pathway_title",
@@ -118,44 +106,31 @@ class EnrichmentResult:
 
 
 class Enrichment:
-    """
-    KEGG pathway enrichment analysis.
-    """
+    """KEGG pathway enrichment analysis."""
 
     def __init__(
         self,
-        # org: str,
         pathways: List[Pathway],
     ) -> None:
-        """
-        Init KEGG pathway enrichment analysis.
+        """Init KEGG pathway enrichment analysis.
 
-        :param str org: Organism identifier used by KEGG database \
-            (3 letter code, e.g. "mmu" for mus musculus or "hsa" for human).
+        :param str org: Organism identifier used by KEGG database (3 letter code, e.g. "mmu" for mus musculus or "hsa" for human).
         :param typing.List[Pathway] pathways: (Optional) List of Pathway instances or list of KEGG pathway identifier.
         """
-
-        # self.organism: str = org
-        # self.resolver: Resolver = Resolver(self.organism)
-
         self.result: List[EnrichmentResult] = []
 
         # Create pathway list
         self.all_pathways: List[Pathway] = pathways
 
     def _check_analysis_result_exist(self) -> None:
-        """
-        Check if summary exists.
-        """
-
+        """Check if summary exists."""
         if not self.result or len(self.result) == 0:
             raise ValueError("need to 'run_analysis' first")
 
     def get_subset(
         self, subset: List[str], inplace: bool = False
     ) -> List[EnrichmentResult]:
-        """
-        Create subset of analysis result by list of pathway ids
+        """Create subset of analysis result by list of pathway ids.
 
         :param typing.List[str] subset: List of pathway identifer to filter enrichment result by.
         :param bool inplace: Update instance variable of enrichment result list and overwrite with generated subset.
@@ -176,15 +151,12 @@ class Enrichment:
         return buffer
 
     def run_analysis(self, gene_list: List[str]) -> List[EnrichmentResult]:
-        """
-        List of gene ids. Return list of EnrichmentResult instances
+        """List of gene ids. Return list of EnrichmentResult instances.
 
         :param typing.List[str] gene_list: List of genes to analyse.
         :return: List of enrichment result instances.
         :rtype: typing.List[EnrichmentResult]
         """
-        # pylint: disable=too-many-locals
-
         all_found_genes: int = 0
         absolute_pathway_genes: int = 0
         study_n: int = len(gene_list)
@@ -237,13 +209,11 @@ class Enrichment:
         return self.result
 
     def to_json(self) -> List[Dict[str, Any]]:
-        """
-        Export to json dict.
+        """Export to json dict.
 
         :rtype: typing.List[typing.Dict[str, typing.Any]]
         :return: Json dict of enrichment results.
         """
-
         self._check_analysis_result_exist()
 
         result: list = []
@@ -259,14 +229,12 @@ class Enrichment:
         delimiter: str = "\t",
         overwrite: bool = False,
     ) -> None:
-        """
-        Save result summary as file.
+        """Save result summary as file.
 
         :param typing.Union[str, io.IOBase, typing.Any] file_obj: String to file or IOBase object
         :param str delimiter: Deleimiter used for csv.
         :param bool overwrite: Set to True to overwrite file, if already exist.
         """
-
         # Check if summary exists
         self._check_analysis_result_exist()
 
@@ -280,7 +248,6 @@ class Enrichment:
                     "To solve please set overwrite=True."
                 )
 
-            # pylint: disable=consider-using-with
             csv_file = open(file_obj, mode="w", encoding="utf-8")
         elif isinstance(file_obj, IOBase):
             # file is IOBase (File object stream)
@@ -310,15 +277,12 @@ class Enrichment:
         csv_file.close()
 
     def to_dataframe(self) -> Any:
-        """
-        Return analysis result as pandas DataFrame. Required pandas dependency.
+        """Return analysis result as pandas DataFrame. Required pandas dependency.
 
         :return: Export enrichment results as pandas dataframe.
         :rtype: pandas.DataFrame
         """
-
         # Ignore import lint at this place to keep pandas an optional dependency
-        # pylint: disable=import-outside-toplevel
         import pandas
 
         # Check if summary exists

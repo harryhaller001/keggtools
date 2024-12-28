@@ -1,10 +1,8 @@
-""" Global constants """
+"""Global constants."""
 
 # Example list for immune system pathways
 
-
 from typing import Dict, List
-
 
 IMMUNE_SYSTEM_PATHWAYS: Dict[str, str] = {
     "04640": "Hematopoietic cell lineage",

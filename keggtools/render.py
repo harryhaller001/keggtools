@@ -1,23 +1,19 @@
-""" Render object """
+"""Render object."""
 
 # import logging
-from typing import Any, Dict, List, Optional, Tuple, Union
 from functools import lru_cache
+from typing import Any, Dict, List, Optional, Tuple, Union
+from xml.etree import ElementTree
+from xml.etree.ElementTree import Element, SubElement
+
+from pydot import Dot, Edge, Node
+
+from .models import Entry, Pathway
+from .resolver import Resolver  # get_gene_names,
+from .storage import Storage
+from .utils import ColorGradient
 
 # from enum import Enum, unique
-
-from xml.etree.ElementTree import Element, SubElement
-from xml.etree import ElementTree
-
-from pydot import Dot, Node, Edge
-
-from .storage import Storage
-from .models import Pathway, Entry
-from .resolver import (
-    Resolver,
-    # get_gene_names,
-)
-from .utils import ColorGradient
 
 
 # TODO: add hex string to int tuple function
@@ -58,8 +54,7 @@ def generate_embedded_html_table(
     cellborder: int = 1,
     truncate: Optional[int] = None,
 ) -> str:
-    """
-    Generate HTML table in insert into label of dot node.
+    """Generate HTML table in insert into label of dot node.
 
     `generate_embedded_html_table({"gene1": "#ffffff", "gene2": "#454545"})`
 
@@ -71,7 +66,6 @@ def generate_embedded_html_table(
     :return: Returns html string of table.
     :rtype: str
     """
-
     # TODO: items input must be an ordered iterable!
 
     # TODO: implement more suppored html attributes in table, tr and td elements
@@ -105,9 +99,7 @@ def generate_embedded_html_table(
 
 
 class Renderer:
-    """
-    Renderer for KEGG Pathway.
-    """
+    """Renderer for KEGG Pathway."""
 
     def __init__(
         self,
@@ -118,8 +110,7 @@ class Renderer:
         upper_color: Tuple[int, int, int] = (255, 0, 0),
         lower_color: Tuple[int, int, int] = (0, 0, 255),
     ) -> None:
-        """
-        Init Renderer instance for KEGG Pathway.
+        """Init Renderer instance for KEGG Pathway.
 
         :param Pathway kegg_pathway: Pathway instance to render.
         :param typing.Optional[typing.Dict[str, float]] gene_dict: Dict to specify overlay color \
@@ -130,9 +121,6 @@ class Renderer:
         :param typing.Tuple[int, int, int] upper_color: Color for upper bound of color gradient.
         :param typing.Tuple[int, int, int] lower_color: Color for lower bound of color gradient.
         """
-
-        # pylint: disable=too-many-arguments
-
         # Pathway instance to render
         self.pathway: Pathway = kegg_pathway
 
@@ -178,9 +166,7 @@ class Renderer:
     # implement color gradient as properties with lru_cache decorator
     @property
     def cmap_upreg(self) -> List[str]:
-        """
-        Generated color map as list of hexadecimal strings for upregulated genes in gene dict.
-        """
+        """Generated color map as list of hexadecimal strings for upregulated genes in gene dict."""
 
         @lru_cache(maxsize=1)
         def cache_wrapper() -> List[str]:
@@ -192,9 +178,7 @@ class Renderer:
 
     @property
     def cmap_downreg(self) -> List[str]:
-        """
-        Generated color map as list of hexadecimal strings for downregulated genes in gene dict.
-        """
+        """Generated color map as list of hexadecimal strings for downregulated genes in gene dict."""
 
         @lru_cache(maxsize=1)
         def cache_wrapper() -> List[str]:
@@ -207,8 +191,7 @@ class Renderer:
     def get_gene_color(
         self, gene_id: str, default_color: Tuple[int, int, int] = (255, 255, 255)
     ) -> str:
-        """
-        Get overlay color for given gene.
+        """Get overlay color for given gene.
 
         :param str gene_id: Identify of gene.
         :param typing.Tuple[int, int, int] default_color: Default color to return if gene is not found in gene_dict. \
@@ -216,7 +199,6 @@ class Renderer:
         :return: Color of gene by expression level specified in gene_dict.
         :rtype: str
         """
-
         # Return default color if gene is not found
         if self.overlay.get(gene_id) in (None, 0.0):
             return ColorGradient.to_hex(color=default_color)
@@ -282,21 +264,16 @@ class Renderer:
         display_unlabeled_genes: bool = True,
         # truncate_gene_list: Optional[int] = None,
     ) -> None:
-        """
-        Render KEGG pathway.
-
+        """Render KEGG pathway.
 
         :param bool display_unlabeled_genes: Entries in the KGML format can have space-seperated entry names. \
             Set this parameter to `False` to hide the entries.
         """
-
         # :param bool resolve_unlabeled_genes: If `True` the function will resolve all gene names for gene entries \
         #     which only have a gene id given.
         # :param typing.Optional[int] truncate_gene_list: With truncate entries with multiple space-seperated names \
         #     to given length. To keep all genes, set parameter to `None`.
         # """
-
-        # pylint: disable=too-many-branches,too-many-locals,too-many-statements
 
         # resolved_gene_names: Dict[str, str] = {}
         # if resolve_unlabeled_genes is True:
@@ -530,13 +507,11 @@ class Renderer:
             self.graph.add_edge(relation_edge)
 
     def to_string(self) -> str:
-        """
-        pydot graph instance to dot string.
+        """Pydot graph instance to dot string.
 
         :return: Generated dot string of pathway.
         :rtype: str
         """
-
         # Generate dot string from pydot graph object
         render_string: Any = self.graph.to_string()
 
@@ -547,15 +522,13 @@ class Renderer:
         return render_string
 
     def to_binary(self, extension: str) -> bytes:
-        """
-        Export pydot graph to binary data.
+        """Export pydot graph to binary data.
 
         :param str extension: Extension of file to export. Use format string like "png", "svg", "pdf" or "jpeg".
         :return: File content are bytes object.
         :rtype: bytes
         :raises TypeError: If variable with generated dot graph is not type bytes.
         """
-
         # render with pydot to binary
         graph_data: Any = self.graph.create(prog="dot", format=extension)
 
@@ -568,13 +541,11 @@ class Renderer:
         return graph_data
 
     def to_file(self, filename: str, extension: str) -> None:
-        """
-        Export pydot graph to file.
+        """Export pydot graph to file.
 
         :param str filename: Filename to save file at.
         :param str extension: Extension of file to export. Use format string like "png", "svg", "pdf" or "jpeg".
         """
-
         # TODO: get export format from filename
 
         # Get binary data from graph object

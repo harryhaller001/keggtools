@@ -1,21 +1,18 @@
-""" Testing keggtools analysis module """
+"""Testing keggtools analysis module."""
 
-from io import StringIO
 import os
+from io import StringIO
 from typing import Any, Dict, List
 
-import pytest
 import pandas
+import pytest
 
 from keggtools import Enrichment, EnrichmentResult, Pathway
 from keggtools.storage import Storage
 
 
 def test_enrichment_result() -> None:
-    """
-    Testing enrichment result instance.
-    """
-
+    """Testing enrichment result instance."""
     result: EnrichmentResult = EnrichmentResult(
         org="mmu",
         pathway_id="12345",
@@ -39,13 +36,10 @@ def test_enrichment_result() -> None:
 
 
 def test_enrichment(storage: Storage) -> None:
-    """
-    Testing enrichment analysis instance.
-    """
-
+    """Testing enrichment analysis instance."""
     # Load testing pathway
     with open(
-        os.path.join(os.path.dirname(__file__), "pathway.kgml"), "r", encoding="utf-8"
+        os.path.join(os.path.dirname(__file__), "pathway.kgml"), encoding="utf-8"
     ) as file_obj:
         loaded_pathway: Pathway = Pathway.parse(file_obj.read())
 
@@ -55,7 +49,6 @@ def test_enrichment(storage: Storage) -> None:
     enrichment: Enrichment = Enrichment(pathways=pathway_list)
 
     with pytest.raises(ValueError):
-        # pylint: disable=protected-access
         enrichment._check_analysis_result_exist()
 
     results: List[EnrichmentResult] = enrichment.run_analysis(

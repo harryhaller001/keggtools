@@ -9,6 +9,7 @@ backports.tarfile==1.2.0
 beautifulsoup4==4.12.3
 biothings-client==0.3.1
 bleach==6.2.0
+cattrs==24.1.2
 certifi==2024.12.14
 cffi==1.17.1
 cfgv==3.4.0
@@ -32,6 +33,7 @@ flit==3.10.1
 flit_core==3.10.1
 fonttools==4.55.3
 furo==2024.8.6
+future==1.0.0
 h5py==3.12.1
 identify==2.6.3
 idna==3.10
@@ -96,6 +98,7 @@ prompt_toolkit==3.0.48
 psutil==6.1.1
 ptyprocess==0.7.0
 pure_eval==0.2.3
+pybiomart==0.2.0
 pycodestyle==2.12.1
 pycparser==2.22
 pydantic==2.10.4
@@ -114,6 +117,7 @@ pyzmq==26.2.0
 readme_renderer==44.0
 referencing==0.35.1
 requests==2.32.3
+requests-cache==1.2.1
 requests-toolbelt==1.0.0
 responses==0.25.3
 rfc3986==2.0.0
@@ -153,6 +157,7 @@ types-requests==2.32.0.20241016
 typing_extensions==4.12.2
 tzdata==2024.2
 umap-learn==0.5.1
+url-normalize==1.4.3
 urllib3==2.3.0
 virtualenv==20.28.0
 wcwidth==0.2.13

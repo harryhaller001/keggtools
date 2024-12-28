@@ -6,6 +6,8 @@ from io import StringIO
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
+import pandas as pd
+
 # XML parsing helper functions
 
 
@@ -240,3 +242,43 @@ def is_valid_gene_name(value: str) -> bool:
 #         """
 
 #         return repr(self.message)
+
+
+def merge_entrez_geneid(
+    diffexp: pd.DataFrame,
+    gene_column: str = "names",
+    dataset_name: str = "hsapiens_gene_ensembl",
+    symbol_source: str = "hgnc_symbol",
+    entrez_source: str = "entrezgene_id",
+    use_cache: bool = True,
+) -> pd.DataFrame:
+    """Use pybiomart to merge entrez gene id to differential expression dataframe.
+
+    :param pandas.DataFrame diffexp: Pandas dataframe containing to differential expression data.
+    :param str gene_column: Name of column in differential expression dataframe that contains to gene symbol.
+    :param str dataset_name: Biomart dataset to use for conversion.
+    :param str symbol_source: Biomart source dataset for gene symbol.
+    :param str entrez_source: Biomart source dataset for entrez id.
+    :param bool use_cache: Use cache for pybioart requests. Defaults to `True`.
+    :return: Returns differential expression dataframe with merged column for entrez id.
+    :rtype: pandas.DataFrame
+    """
+    from pybiomart import Dataset
+
+    dataset = Dataset(name=dataset_name, host="http://www.ensembl.org", use_cache=use_cache)
+    # Query dataset
+    convert_df = dataset.query(attributes=[symbol_source, entrez_source])
+    # Rename columns
+    convert_df.columns = ["symbol", "entrez"]
+    # Remove missing entrez ids
+    convert_df = convert_df[~convert_df["entrez"].isna()]
+
+    # Convert entrez id to string type
+    convert_df["entrez"] = convert_df["entrez"].astype(int)
+    convert_df["entrez"] = convert_df["entrez"].astype(str)
+
+    # merge with diffexp df
+    diffexp = diffexp.merge(right=convert_df, how="left", left_on=gene_column, right_on="symbol")
+    # Filter missing entrez ids
+    diffexp = diffexp[~diffexp["entrez"].isna()]
+    return diffexp

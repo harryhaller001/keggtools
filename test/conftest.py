@@ -4,6 +4,7 @@ import os
 from collections.abc import Generator
 
 import pytest
+import requests_cache
 
 from keggtools.models import Pathway
 from keggtools.resolver import Resolver
@@ -48,3 +49,9 @@ def pathway() -> Pathway:
         loaded_pathway: Pathway = Pathway.from_xml(file_obj.read())
 
     return loaded_pathway
+
+
+@pytest.fixture(scope="session", autouse=True)
+def disable_requests_cache() -> None:
+    """Disable requests cache for whole session."""
+    requests_cache.uninstall_cache()

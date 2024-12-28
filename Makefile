@@ -61,6 +61,7 @@ install: ## install all python dependencies
 		nbconvert \
 		pydantic-xml \
 		ruff \
+		pybiomart \
 		--upgrade
 
 	pre-commit install

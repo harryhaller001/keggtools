@@ -30,7 +30,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Typing :: Typed",
 ]
-dependencies = ["pydot", "requests", "scipy", "pydantic-xml"]
+dependencies = ["pydot", "requests", "scipy", "pydantic-xml", "pybiomart"]
 
 dynamic = ["version"]
 
@@ -68,7 +68,7 @@ warn_unused_configs = true
 
 # Ignore libs which are not PEP 561 compliant
 [[tool.mypy.overrides]]
-module = ["pandas", "setuptools", "scipy", "pydot"]
+module = ["pandas", "setuptools", "scipy", "pydot", "pybiomart"]
 ignore_missing_imports = true
 
 

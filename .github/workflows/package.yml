@@ -90,7 +90,7 @@ jobs:
             run: |
                 pip install Sphinx furo
                 mypy ./docs/conf.py
-                flake8 --max-line-length 120 ./docs/conf.py
+                ruff check ./docs/conf.py
                 python -m sphinx -M doctest ./docs ./docs/_build
                 python -m  sphinx -M coverage ./docs ./docs/_build
                 python -m  sphinx -M html ./docs ./docs/_build

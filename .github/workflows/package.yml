@@ -37,16 +37,16 @@ jobs:
             run: |
                 sudo apt-get install -y graphviz
                 python -m pip install --upgrade pip
-                pip install mypy flake8 pytest coverage twine setuptools types-requests responses flit
-                pip install requests scipy pydot pandas
+                pip install mypy pytest coverage twine setuptools types-requests responses flit ruff
+                pip install requests scipy pydot pandas pybiomart pydantic-xml
 
 
 
         # Linting package
         -   name: Lint
             run: |
-                flake8 --max-line-length 120 ./keggtools
-                flake8 --max-line-length 120 ./test/*.py
+                ruff check keggtools/*.py
+                ruff check test/*.py
 
 
         # Install package from setup.py and static code analysis

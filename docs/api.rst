@@ -162,3 +162,4 @@ Utils
 .. autofunction:: keggtools.utils::is_valid_pathway_number
 .. autofunction:: keggtools.utils::is_valid_pathway_org
 .. autofunction:: keggtools.utils::is_valid_gene_name
+.. autofunction:: keggtools.utils::merge_entrez_geneid

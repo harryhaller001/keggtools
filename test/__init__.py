@@ -1,1 +1,1 @@
-""" Init keggtools testing module """
+"""Init keggtools testing module."""

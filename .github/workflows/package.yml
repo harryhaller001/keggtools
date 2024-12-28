@@ -22,8 +22,8 @@ jobs:
         # Matrix testing
         strategy:
             matrix:
-                # Check for all python versions >=3.8
-                python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+                # Check for all python versions >=3.10
+                python-version: ["3.10", "3.11", "3.12"]
 
         steps:
         -   uses: actions/checkout@v4
@@ -37,16 +37,16 @@ jobs:
             run: |
                 sudo apt-get install -y graphviz
                 python -m pip install --upgrade pip
-                pip install mypy flake8 pytest coverage twine setuptools types-requests responses flit
-                pip install requests scipy pydot pandas
+                pip install mypy pytest coverage twine setuptools types-requests responses flit ruff
+                pip install requests scipy pydot pandas pybiomart pydantic-xml
 
 
 
         # Linting package
         -   name: Lint
             run: |
-                flake8 --max-line-length 120 ./keggtools
-                flake8 --max-line-length 120 ./test/*.py
+                ruff check keggtools/*.py
+                ruff check test/*.py
 
 
         # Install package from setup.py and static code analysis
@@ -90,7 +90,7 @@ jobs:
             run: |
                 pip install Sphinx furo
                 mypy ./docs/conf.py
-                flake8 --max-line-length 120 ./docs/conf.py
+                ruff check ./docs/conf.py
                 python -m sphinx -M doctest ./docs ./docs/_build
                 python -m  sphinx -M coverage ./docs ./docs/_build
                 python -m  sphinx -M html ./docs ./docs/_build

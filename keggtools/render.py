@@ -1,23 +1,19 @@
-""" Render object """
+"""Render object."""
 
 # import logging
-from typing import Any, Dict, List, Optional, Tuple, Union
 from functools import lru_cache
+from typing import Any
+from xml.etree import ElementTree
+from xml.etree.ElementTree import Element, SubElement
+
+from pydot import Dot, Edge, Node
+
+from .models import Entry, Pathway
+from .resolver import Resolver  # get_gene_names,
+from .storage import Storage
+from .utils import ColorGradient
 
 # from enum import Enum, unique
-
-from xml.etree.ElementTree import Element, SubElement
-from xml.etree import ElementTree
-
-from pydot import Dot, Node, Edge
-
-from .storage import Storage
-from .models import Pathway, Entry
-from .resolver import (
-    Resolver,
-    # get_gene_names,
-)
-from .utils import ColorGradient
 
 
 # TODO: add hex string to int tuple function
@@ -53,13 +49,12 @@ from .utils import ColorGradient
 
 
 def generate_embedded_html_table(
-    items: Dict[str, str],
+    items: dict[str, str],
     border: int = 0,
     cellborder: int = 1,
-    truncate: Optional[int] = None,
+    truncate: int | None = None,
 ) -> str:
-    """
-    Generate HTML table in insert into label of dot node.
+    """Generate HTML table in insert into label of dot node.
 
     `generate_embedded_html_table({"gene1": "#ffffff", "gene2": "#454545"})`
 
@@ -71,7 +66,6 @@ def generate_embedded_html_table(
     :return: Returns html string of table.
     :rtype: str
     """
-
     # TODO: items input must be an ordered iterable!
 
     # TODO: implement more suppored html attributes in table, tr and td elements
@@ -105,21 +99,18 @@ def generate_embedded_html_table(
 
 
 class Renderer:
-    """
-    Renderer for KEGG Pathway.
-    """
+    """Renderer for KEGG Pathway."""
 
     def __init__(
         self,
         kegg_pathway: Pathway,
-        gene_dict: Optional[Dict[str, float]] = None,
-        cache_or_resolver: Optional[Union[Storage, str, Resolver]] = None,
+        gene_dict: dict[str, float] | None = None,
+        cache_or_resolver: Storage | str | Resolver | None = None,
         # resolve_compounds: bool = True # TODO: Specify if renderer should resolver compounds in human readable text
-        upper_color: Tuple[int, int, int] = (255, 0, 0),
-        lower_color: Tuple[int, int, int] = (0, 0, 255),
+        upper_color: tuple[int, int, int] = (255, 0, 0),
+        lower_color: tuple[int, int, int] = (0, 0, 255),
     ) -> None:
-        """
-        Init Renderer instance for KEGG Pathway.
+        """Init Renderer instance for KEGG Pathway.
 
         :param Pathway kegg_pathway: Pathway instance to render.
         :param typing.Optional[typing.Dict[str, float]] gene_dict: Dict to specify overlay color \
@@ -130,9 +121,6 @@ class Renderer:
         :param typing.Tuple[int, int, int] upper_color: Color for upper bound of color gradient.
         :param typing.Tuple[int, int, int] lower_color: Color for lower bound of color gradient.
         """
-
-        # pylint: disable=too-many-arguments
-
         # Pathway instance to render
         self.pathway: Pathway = kegg_pathway
 
@@ -150,7 +138,7 @@ class Renderer:
         )
 
         # overlay vars
-        self.overlay: Dict[str, float] = {}
+        self.overlay: dict[str, float] = {}
 
         if gene_dict is not None:
             self.overlay = gene_dict
@@ -161,54 +149,41 @@ class Renderer:
         self.lower_color: tuple = lower_color
 
         # Init resolver instance from pathway org code.
-        resolver_buffer: Optional[Resolver] = None
+        resolver_buffer: Resolver | None = None
 
-        if isinstance(cache_or_resolver, (str, Storage)) or cache_or_resolver is None:
+        if isinstance(cache_or_resolver, str | Storage) or cache_or_resolver is None:
             resolver_buffer = Resolver(cache=cache_or_resolver)
         elif isinstance(cache_or_resolver, Resolver):
             resolver_buffer = cache_or_resolver
         else:
             # Raise error of type is not correct
-            raise TypeError(
-                "String to directory, storage instance or resolver instance must be passed."
-            )
+            raise TypeError("String to directory, storage instance or resolver instance must be passed.")
 
         self.resolver: Resolver = resolver_buffer
 
     # implement color gradient as properties with lru_cache decorator
     @property
-    def cmap_upreg(self) -> List[str]:
-        """
-        Generated color map as list of hexadecimal strings for upregulated genes in gene dict.
-        """
+    def cmap_upreg(self) -> list[str]:
+        """Generated color map as list of hexadecimal strings for upregulated genes in gene dict."""
 
         @lru_cache(maxsize=1)
-        def cache_wrapper() -> List[str]:
-            return ColorGradient(
-                start=(255, 255, 255), stop=self.upper_color, steps=100
-            ).get_list()
+        def cache_wrapper() -> list[str]:
+            return ColorGradient(start=(255, 255, 255), stop=self.upper_color, steps=100).get_list()
 
         return cache_wrapper()
 
     @property
-    def cmap_downreg(self) -> List[str]:
-        """
-        Generated color map as list of hexadecimal strings for downregulated genes in gene dict.
-        """
+    def cmap_downreg(self) -> list[str]:
+        """Generated color map as list of hexadecimal strings for downregulated genes in gene dict."""
 
         @lru_cache(maxsize=1)
-        def cache_wrapper() -> List[str]:
-            return ColorGradient(
-                start=(255, 255, 255), stop=self.lower_color, steps=100
-            ).get_list()
+        def cache_wrapper() -> list[str]:
+            return ColorGradient(start=(255, 255, 255), stop=self.lower_color, steps=100).get_list()
 
         return cache_wrapper()
 
-    def get_gene_color(
-        self, gene_id: str, default_color: Tuple[int, int, int] = (255, 255, 255)
-    ) -> str:
-        """
-        Get overlay color for given gene.
+    def get_gene_color(self, gene_id: str, default_color: tuple[int, int, int] = (255, 255, 255)) -> str:
+        """Get overlay color for given gene.
 
         :param str gene_id: Identify of gene.
         :param typing.Tuple[int, int, int] default_color: Default color to return if gene is not found in gene_dict. \
@@ -216,7 +191,6 @@ class Renderer:
         :return: Color of gene by expression level specified in gene_dict.
         :rtype: str
         """
-
         # Return default color if gene is not found
         if self.overlay.get(gene_id) in (None, 0.0):
             return ColorGradient.to_hex(color=default_color)
@@ -282,21 +256,16 @@ class Renderer:
         display_unlabeled_genes: bool = True,
         # truncate_gene_list: Optional[int] = None,
     ) -> None:
-        """
-        Render KEGG pathway.
-
+        """Render KEGG pathway.
 
         :param bool display_unlabeled_genes: Entries in the KGML format can have space-seperated entry names. \
             Set this parameter to `False` to hide the entries.
         """
-
         # :param bool resolve_unlabeled_genes: If `True` the function will resolve all gene names for gene entries \
         #     which only have a gene id given.
         # :param typing.Optional[int] truncate_gene_list: With truncate entries with multiple space-seperated names \
         #     to given length. To keep all genes, set parameter to `None`.
         # """
-
-        # pylint: disable=too-many-branches,too-many-locals,too-many-statements
 
         # resolved_gene_names: Dict[str, str] = {}
         # if resolve_unlabeled_genes is True:
@@ -324,7 +293,7 @@ class Renderer:
                     # parse list and use names as labels
 
                     if len(entry.get_gene_id()) > 1 and display_unlabeled_genes is True:
-                        entry_gene_list: List[str] = entry.get_gene_id()
+                        entry_gene_list: list[str] = entry.get_gene_id()
 
                         # Overwrite name of first item with graphics name
                         entry_gene_list[0] = entry_label
@@ -344,10 +313,7 @@ class Renderer:
                                 name=entry.id,
                                 label="<"
                                 + generate_embedded_html_table(
-                                    items={
-                                        gene_id: self.get_gene_color(gene_id)
-                                        for gene_id in entry_gene_list
-                                    }
+                                    items={gene_id: self.get_gene_color(gene_id) for gene_id in entry_gene_list}
                                 )
                                 + ">",
                                 shape="plaintext",
@@ -366,20 +332,16 @@ class Renderer:
                                 shape="rectangle",
                                 style="filled",
                                 color="#000000",
-                                fillcolor=self.get_gene_color(
-                                    gene_id=entry.get_gene_id()[0]
-                                ),
+                                fillcolor=self.get_gene_color(gene_id=entry.get_gene_id()[0]),
                             )
                         )
 
                 elif entry.type == "group":
-                    component_label: List[Tuple[str, str]] = []
+                    component_label: list[tuple[str, str]] = []
 
                     # Iterate of components of group entry
                     for comp in entry.components:
-                        component_entry: Optional[Entry] = self.pathway.get_entry_by_id(
-                            comp.id
-                        )
+                        component_entry: Entry | None = self.pathway.get_entry_by_id(comp.id)
 
                         if (
                             component_entry is not None
@@ -390,9 +352,7 @@ class Renderer:
                             component_label.append(
                                 (
                                     component_entry.graphics.name.split(", ")[0],
-                                    self.get_gene_color(
-                                        component_entry.get_gene_id()[0]
-                                    ),
+                                    self.get_gene_color(component_entry.get_gene_id()[0]),
                                 )
                             )
 
@@ -475,7 +435,7 @@ class Renderer:
                 line_style = "dotted"
 
             # Add molecular events as edge labels
-            molecular_event_dict: Dict[str, str] = {
+            molecular_event_dict: dict[str, str] = {
                 "phosphorylation": "+p",
                 "dephosphorylation": "-p",
                 "glycosylation": "+g",
@@ -484,7 +444,7 @@ class Renderer:
             }
 
             # Iterate over relation subtypes and check if moleuclar event is present
-            edge_label: Optional[str] = None
+            edge_label: str | None = None
 
             # Default arrowhead
             arrowhead: str = "none"
@@ -530,13 +490,11 @@ class Renderer:
             self.graph.add_edge(relation_edge)
 
     def to_string(self) -> str:
-        """
-        pydot graph instance to dot string.
+        """Pydot graph instance to dot string.
 
         :return: Generated dot string of pathway.
         :rtype: str
         """
-
         # Generate dot string from pydot graph object
         render_string: Any = self.graph.to_string()
 
@@ -547,34 +505,28 @@ class Renderer:
         return render_string
 
     def to_binary(self, extension: str) -> bytes:
-        """
-        Export pydot graph to binary data.
+        """Export pydot graph to binary data.
 
         :param str extension: Extension of file to export. Use format string like "png", "svg", "pdf" or "jpeg".
         :return: File content are bytes object.
         :rtype: bytes
         :raises TypeError: If variable with generated dot graph is not type bytes.
         """
-
         # render with pydot to binary
         graph_data: Any = self.graph.create(prog="dot", format=extension)
 
         # Type check of return value
         if not isinstance(graph_data, bytes):
-            raise TypeError(
-                "Failed to create binary file object from pydot graph instance."
-            )
+            raise TypeError("Failed to create binary file object from pydot graph instance.")
 
         return graph_data
 
     def to_file(self, filename: str, extension: str) -> None:
-        """
-        Export pydot graph to file.
+        """Export pydot graph to file.
 
         :param str filename: Filename to save file at.
         :param str extension: Extension of file to export. Use format string like "png", "svg", "pdf" or "jpeg".
         """
-
         # TODO: get export format from filename
 
         # Get binary data from graph object

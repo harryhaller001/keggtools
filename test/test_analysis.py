@@ -1,21 +1,18 @@
-""" Testing keggtools analysis module """
+"""Testing keggtools analysis module."""
 
-from io import StringIO
 import os
-from typing import Any, Dict, List
+from io import StringIO
+from typing import Any
 
-import pytest
 import pandas
+import pytest
 
 from keggtools import Enrichment, EnrichmentResult, Pathway
 from keggtools.storage import Storage
 
 
 def test_enrichment_result() -> None:
-    """
-    Testing enrichment result instance.
-    """
-
+    """Testing enrichment result instance."""
     result: EnrichmentResult = EnrichmentResult(
         org="mmu",
         pathway_id="12345",
@@ -31,7 +28,7 @@ def test_enrichment_result() -> None:
     assert isinstance(result.__str__(), str)
 
     # testing result dict
-    result_json: Dict[str, Any] = result.json_summary()
+    result_json: dict[str, Any] = result.json_summary()
 
     assert result_json["found_genes"] == "gene1,gene2"
 
@@ -39,28 +36,20 @@ def test_enrichment_result() -> None:
 
 
 def test_enrichment(storage: Storage) -> None:
-    """
-    Testing enrichment analysis instance.
-    """
-
+    """Testing enrichment analysis instance."""
     # Load testing pathway
-    with open(
-        os.path.join(os.path.dirname(__file__), "pathway.kgml"), "r", encoding="utf-8"
-    ) as file_obj:
-        loaded_pathway: Pathway = Pathway.parse(file_obj.read())
+    with open(os.path.join(os.path.dirname(__file__), "pathway.kgml"), encoding="utf-8") as file_obj:
+        loaded_pathway: Pathway = Pathway.from_xml(file_obj.read())
 
     # Build pathway list
-    pathway_list: List[Pathway] = [loaded_pathway]
+    pathway_list: list[Pathway] = [loaded_pathway]
 
     enrichment: Enrichment = Enrichment(pathways=pathway_list)
 
     with pytest.raises(ValueError):
-        # pylint: disable=protected-access
         enrichment._check_analysis_result_exist()
 
-    results: List[EnrichmentResult] = enrichment.run_analysis(
-        gene_list=["12043", "18035", "17874", "21937"]
-    )
+    results: list[EnrichmentResult] = enrichment.run_analysis(gene_list=["12043", "18035", "17874", "21937"])
 
     assert len(results) == 1
     assert results[0].study_count == 4
@@ -78,7 +67,7 @@ def test_enrichment(storage: Storage) -> None:
     # Test export functions
 
     # Testing json export
-    export_json: List[Dict[str, Any]] = enrichment.to_json()
+    export_json: list[dict[str, Any]] = enrichment.to_json()
 
     assert isinstance(export_json, list) and isinstance(export_json[0], dict)
 
@@ -104,9 +93,7 @@ def test_enrichment(storage: Storage) -> None:
     assert os.path.isfile(csv_filename)
 
     # Testing valid csv by reading exported csv
-    validate_df: pandas.DataFrame = pandas.read_csv(
-        csv_filename, delimiter="\t", header=None
-    )
+    validate_df: pandas.DataFrame = pandas.read_csv(csv_filename, delimiter="\t", header=None)
 
     # Check if gene list (5th column of csv file) contains seperated list of genes
     # TODO: make better test!

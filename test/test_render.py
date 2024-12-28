@@ -1,20 +1,16 @@
-""" Testing keggtools rendering module """
+"""Testing keggtools rendering module."""
 
-from typing import Dict
-
-from xml.etree.ElementTree import Element
 from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
 
-from keggtools.models import is_valid_hex_color, Pathway
+from keggtools.models import Pathway
 from keggtools.render import Renderer, generate_embedded_html_table
+from keggtools.utils import is_valid_hex_color
 
 
 def test_generate_html_table() -> None:
-    """
-    Testing function to generate html table.
-    """
-
-    items: Dict[str, str] = {
+    """Testing function to generate html table."""
+    items: dict[str, str] = {
         "gene1": "#ffffff",
         "gene2": "#ff0000",
         "gene3": "#ffffff",
@@ -38,10 +34,7 @@ def test_generate_html_table() -> None:
 
 
 def test_rendering_function(pathway: Pathway) -> None:
-    """
-    testing rendering function with test KGML pathway.
-    """
-
+    """Testing rendering function with test KGML pathway."""
     renderer: Renderer = Renderer(kegg_pathway=pathway)
 
     renderer.render()
@@ -99,12 +92,9 @@ def test_rendering_function(pathway: Pathway) -> None:
 
 
 def test_color_gradient_rendering(pathway: Pathway) -> None:
-    """
-    Testing color overlay from gene expression levels.
-    """
-
+    """Testing color overlay from gene expression levels."""
     # Init example gene dict to test color generation
-    gene_dict: Dict[str, float] = {
+    gene_dict: dict[str, float] = {
         "gene1": 0.0,
         "gene2": -5.1,
         "gene3": 1.2,
@@ -121,18 +111,14 @@ def test_color_gradient_rendering(pathway: Pathway) -> None:
     assert renderer.get_gene_color(gene_id="gene1") == "#ffffff"
 
     # Testing custom default color from tuple
-    assert (
-        renderer.get_gene_color(gene_id="gene1", default_color=(0, 0, 0)) == "#000000"
-    )
+    assert renderer.get_gene_color(gene_id="gene1", default_color=(0, 0, 0)) == "#000000"
 
     # Test maximum
     assert (
-        is_valid_hex_color(renderer.get_gene_color("gene4"))
-        and renderer.get_gene_color("gene4").lower() == "#ff0000"
+        is_valid_hex_color(renderer.get_gene_color("gene4")) and renderer.get_gene_color("gene4").lower() == "#ff0000"
     )
 
     # test minimum
     assert (
-        is_valid_hex_color(renderer.get_gene_color("gene2"))
-        and renderer.get_gene_color("gene2").lower() == "#0000ff"
+        is_valid_hex_color(renderer.get_gene_color("gene2")) and renderer.get_gene_color("gene2").lower() == "#0000ff"
     )

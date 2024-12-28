@@ -1,12 +1,8 @@
-""" Global constants """
+"""Global constants."""
 
 # Example list for immune system pathways
 
-
-from typing import Dict, List
-
-
-IMMUNE_SYSTEM_PATHWAYS: Dict[str, str] = {
+IMMUNE_SYSTEM_PATHWAYS: dict[str, str] = {
     "04640": "Hematopoietic cell lineage",
     "04610": "Complement and coagulation cascades",
     "04611": "Platelet activation",
@@ -30,7 +26,7 @@ IMMUNE_SYSTEM_PATHWAYS: Dict[str, str] = {
 }
 
 
-GLOBAL_AND_OVERVIEW_MAPS: Dict[str, str] = {
+GLOBAL_AND_OVERVIEW_MAPS: dict[str, str] = {
     "01100": "Metabolic pathways",
     "01110": "Biosynthesis of secondary metabolites",
     "01120": "Microbial metabolism in diverse environments",
@@ -44,7 +40,7 @@ GLOBAL_AND_OVERVIEW_MAPS: Dict[str, str] = {
     "01220": "Degradation of aromatic compounds",
 }
 
-CARBOHYDRATE_METABOLISM: Dict[str, str] = {
+CARBOHYDRATE_METABOLISM: dict[str, str] = {
     "00010": "Glycolysis / Gluconeogenesis",
     "00020": "Citrate cycle (TCA cycle)",
     "00030": "Pentose phosphate pathway",
@@ -62,7 +58,7 @@ CARBOHYDRATE_METABOLISM: Dict[str, str] = {
     "00562": "Inositol phosphate metabolism",
 }
 
-ENERGY_METABOLISM: Dict[str, str] = {
+ENERGY_METABOLISM: dict[str, str] = {
     "00190": "Oxidative phosphorylation",
     "00195": "Photosynthesis",
     "00196": "Photosynthesis - antenna proteins",
@@ -73,7 +69,7 @@ ENERGY_METABOLISM: Dict[str, str] = {
     "00920": "Sulfur metabolism",
 }
 
-LIPID_METABOLISM: Dict[str, str] = {
+LIPID_METABOLISM: dict[str, str] = {
     "00061": "Fatty acid biosynthesis",
     "00062": "Fatty acid elongation",
     "00071": "Fatty acid degradation",
@@ -92,12 +88,12 @@ LIPID_METABOLISM: Dict[str, str] = {
     "01040": "Biosynthesis of unsaturated fatty acids",
 }
 
-NUCLEOTIDE_METABOLISM: Dict[str, str] = {
+NUCLEOTIDE_METABOLISM: dict[str, str] = {
     "00230": "Purine metabolism",
     "00240": "Pyrimidine metabolism",
 }
 
-AMINO_ACID_METABOLISM: Dict[str, str] = {
+AMINO_ACID_METABOLISM: dict[str, str] = {
     "00250": "Alanine, aspartate and glutamate metabolism",
     "00260": "Glycine, serine and threonine metabolism",
     "00270": "Cysteine and methionine metabolism",
@@ -114,7 +110,7 @@ AMINO_ACID_METABOLISM: Dict[str, str] = {
     "00400": "Phenylalanine, tyrosine and tryptophan biosynthesis",
 }
 
-METABOLISM_OF_OTHER_AMINO_ACIDS: Dict[str, str] = {
+METABOLISM_OF_OTHER_AMINO_ACIDS: dict[str, str] = {
     "00410": "beta-Alanine metabolism",
     "00430": "Taurine and hypotaurine metabolism",
     "00440": "Phosphonate and phosphinate metabolism",
@@ -124,7 +120,7 @@ METABOLISM_OF_OTHER_AMINO_ACIDS: Dict[str, str] = {
     "00480": "Glutathione metabolism",
 }
 
-GLYCAN_BIOSYNTHESIS_AND_METABOLISM: Dict[str, str] = {
+GLYCAN_BIOSYNTHESIS_AND_METABOLISM: dict[str, str] = {
     "00510": "N-Glycan biosynthesis",
     "00513": "Various types of N-glycan biosynthesis",
     "00512": "Mucin type O-glycan biosynthesis",
@@ -149,7 +145,7 @@ GLYCAN_BIOSYNTHESIS_AND_METABOLISM: Dict[str, str] = {
     "00543": "Exopolysaccharide biosynthesis New!",
 }
 
-METABOLISM_OF_COFACTORS_AND_VITAMINS: Dict[str, str] = {
+METABOLISM_OF_COFACTORS_AND_VITAMINS: dict[str, str] = {
     "00730": "Thiamine metabolism",
     "00740": "Riboflavin metabolism",
     "00750": "Vitamin B6 metabolism",
@@ -164,7 +160,7 @@ METABOLISM_OF_COFACTORS_AND_VITAMINS: Dict[str, str] = {
     "00130": "Ubiquinone and other terpenoid-quinone biosynthesis",
 }
 
-METABOLISM_OF_TERPENOIDS_AND_POLYKETIDES: Dict[str, str] = {
+METABOLISM_OF_TERPENOIDS_AND_POLYKETIDES: dict[str, str] = {
     "00900": "Terpenoid backbone biosynthesis",
     "00902": "Monoterpenoid biosynthesis",
     "00909": "Sesquiterpenoid and triterpenoid biosynthesis",
@@ -188,7 +184,7 @@ METABOLISM_OF_TERPENOIDS_AND_POLYKETIDES: Dict[str, str] = {
     "01055": "Biosynthesis of vancomycin group antibiotics",
 }
 
-BIOSYNTHESIS_OF_OTHER_SECONDARY_METABOLITES: Dict[str, str] = {
+BIOSYNTHESIS_OF_OTHER_SECONDARY_METABOLITES: dict[str, str] = {
     "00940": "Phenylpropanoid biosynthesis",
     "00945": "Stilbenoid, diarylheptanoid and gingerol biosynthesis",
     "00941": "Flavonoid biosynthesis",
@@ -221,7 +217,7 @@ BIOSYNTHESIS_OF_OTHER_SECONDARY_METABOLITES: Dict[str, str] = {
     "00997": "Biosynthesis of various other secondary metabolites",
 }
 
-XENOBIOTICS_BIODEGRADATION_AND_METABOLISM: Dict[str, str] = {
+XENOBIOTICS_BIODEGRADATION_AND_METABOLISM: dict[str, str] = {
     "00362": "Benzoate degradation",
     "00627": "Aminobenzoate degradation",
     "00364": "Fluorobenzoate degradation",
@@ -245,7 +241,7 @@ XENOBIOTICS_BIODEGRADATION_AND_METABOLISM: Dict[str, str] = {
     "00983": "Drug metabolism - other enzymes",
 }
 
-CHEMICAL_STRUCTURE_TRANSFORMATION_MAPS: Dict[str, str] = {
+CHEMICAL_STRUCTURE_TRANSFORMATION_MAPS: dict[str, str] = {
     "01010": "Overview of biosynthetic pathways",
     "01060": "Biosynthesis of plant secondary metabolites",
     "01061": "Biosynthesis of phenylpropanoids",
@@ -262,7 +258,7 @@ CHEMICAL_STRUCTURE_TRANSFORMATION_MAPS: Dict[str, str] = {
 # Details at KGML manual https://www.kegg.jp/kegg/xml/docs/
 
 
-RELATION_SUBTYPES: List[str] = [
+RELATION_SUBTYPES: list[str] = [
     "compound",
     "hidden compound",
     "activation",
@@ -282,7 +278,7 @@ RELATION_SUBTYPES: List[str] = [
 ]
 
 
-RELATION_TYPES: List[str] = [
+RELATION_TYPES: list[str] = [
     "ECrel",
     "PPrel",
     "GErel",
@@ -290,9 +286,9 @@ RELATION_TYPES: List[str] = [
     "maplink",
 ]
 
-GRAPHIC_TYPE: List[str] = ["rectangle", "circle", "roundrectangle", "line"]
+GRAPHIC_TYPE: list[str] = ["rectangle", "circle", "roundrectangle", "line"]
 
-ENTRY_TYPE: List[str] = [
+ENTRY_TYPE: list[str] = [
     "ortholog",
     "enzyme",
     "reaction",
@@ -305,7 +301,7 @@ ENTRY_TYPE: List[str] = [
 ]
 
 
-REACTION_TYPE: List[str] = [
+REACTION_TYPE: list[str] = [
     "reversible",
     "irreversible",
 ]

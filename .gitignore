@@ -2,6 +2,7 @@
 # Ignore caching directories
 .keggtools_cache/
 coverage/
+*.sqlite
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

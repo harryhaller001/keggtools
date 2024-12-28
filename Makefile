@@ -63,6 +63,7 @@ install: ## install all python dependencies
 		nbconvert \
 		--upgrade
 
+	pre-commit install
 
 
 .PHONY: freeze

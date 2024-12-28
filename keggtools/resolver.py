@@ -1,6 +1,6 @@
 """Resolve requests to KEGG data Api."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 import requests
 
@@ -27,7 +27,7 @@ def _request_to_dict(
     col_keys: int = 0,
     col_values: int = 1,
     **kwargs: Any,
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """Request TSV resource from Url and parse to dict.
 
     :param str url: Url to request.
@@ -40,7 +40,7 @@ def _request_to_dict(
     return parse_tsv_to_dict(data=_request(url=url, **kwargs), col_keys=col_keys, col_values=col_values)
 
 
-def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
+def get_gene_names(genes: list[str], max_genes: int = 50) -> dict[str, str]:
     """Resolve KEGG gene identifer to name using to KEGG database REST Api.
 
     Function is implemented outside the resolver instance, because requests are not cached and only gene identifier
@@ -70,10 +70,10 @@ def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
     query_string: str = "+".join(genes)
 
     # Request without cache
-    resolve_dict: Dict[str, str] = _request_to_dict(url=f"http://rest.kegg.jp/list/{query_string}")
+    resolve_dict: dict[str, str] = _request_to_dict(url=f"http://rest.kegg.jp/list/{query_string}")
 
     # Sanitize dict by splitting first entry of gene name
-    result_dict: Dict[str, str] = {}
+    result_dict: dict[str, str] = {}
 
     for key, value in resolve_dict.items():
         result_dict[key] = value.split(", ")[0]
@@ -95,14 +95,14 @@ class Resolver:
     Request interface for KEGG API endpoint.
     """
 
-    def __init__(self, cache: Optional[Union[Storage, str]] = None) -> None:
+    def __init__(self, cache: Storage | str | None = None) -> None:
         """Init Resolver instance.
 
         :param typing.Optional[typing.Union[Storage, str]] cache: Directory to use as cache storage or Storage instance.
         """
         # Handle different types of argument for cache
 
-        _store: Optional[Storage] = None
+        _store: Storage | None = None
 
         if isinstance(cache, str):
             _store = Storage(cachedir=cache)
@@ -130,7 +130,7 @@ class Resolver:
         :return: Returns content of file as string.
         :rtype: str
         """
-        file_data: Optional[str] = None
+        file_data: str | None = None
 
         if self.storage.exist(filename=filename):
             # return pathway list dump
@@ -153,7 +153,7 @@ class Resolver:
         col_keys: int = 0,
         col_values: int = 1,
         **kwargs: Any,
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """Load and parse TSV file from cache folder and return two columns as dict. If file does not exist, request from given url.
 
         :param str filename: Filename to store in cache folder.
@@ -170,7 +170,7 @@ class Resolver:
         # Parse tsv data to dict
         return parse_tsv_to_dict(data=tsv_data, col_keys=col_keys, col_values=col_values)
 
-    def get_pathway_list(self, organism: str, **kwargs: Any) -> Dict[str, str]:
+    def get_pathway_list(self, organism: str, **kwargs: Any) -> dict[str, str]:
         """Request list of pathways linked to organism.
 
         :param str organism: 3 letter organism code used by KEGG database.
@@ -209,9 +209,9 @@ class Resolver:
         )
 
         # Parse string
-        return Pathway.parse(data)
+        return Pathway.from_xml(data)
 
-    def get_compounds(self, **kwargs: Any) -> Dict[str, str]:
+    def get_compounds(self, **kwargs: Any) -> dict[str, str]:
         """Get dict of components. Request from KEGG API if not in cache.
 
         :param typing.Any kwargs: other arguments to `requests.get`.
@@ -224,7 +224,7 @@ class Resolver:
             **kwargs,
         )
 
-    def get_organism_list(self, **kwargs: Any) -> Dict[str, str]:
+    def get_organism_list(self, **kwargs: Any) -> dict[str, str]:
         """Get organism codes from file or KEGG API.
 
         :param typing.Any kwargs: other arguments to `requests.get`.

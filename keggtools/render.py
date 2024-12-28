@@ -2,7 +2,7 @@
 
 # import logging
 from functools import lru_cache
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, SubElement
 
@@ -49,10 +49,10 @@ from .utils import ColorGradient
 
 
 def generate_embedded_html_table(
-    items: Dict[str, str],
+    items: dict[str, str],
     border: int = 0,
     cellborder: int = 1,
-    truncate: Optional[int] = None,
+    truncate: int | None = None,
 ) -> str:
     """Generate HTML table in insert into label of dot node.
 
@@ -104,11 +104,11 @@ class Renderer:
     def __init__(
         self,
         kegg_pathway: Pathway,
-        gene_dict: Optional[Dict[str, float]] = None,
-        cache_or_resolver: Optional[Union[Storage, str, Resolver]] = None,
+        gene_dict: dict[str, float] | None = None,
+        cache_or_resolver: Storage | str | Resolver | None = None,
         # resolve_compounds: bool = True # TODO: Specify if renderer should resolver compounds in human readable text
-        upper_color: Tuple[int, int, int] = (255, 0, 0),
-        lower_color: Tuple[int, int, int] = (0, 0, 255),
+        upper_color: tuple[int, int, int] = (255, 0, 0),
+        lower_color: tuple[int, int, int] = (0, 0, 255),
     ) -> None:
         """Init Renderer instance for KEGG Pathway.
 
@@ -138,7 +138,7 @@ class Renderer:
         )
 
         # overlay vars
-        self.overlay: Dict[str, float] = {}
+        self.overlay: dict[str, float] = {}
 
         if gene_dict is not None:
             self.overlay = gene_dict
@@ -149,9 +149,9 @@ class Renderer:
         self.lower_color: tuple = lower_color
 
         # Init resolver instance from pathway org code.
-        resolver_buffer: Optional[Resolver] = None
+        resolver_buffer: Resolver | None = None
 
-        if isinstance(cache_or_resolver, (str, Storage)) or cache_or_resolver is None:
+        if isinstance(cache_or_resolver, str | Storage) or cache_or_resolver is None:
             resolver_buffer = Resolver(cache=cache_or_resolver)
         elif isinstance(cache_or_resolver, Resolver):
             resolver_buffer = cache_or_resolver
@@ -163,26 +163,26 @@ class Renderer:
 
     # implement color gradient as properties with lru_cache decorator
     @property
-    def cmap_upreg(self) -> List[str]:
+    def cmap_upreg(self) -> list[str]:
         """Generated color map as list of hexadecimal strings for upregulated genes in gene dict."""
 
         @lru_cache(maxsize=1)
-        def cache_wrapper() -> List[str]:
+        def cache_wrapper() -> list[str]:
             return ColorGradient(start=(255, 255, 255), stop=self.upper_color, steps=100).get_list()
 
         return cache_wrapper()
 
     @property
-    def cmap_downreg(self) -> List[str]:
+    def cmap_downreg(self) -> list[str]:
         """Generated color map as list of hexadecimal strings for downregulated genes in gene dict."""
 
         @lru_cache(maxsize=1)
-        def cache_wrapper() -> List[str]:
+        def cache_wrapper() -> list[str]:
             return ColorGradient(start=(255, 255, 255), stop=self.lower_color, steps=100).get_list()
 
         return cache_wrapper()
 
-    def get_gene_color(self, gene_id: str, default_color: Tuple[int, int, int] = (255, 255, 255)) -> str:
+    def get_gene_color(self, gene_id: str, default_color: tuple[int, int, int] = (255, 255, 255)) -> str:
         """Get overlay color for given gene.
 
         :param str gene_id: Identify of gene.
@@ -293,7 +293,7 @@ class Renderer:
                     # parse list and use names as labels
 
                     if len(entry.get_gene_id()) > 1 and display_unlabeled_genes is True:
-                        entry_gene_list: List[str] = entry.get_gene_id()
+                        entry_gene_list: list[str] = entry.get_gene_id()
 
                         # Overwrite name of first item with graphics name
                         entry_gene_list[0] = entry_label
@@ -337,11 +337,11 @@ class Renderer:
                         )
 
                 elif entry.type == "group":
-                    component_label: List[Tuple[str, str]] = []
+                    component_label: list[tuple[str, str]] = []
 
                     # Iterate of components of group entry
                     for comp in entry.components:
-                        component_entry: Optional[Entry] = self.pathway.get_entry_by_id(comp.id)
+                        component_entry: Entry | None = self.pathway.get_entry_by_id(comp.id)
 
                         if (
                             component_entry is not None
@@ -435,7 +435,7 @@ class Renderer:
                 line_style = "dotted"
 
             # Add molecular events as edge labels
-            molecular_event_dict: Dict[str, str] = {
+            molecular_event_dict: dict[str, str] = {
                 "phosphorylation": "+p",
                 "dephosphorylation": "-p",
                 "glycosylation": "+g",
@@ -444,7 +444,7 @@ class Renderer:
             }
 
             # Iterate over relation subtypes and check if moleuclar event is present
-            edge_label: Optional[str] = None
+            edge_label: str | None = None
 
             # Default arrowhead
             arrowhead: str = "none"

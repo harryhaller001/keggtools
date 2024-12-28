@@ -1,16 +1,16 @@
 """Testing keggtools rendering module."""
 
-from typing import Dict
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
-from keggtools.models import Pathway, is_valid_hex_color
+from keggtools.models import Pathway
 from keggtools.render import Renderer, generate_embedded_html_table
+from keggtools.utils import is_valid_hex_color
 
 
 def test_generate_html_table() -> None:
     """Testing function to generate html table."""
-    items: Dict[str, str] = {
+    items: dict[str, str] = {
         "gene1": "#ffffff",
         "gene2": "#ff0000",
         "gene3": "#ffffff",
@@ -94,7 +94,7 @@ def test_rendering_function(pathway: Pathway) -> None:
 def test_color_gradient_rendering(pathway: Pathway) -> None:
     """Testing color overlay from gene expression levels."""
     # Init example gene dict to test color generation
-    gene_dict: Dict[str, float] = {
+    gene_dict: dict[str, float] = {
         "gene1": 0.0,
         "gene2": -5.1,
         "gene3": 1.2,

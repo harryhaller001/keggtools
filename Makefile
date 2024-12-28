@@ -39,8 +39,6 @@ help: ## This help.
 install: ## install all python dependencies
 	@$(PIP_OPT) install \
 		mypy \
-		flake8 \
-		black \
 		pytest \
 		coverage \
 		twine \
@@ -61,6 +59,8 @@ install: ## install all python dependencies
 		leidenalg \
 		umap-learn==0.5.1 \
 		nbconvert \
+		pydantic-xml \
+		ruff \
 		--upgrade
 
 	pre-commit install

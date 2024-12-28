@@ -2,7 +2,7 @@
 
 import os
 from io import StringIO
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas
 import pytest
@@ -28,7 +28,7 @@ def test_enrichment_result() -> None:
     assert isinstance(result.__str__(), str)
 
     # testing result dict
-    result_json: Dict[str, Any] = result.json_summary()
+    result_json: dict[str, Any] = result.json_summary()
 
     assert result_json["found_genes"] == "gene1,gene2"
 
@@ -39,17 +39,17 @@ def test_enrichment(storage: Storage) -> None:
     """Testing enrichment analysis instance."""
     # Load testing pathway
     with open(os.path.join(os.path.dirname(__file__), "pathway.kgml"), encoding="utf-8") as file_obj:
-        loaded_pathway: Pathway = Pathway.parse(file_obj.read())
+        loaded_pathway: Pathway = Pathway.from_xml(file_obj.read())
 
     # Build pathway list
-    pathway_list: List[Pathway] = [loaded_pathway]
+    pathway_list: list[Pathway] = [loaded_pathway]
 
     enrichment: Enrichment = Enrichment(pathways=pathway_list)
 
     with pytest.raises(ValueError):
         enrichment._check_analysis_result_exist()
 
-    results: List[EnrichmentResult] = enrichment.run_analysis(gene_list=["12043", "18035", "17874", "21937"])
+    results: list[EnrichmentResult] = enrichment.run_analysis(gene_list=["12043", "18035", "17874", "21937"])
 
     assert len(results) == 1
     assert results[0].study_count == 4
@@ -67,7 +67,7 @@ def test_enrichment(storage: Storage) -> None:
     # Test export functions
 
     # Testing json export
-    export_json: List[Dict[str, Any]] = enrichment.to_json()
+    export_json: list[dict[str, Any]] = enrichment.to_json()
 
     assert isinstance(export_json, list) and isinstance(export_json[0], dict)
 

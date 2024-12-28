@@ -2,7 +2,6 @@
 
 import os
 import warnings
-from typing import Dict, List
 from unittest.mock import patch
 
 import pytest
@@ -21,7 +20,7 @@ def test_get_gene_names() -> None:
     # Filter warnings
     warnings.filterwarnings("ignore", category=UserWarning)
 
-    gene_list: List[str] = [
+    gene_list: list[str] = [
         "mmu:11797",
         "mmu:266632",
         "mmu:22033",  # This item is not resolved by request
@@ -36,7 +35,7 @@ def test_get_gene_names() -> None:
             status=200,
         )
 
-        result_dict: Dict[str, str] = get_gene_names(genes=gene_list)
+        result_dict: dict[str, str] = get_gene_names(genes=gene_list)
 
         # Check results are correctly parsed
         assert result_dict["mmu:11797"] == "Birc2" and result_dict["mmu:266632"] == "Irak4"
@@ -97,7 +96,7 @@ def test_get_pathway_list(resolver: Resolver) -> None:
             status=200,
         )
 
-        result: Dict[str, str] = resolver.get_pathway_list(organism=ORGANISM)
+        result: dict[str, str] = resolver.get_pathway_list(organism=ORGANISM)
 
     assert result["path:mmu00010"] == "Glycolysis / Gluconeogenesis - Mus musculus (house mouse)"
     assert result["path:mmu00020"] == "Citrate cycle (TCA cycle) - Mus musculus (house mouse)"
@@ -135,7 +134,7 @@ def test_get_organism_list(resolver: Resolver) -> None:
             status=200,
         )
 
-        result: Dict[str, str] = resolver.get_organism_list()
+        result: dict[str, str] = resolver.get_organism_list()
 
     # Check if parsing works
     assert "hsa" in result
@@ -159,6 +158,6 @@ def test_get_compounds(resolver: Resolver) -> None:
             status=200,
         )
 
-        result: Dict[str, str] = resolver.get_compounds()
+        result: dict[str, str] = resolver.get_compounds()
 
     assert result["cpd:C00007"] == "Oxygen; O2"

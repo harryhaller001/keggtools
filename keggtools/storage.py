@@ -2,13 +2,13 @@
 
 import os
 import pickle
-from typing import Any, Optional
+from typing import Any
 
 
 class Storage:
     """Storage handler class."""
 
-    def __init__(self, cachedir: Optional[str] = None) -> None:
+    def __init__(self, cachedir: str | None = None) -> None:
         """Init KEGG data storage instance.
 
         :param typing.Optional[str] cachedir: Path to folder to use as cache.

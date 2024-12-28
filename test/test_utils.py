@@ -1,6 +1,5 @@
 """Testing utils module."""
 
-from typing import Dict, List
 from xml.etree.ElementTree import Element
 
 from keggtools.utils import (
@@ -47,7 +46,7 @@ def test_color_gradient() -> None:
     )
 
     # Generate list of hex colors
-    color_list: List[str] = grad.get_list()
+    color_list: list[str] = grad.get_list()
 
     assert len(color_list) == 256
 
@@ -70,7 +69,7 @@ def test_parse_tsv() -> None:
 
     # Test parse to dict function
 
-    parsed_dict: Dict[str, str] = parse_tsv_to_dict(data=tsv_data)
+    parsed_dict: dict[str, str] = parse_tsv_to_dict(data=tsv_data)
 
     assert parsed_dict["header1"] == "header2"
     assert parsed_dict["item3"] == "item4"

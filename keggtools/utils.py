@@ -3,7 +3,6 @@
 import csv
 import re
 from io import StringIO
-from typing import Dict, List, Optional, Union
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
@@ -19,7 +18,7 @@ def get_attribute(element: Element, key: str) -> str:
     :rtype: str
     :raises ValueError: Error if attribute does not exist or is wrong type.
     """
-    value: Optional[str] = element.attrib.get(key)
+    value: str | None = element.attrib.get(key)
 
     # Check if value is not none and is string
     if value is None or isinstance(value, str) is False:
@@ -46,7 +45,7 @@ def get_numeric_attribute(element: Element, key: str) -> str:
     return value
 
 
-def parse_xml(xml_object_or_string: Union[str, Element]) -> Element:
+def parse_xml(xml_object_or_string: str | Element) -> Element:
     """Returns XML Element object from string or XML Element.
 
     :param typing.Union[str, xml.etree.ElementTree.Element] xml_object_or_string: Input parameter to check.
@@ -72,7 +71,7 @@ def parse_tsv_to_dict(
     data: str,
     col_keys: int = 0,
     col_values: int = 1,
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """Parse .tsv file from string and build dict from first two columns. Other columns are ignored.
 
     :param str data: Tsv string to parse.
@@ -83,7 +82,7 @@ def parse_tsv_to_dict(
     """
     list_data: list = parse_tsv(data=data)
 
-    result: Dict[str, str] = {}
+    result: dict[str, str] = {}
 
     for row in list_data:
         if len(row) >= 2 and row[col_keys] != "":
@@ -134,7 +133,7 @@ class ColorGradient:
 
         return f"#{color[0]:02x}{color[1]:02x}{color[2]:02x}".lower()
 
-    def get_list(self) -> List[str]:
+    def get_list(self) -> list[str]:
         """Get gradient color as list.
 
         :return: Returns list of hexadecimal color strings with a gradient.
@@ -153,7 +152,7 @@ class ColorGradient:
 
         a_component = _array_multiply(a_var, ratio)
         b_component = _array_multiply(b_var, 1 - ratio)
-        values: List[float] = list(map(sum, zip(a_component, b_component)))
+        values: list[float] = list(map(sum, zip(a_component, b_component, strict=False)))
 
         return tuple(int(item) for item in values)
 

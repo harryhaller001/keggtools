@@ -3,7 +3,7 @@
 import os
 from csv import DictWriter
 from io import IOBase
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from scipy import stats
 
@@ -20,7 +20,7 @@ class EnrichmentResult:
         pathway_name: str,
         found_genes: list,
         pathway_genes: list,
-        pathway_title: Optional[str] = None,
+        pathway_title: str | None = None,
     ) -> None:
         """Init Result of KEGG pathway enrichment analysis.
 
@@ -34,12 +34,12 @@ class EnrichmentResult:
         self.organism: str = org
         self.pathway_id: str = pathway_id
         self.pathway_name: str = pathway_name
-        self.pathway_title: Optional[str] = pathway_title
+        self.pathway_title: str | None = pathway_title
 
         # Results from enrichment analysis
         self.found_genes: list = found_genes
         self.pathway_genes: list = pathway_genes
-        self.pvalue: Optional[float] = None
+        self.pvalue: float | None = None
 
     @property
     def pathway_genes_count(self) -> int:
@@ -70,7 +70,7 @@ class EnrichmentResult:
             f" ({self.pathway_name}) {len(self.found_genes)}/{self.pathway_genes_count}>"
         )
 
-    def json_summary(self, gene_delimiter: str = ",") -> Dict[str, Any]:
+    def json_summary(self, gene_delimiter: str = ",") -> dict[str, Any]:
         """Build json summary for enrichment analysis.
 
         :param str gene_delimiter: Delimiter to seperate genes in gene list.
@@ -88,7 +88,7 @@ class EnrichmentResult:
         }
 
     @staticmethod
-    def get_header() -> List[str]:
+    def get_header() -> list[str]:
         """Build default header for enrichment analysis.
 
         :rtype: typing.List[str]
@@ -110,24 +110,24 @@ class Enrichment:
 
     def __init__(
         self,
-        pathways: List[Pathway],
+        pathways: list[Pathway],
     ) -> None:
         """Init KEGG pathway enrichment analysis.
 
         :param str org: Organism identifier used by KEGG database (3 letter code, e.g. "mmu" for mus musculus or "hsa" for human).
         :param typing.List[Pathway] pathways: (Optional) List of Pathway instances or list of KEGG pathway identifier.
         """
-        self.result: List[EnrichmentResult] = []
+        self.result: list[EnrichmentResult] = []
 
         # Create pathway list
-        self.all_pathways: List[Pathway] = pathways
+        self.all_pathways: list[Pathway] = pathways
 
     def _check_analysis_result_exist(self) -> None:
         """Check if summary exists."""
         if not self.result or len(self.result) == 0:
             raise ValueError("need to 'run_analysis' first")
 
-    def get_subset(self, subset: List[str], inplace: bool = False) -> List[EnrichmentResult]:
+    def get_subset(self, subset: list[str], inplace: bool = False) -> list[EnrichmentResult]:
         """Create subset of analysis result by list of pathway ids.
 
         :param typing.List[str] subset: List of pathway identifer to filter enrichment result by.
@@ -148,7 +148,7 @@ class Enrichment:
 
         return buffer
 
-    def run_analysis(self, gene_list: List[str]) -> List[EnrichmentResult]:
+    def run_analysis(self, gene_list: list[str]) -> list[EnrichmentResult]:
         """List of gene ids. Return list of EnrichmentResult instances.
 
         :param typing.List[str] gene_list: List of genes to analyse.
@@ -160,7 +160,7 @@ class Enrichment:
         study_n: int = len(gene_list)
 
         for pathway in self.all_pathways:
-            genes_found: List[str] = []
+            genes_found: list[str] = []
             all_pathways_genes = pathway.get_genes()
             absolute_pathway_genes += len(all_pathways_genes)
 
@@ -204,7 +204,7 @@ class Enrichment:
 
         return self.result
 
-    def to_json(self) -> List[Dict[str, Any]]:
+    def to_json(self) -> list[dict[str, Any]]:
         """Export to json dict.
 
         :rtype: typing.List[typing.Dict[str, typing.Any]]
@@ -221,7 +221,7 @@ class Enrichment:
 
     def to_csv(
         self,
-        file_obj: Union[str, IOBase, Any],
+        file_obj: str | IOBase | Any,
         delimiter: str = "\t",
         overwrite: bool = False,
     ) -> None:
@@ -234,7 +234,7 @@ class Enrichment:
         # Check if summary exists
         self._check_analysis_result_exist()
 
-        csv_file: Optional[IOBase] = None
+        csv_file: IOBase | None = None
 
         if isinstance(file_obj, str):
             # file is str (Name of file)
@@ -256,7 +256,7 @@ class Enrichment:
         if child_delimiter == delimiter:
             raise ValueError("This delimiter is reserved to seperate list of genes.")
 
-        headers: List[str] = EnrichmentResult.get_header()
+        headers: list[str] = EnrichmentResult.get_header()
         writer: DictWriter = DictWriter(csv_file, fieldnames=headers, delimiter=delimiter)
 
         for item in self.result:

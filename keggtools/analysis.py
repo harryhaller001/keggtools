@@ -127,9 +127,7 @@ class Enrichment:
         if not self.result or len(self.result) == 0:
             raise ValueError("need to 'run_analysis' first")
 
-    def get_subset(
-        self, subset: List[str], inplace: bool = False
-    ) -> List[EnrichmentResult]:
+    def get_subset(self, subset: List[str], inplace: bool = False) -> List[EnrichmentResult]:
         """Create subset of analysis result by list of pathway ids.
 
         :param typing.List[str] subset: List of pathway identifer to filter enrichment result by.
@@ -192,9 +190,7 @@ class Enrichment:
                 a_var: int = analysis.study_count
                 b_var: int = study_n - analysis.study_count
                 c_var: int = analysis.pathway_genes_count - analysis.study_count
-                d_var: int = (
-                    absolute_pathway_genes - analysis.pathway_genes_count - b_var
-                )
+                d_var: int = absolute_pathway_genes - analysis.pathway_genes_count - b_var
 
                 # Calculate p value with Fisher exact test
                 _, pval = stats.fisher_exact(
@@ -243,10 +239,7 @@ class Enrichment:
         if isinstance(file_obj, str):
             # file is str (Name of file)
             if os.path.isfile(file_obj) and not overwrite:
-                raise RuntimeError(
-                    f"File {file_obj} does already exist."
-                    "To solve please set overwrite=True."
-                )
+                raise RuntimeError(f"File {file_obj} does already exist." "To solve please set overwrite=True.")
 
             csv_file = open(file_obj, mode="w", encoding="utf-8")
         elif isinstance(file_obj, IOBase):
@@ -254,9 +247,7 @@ class Enrichment:
             csv_file = file_obj
 
         else:
-            raise TypeError(
-                "Argument 'file_obj' must be string or IOBase instance, like an open file object."
-            )
+            raise TypeError("Argument 'file_obj' must be string or IOBase instance, like an open file object.")
 
         # Delimiter of gene names
         child_delimiter = " "
@@ -266,9 +257,7 @@ class Enrichment:
             raise ValueError("This delimiter is reserved to seperate list of genes.")
 
         headers: List[str] = EnrichmentResult.get_header()
-        writer: DictWriter = DictWriter(
-            csv_file, fieldnames=headers, delimiter=delimiter
-        )
+        writer: DictWriter = DictWriter(csv_file, fieldnames=headers, delimiter=delimiter)
 
         for item in self.result:
             # Write lines

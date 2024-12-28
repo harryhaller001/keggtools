@@ -39,9 +39,7 @@ class Subtype:
         """
         # check for valid subtype names in RELATION_SUBTYPES
         if name not in RELATION_SUBTYPES:
-            raise ValueError(
-                f"Name of relation subtype '{name}' is not in list of valid subtypes."
-            )
+            raise ValueError(f"Name of relation subtype '{name}' is not in list of valid subtypes.")
 
         self.name: str = name
         self.value: str = value
@@ -426,9 +424,7 @@ class Entry:
         :return: XML string.
         :rtype: xml.etree.ElementTree.Element
         """
-        entry_element: Element = Element(
-            "entry", attrib={"id": self.id, "name": self.name, "type": self.type}
-        )
+        entry_element: Element = Element("entry", attrib={"id": self.id, "name": self.name, "type": self.type})
 
         # Add optional attributes to xml element
         if self.link is not None:
@@ -881,9 +877,7 @@ class Pathway:
         """
         # Generate xml header string
         # docstring is not supported by build-in xml builer
-        xml_timestamp: str = (
-            datetime.now().astimezone().strftime("%b %d, %Y %H:%M:%S (GMT%z)")
-        )
+        xml_timestamp: str = datetime.now().astimezone().strftime("%b %d, %Y %H:%M:%S (GMT%z)")
         xml_header: str = (
             '<?xml version="1.0"?>\n'
             '<!DOCTYPE pathway SYSTEM "http://www.kegg.jp/kegg/xml/KGML_v0.7.2_.dtd">\n'

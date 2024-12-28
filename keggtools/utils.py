@@ -141,10 +141,7 @@ class ColorGradient:
         :rtype: typing.List[str]
         """
         step_list = [index / float(self.steps) for index in range(self.steps)]
-        result = [
-            ColorGradient._intermediate(self.stop, self.start, step)
-            for step in step_list
-        ]
+        result = [ColorGradient._intermediate(self.stop, self.start, step) for step in step_list]
         result.append(self.stop)
 
         return [ColorGradient.to_hex(code) for code in result]
@@ -192,9 +189,7 @@ def is_valid_pathway_name(value: str) -> bool:
     :return: Returns True if value matches format of pathway name.
     :rtype: bool
     """
-    return (
-        re.match(pattern=r"^path:(ko|ec|[a-z]{3})([0-9]{5})$", string=value) is not None
-    )
+    return re.match(pattern=r"^path:(ko|ec|[a-z]{3})([0-9]{5})$", string=value) is not None
 
 
 def is_valid_hex_color(value: str) -> bool:

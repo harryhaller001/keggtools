@@ -111,18 +111,14 @@ def test_color_gradient_rendering(pathway: Pathway) -> None:
     assert renderer.get_gene_color(gene_id="gene1") == "#ffffff"
 
     # Testing custom default color from tuple
-    assert (
-        renderer.get_gene_color(gene_id="gene1", default_color=(0, 0, 0)) == "#000000"
-    )
+    assert renderer.get_gene_color(gene_id="gene1", default_color=(0, 0, 0)) == "#000000"
 
     # Test maximum
     assert (
-        is_valid_hex_color(renderer.get_gene_color("gene4"))
-        and renderer.get_gene_color("gene4").lower() == "#ff0000"
+        is_valid_hex_color(renderer.get_gene_color("gene4")) and renderer.get_gene_color("gene4").lower() == "#ff0000"
     )
 
     # test minimum
     assert (
-        is_valid_hex_color(renderer.get_gene_color("gene2"))
-        and renderer.get_gene_color("gene2").lower() == "#0000ff"
+        is_valid_hex_color(renderer.get_gene_color("gene2")) and renderer.get_gene_color("gene2").lower() == "#0000ff"
     )

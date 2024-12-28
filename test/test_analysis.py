@@ -38,9 +38,7 @@ def test_enrichment_result() -> None:
 def test_enrichment(storage: Storage) -> None:
     """Testing enrichment analysis instance."""
     # Load testing pathway
-    with open(
-        os.path.join(os.path.dirname(__file__), "pathway.kgml"), encoding="utf-8"
-    ) as file_obj:
+    with open(os.path.join(os.path.dirname(__file__), "pathway.kgml"), encoding="utf-8") as file_obj:
         loaded_pathway: Pathway = Pathway.parse(file_obj.read())
 
     # Build pathway list
@@ -51,9 +49,7 @@ def test_enrichment(storage: Storage) -> None:
     with pytest.raises(ValueError):
         enrichment._check_analysis_result_exist()
 
-    results: List[EnrichmentResult] = enrichment.run_analysis(
-        gene_list=["12043", "18035", "17874", "21937"]
-    )
+    results: List[EnrichmentResult] = enrichment.run_analysis(gene_list=["12043", "18035", "17874", "21937"])
 
     assert len(results) == 1
     assert results[0].study_count == 4
@@ -97,9 +93,7 @@ def test_enrichment(storage: Storage) -> None:
     assert os.path.isfile(csv_filename)
 
     # Testing valid csv by reading exported csv
-    validate_df: pandas.DataFrame = pandas.read_csv(
-        csv_filename, delimiter="\t", header=None
-    )
+    validate_df: pandas.DataFrame = pandas.read_csv(csv_filename, delimiter="\t", header=None)
 
     # Check if gene list (5th column of csv file) contains seperated list of genes
     # TODO: make better test!

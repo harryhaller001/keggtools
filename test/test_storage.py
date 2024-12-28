@@ -60,15 +60,13 @@ def test_cache_readwrite(storage: Storage) -> None:
 
     # Testing string file
     assert storage.exist(testing_filename) is False
-    assert storage.save(
-        filename=testing_filename, data=testing_payload
-    ) == os.path.join(CACHEDIR, testing_filename)
+    assert storage.save(filename=testing_filename, data=testing_payload) == os.path.join(CACHEDIR, testing_filename)
     assert storage.load(filename=testing_filename) == testing_payload
 
     # testing binary file
-    assert storage.save_dump(
-        filename=testing_filename, data=testing_payload
-    ) == os.path.join(CACHEDIR, testing_filename)
+    assert storage.save_dump(filename=testing_filename, data=testing_payload) == os.path.join(
+        CACHEDIR, testing_filename
+    )
     assert storage.load_dump(filename=testing_filename) == testing_payload
 
     # Testing loading of none existing files

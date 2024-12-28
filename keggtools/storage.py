@@ -96,9 +96,7 @@ class Storage:
         path: str = self.build_cache_path(filename=filename)
 
         if not os.path.isfile(path):
-            raise FileNotFoundError(
-                f"Can not load file. File at path '{path}' does not exist."
-            )
+            raise FileNotFoundError(f"Can not load file. File at path '{path}' does not exist.")
 
         with open(path, encoding="utf-8") as f_obj:
             data = f_obj.read()
@@ -116,9 +114,7 @@ class Storage:
         path: str = self.build_cache_path(filename=filename)
 
         if not os.path.isfile(path):
-            raise FileNotFoundError(
-                f"Can not load file. File at path '{path}' does not exist."
-            )
+            raise FileNotFoundError(f"Can not load file. File at path '{path}' does not exist.")
 
         with open(path, "rb") as input_file:
             return pickle.load(input_file)

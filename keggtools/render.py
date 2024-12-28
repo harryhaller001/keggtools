@@ -157,9 +157,7 @@ class Renderer:
             resolver_buffer = cache_or_resolver
         else:
             # Raise error of type is not correct
-            raise TypeError(
-                "String to directory, storage instance or resolver instance must be passed."
-            )
+            raise TypeError("String to directory, storage instance or resolver instance must be passed.")
 
         self.resolver: Resolver = resolver_buffer
 
@@ -170,9 +168,7 @@ class Renderer:
 
         @lru_cache(maxsize=1)
         def cache_wrapper() -> List[str]:
-            return ColorGradient(
-                start=(255, 255, 255), stop=self.upper_color, steps=100
-            ).get_list()
+            return ColorGradient(start=(255, 255, 255), stop=self.upper_color, steps=100).get_list()
 
         return cache_wrapper()
 
@@ -182,15 +178,11 @@ class Renderer:
 
         @lru_cache(maxsize=1)
         def cache_wrapper() -> List[str]:
-            return ColorGradient(
-                start=(255, 255, 255), stop=self.lower_color, steps=100
-            ).get_list()
+            return ColorGradient(start=(255, 255, 255), stop=self.lower_color, steps=100).get_list()
 
         return cache_wrapper()
 
-    def get_gene_color(
-        self, gene_id: str, default_color: Tuple[int, int, int] = (255, 255, 255)
-    ) -> str:
+    def get_gene_color(self, gene_id: str, default_color: Tuple[int, int, int] = (255, 255, 255)) -> str:
         """Get overlay color for given gene.
 
         :param str gene_id: Identify of gene.
@@ -321,10 +313,7 @@ class Renderer:
                                 name=entry.id,
                                 label="<"
                                 + generate_embedded_html_table(
-                                    items={
-                                        gene_id: self.get_gene_color(gene_id)
-                                        for gene_id in entry_gene_list
-                                    }
+                                    items={gene_id: self.get_gene_color(gene_id) for gene_id in entry_gene_list}
                                 )
                                 + ">",
                                 shape="plaintext",
@@ -343,9 +332,7 @@ class Renderer:
                                 shape="rectangle",
                                 style="filled",
                                 color="#000000",
-                                fillcolor=self.get_gene_color(
-                                    gene_id=entry.get_gene_id()[0]
-                                ),
+                                fillcolor=self.get_gene_color(gene_id=entry.get_gene_id()[0]),
                             )
                         )
 
@@ -354,9 +341,7 @@ class Renderer:
 
                     # Iterate of components of group entry
                     for comp in entry.components:
-                        component_entry: Optional[Entry] = self.pathway.get_entry_by_id(
-                            comp.id
-                        )
+                        component_entry: Optional[Entry] = self.pathway.get_entry_by_id(comp.id)
 
                         if (
                             component_entry is not None
@@ -367,9 +352,7 @@ class Renderer:
                             component_label.append(
                                 (
                                     component_entry.graphics.name.split(", ")[0],
-                                    self.get_gene_color(
-                                        component_entry.get_gene_id()[0]
-                                    ),
+                                    self.get_gene_color(component_entry.get_gene_id()[0]),
                                 )
                             )
 
@@ -534,9 +517,7 @@ class Renderer:
 
         # Type check of return value
         if not isinstance(graph_data, bytes):
-            raise TypeError(
-                "Failed to create binary file object from pydot graph instance."
-            )
+            raise TypeError("Failed to create binary file object from pydot graph instance.")
 
         return graph_data
 

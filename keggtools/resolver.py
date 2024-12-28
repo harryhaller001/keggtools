@@ -37,9 +37,7 @@ def _request_to_dict(
     :return: TSV parsed to dict.
     :rtype: typing.Dict[str, str]
     """
-    return parse_tsv_to_dict(
-        data=_request(url=url, **kwargs), col_keys=col_keys, col_values=col_values
-    )
+    return parse_tsv_to_dict(data=_request(url=url, **kwargs), col_keys=col_keys, col_values=col_values)
 
 
 def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
@@ -72,9 +70,7 @@ def get_gene_names(genes: List[str], max_genes: int = 50) -> Dict[str, str]:
     query_string: str = "+".join(genes)
 
     # Request without cache
-    resolve_dict: Dict[str, str] = _request_to_dict(
-        url=f"http://rest.kegg.jp/list/{query_string}"
-    )
+    resolve_dict: Dict[str, str] = _request_to_dict(url=f"http://rest.kegg.jp/list/{query_string}")
 
     # Sanitize dict by splitting first entry of gene name
     result_dict: Dict[str, str] = {}
@@ -172,9 +168,7 @@ class Resolver:
         tsv_data: str = self._cache_or_request(filename=filename, url=url, **kwargs)
 
         # Parse tsv data to dict
-        return parse_tsv_to_dict(
-            data=tsv_data, col_keys=col_keys, col_values=col_values
-        )
+        return parse_tsv_to_dict(data=tsv_data, col_keys=col_keys, col_values=col_values)
 
     def get_pathway_list(self, organism: str, **kwargs: Any) -> Dict[str, str]:
         """Request list of pathways linked to organism.

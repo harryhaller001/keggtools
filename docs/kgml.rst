@@ -10,7 +10,7 @@ KEGG Markup Language
 Schema
 ======
 
-.. image:: media/kgml-schema.png
+.. image:: figures/figure1.png
     :width: 400
     :alt: KGML schema
 

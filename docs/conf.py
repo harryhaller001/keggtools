@@ -23,7 +23,10 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
+    "nbsphinx",
 ]
+
+nbsphinx_execute = "never"
 
 # Mapping for intersphinx extension
 intersphinx_mapping = {
@@ -37,7 +40,7 @@ master_doc = "index"
 pygments_style = "sphinx"
 
 
-exclude_trees = ["_build", "cloudflare-workers", "dist"]
+exclude_trees = ["_build", "cloudflare-workers", "dist", "data"]
 
 exclude_patterns = [
     "wrangler.toml",
@@ -45,6 +48,8 @@ exclude_patterns = [
     "_build",
     "Thumbs.db",
     ".DS_Store",
+    "*.sqlite",
+    "data",
 ]
 
 # Generate the API documentation when building
@@ -57,7 +62,10 @@ coverage_show_missing_items = True
 
 
 html_theme = "furo"
-
+html_static_path = ["_static"]
+html_css_files = [
+    "css/custom.css",
+]
 
 html_show_sphinx = False
 html_context = {

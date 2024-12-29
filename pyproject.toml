@@ -55,7 +55,7 @@ test = [
     "ruff",
 ]
 
-doc = ["Sphinx", "furo"]
+doc = ["Sphinx", "furo", "nbsphinx"]
 
 
 # Mypy config
@@ -74,7 +74,7 @@ ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 120
-extend-include = ["*.ipynb"]
+# extend-include = ["*.ipynb"]
 
 format.docstring-code-format = true
 

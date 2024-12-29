@@ -1,0 +1,5 @@
+/* Fix broken inline styles for image display */
+div.nboutput.container div.output_area:not(.rendered_html)>img {
+    width: unset !important;
+    height: unset !important;
+}

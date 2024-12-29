@@ -140,13 +140,8 @@ docs: ## Build sphinx docs
 	@rm -rf ./docs/_build
 
 # Generate dot graphics
-	dot ./reproducibility/figures/figure1.dot -Tpng -Gdpi=300 > ./reproducibility/figures/figure1.png
-	dot ./reproducibility/figures/figure5.dot -Tpng -Gdpi=300 > ./reproducibility/figures/figure5.png
-
-# Copy figures to docs folder
-	cp ./reproducibility/figures/figure1.png ./docs/media/kgml-schema.png
-	cp ./reproducibility/figures/figure4.png ./docs/media/keggtools-enrichment.png
-	cp ./reproducibility/figures/figure5.png ./docs/media/keggtools-pathway.png
+	dot ./docs/figures/figure1.dot -Tpng -Gdpi=300 > ./docs/figures/figure1.png
+	dot ./docs/figures/figure5.dot -Tpng -Gdpi=300 > ./docs/figures/figure5.png
 
 
 	@$(SPHINX_OPT) -M doctest $(DOCS_DIR) $(DOCS_DIR)/_build

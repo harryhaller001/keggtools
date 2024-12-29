@@ -3,6 +3,13 @@
 .keggtools_cache/
 coverage/
 *.sqlite
+*.h5ad
+*.tar.gz
+*/**/matrix.mtx
+*/**/barcodes.tsv
+*/**/genes.tsv
+/docs/data
+/docs/.keggtools_cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

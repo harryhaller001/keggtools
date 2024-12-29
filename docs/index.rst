@@ -10,7 +10,7 @@ keggtools
 
 Library for KEGG pathway enrichment analysis.
 
-.. image:: media/keggtools-enrichment.png
+.. image:: figures/figure4.png
 
 
 Quick Start
@@ -29,6 +29,7 @@ For more details, see :ref:`install`.
     :maxdepth: 1
 
     install
-    example
+    vignette
     kgml
     api
+

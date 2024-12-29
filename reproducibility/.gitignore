@@ -1,8 +1,0 @@
-
-*.tar.gz
-
-/rawdata
-
-# Ignore exported csv files
-*.csv
-

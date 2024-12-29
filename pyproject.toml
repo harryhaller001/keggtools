@@ -53,10 +53,12 @@ test = [
     "pandas",
     "isort",
     "ruff",
+    "twine",
+    "setuptools",
+    "flit",
 ]
 
-doc = ["Sphinx", "furo", "nbsphinx"]
-
+docs = ["Sphinx", "furo", "nbsphinx"]
 
 # Mypy config
 # https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file

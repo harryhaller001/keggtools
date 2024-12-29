@@ -16,30 +16,49 @@ on:
 jobs:
 
     build:
-        # Run on ubuntu latest
-        runs-on: ubuntu-latest
+
+        # Set ubuntu version by matrix strategy
+        runs-on: ${{ matrix.os }}
+        defaults:
+            run:
+                shell: bash -e {0}
 
         # Matrix testing
         strategy:
             matrix:
                 # Check for all python versions >=3.10
-                python-version: ["3.10", "3.11", "3.12"]
+                include:
+                    -   os: ubuntu-latest
+                        python-version: "3.10"
+                    -   os: ubuntu-latest
+                        python-version: "3.11"
+                    -   os: ubuntu-latest
+                        python-version: "3.12"
+                    -   os: ubuntu-latest
+                        python-version: "3.12"
+                        pip-flags: "--pre"
+                        name: PRE-RELEASE DEPENDENCIES
+
+        name: ${{ matrix.name }} Python ${{ matrix.python }}
+        env:
+            OS: ${{ matrix.os }}
+            PYTHON: ${{ matrix.python }}
 
         steps:
         -   uses: actions/checkout@v4
-        -   name: Set up Python ${{ matrix.python-version }}
+        -   name: Set up Python ${{ matrix.python }}
             uses: actions/setup-python@v5
             with:
-                python-version: ${{ matrix.python-version }}
+                python-version: ${{ matrix.python }}
+                cache: "pip"
+                cache-dependency-path: "**/pyproject.toml"
 
         # Install dependencies from freeze
         -   name: Install dependencies
             run: |
-                sudo apt-get install -y graphviz
-                python -m pip install --upgrade pip
-                pip install mypy pytest coverage twine setuptools types-requests responses flit ruff
-                pip install requests scipy pydot pandas pybiomart pydantic-xml
-
+                sudo apt-get install -y graphviz pandoc
+                python -m pip install --upgrade pip wheel
+                pip install ${{ matrix.pip-flags }} ".[test,docs]"
 
 
         # Linting package
@@ -88,7 +107,6 @@ jobs:
         # Test and build the docs for keggtools
         -   name: test and build docs
             run: |
-                pip install Sphinx furo
                 mypy ./docs/conf.py
                 ruff check ./docs/conf.py
                 python -m sphinx -M doctest ./docs ./docs/_build

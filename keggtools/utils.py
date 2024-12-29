@@ -11,42 +11,6 @@ import pandas as pd
 # XML parsing helper functions
 
 
-def get_attribute(element: Element, key: str) -> str:
-    """Get attribute from XML Element object. Raises KeyError is Attribute is not found or not valid.
-
-    :param xml.etree.ElementTree.Element element: XML element to get attribute from.
-    :param str key: Name of attribute.
-    :return: Value of attribute.
-    :rtype: str
-    :raises ValueError: Error if attribute does not exist or is wrong type.
-    """
-    value: str | None = element.attrib.get(key)
-
-    # Check if value is not none and is string
-    if value is None or isinstance(value, str) is False:
-        raise ValueError(f"Value of attribute '{key}' is not a string.")
-
-    return value
-
-
-def get_numeric_attribute(element: Element, key: str) -> str:
-    """Get attribute from XML Element object. Raises KeyError is Attribute is not found or not valid.
-
-    :param Element element: XML element to get attribute from.
-    :param str key: Name of attribute.
-    :return: Value of attribute. ValueError is raised if value is not a numeric string.
-    :rtype: str
-    :raises ValueError: Error is attribute is not a digit (numberic string), does not exist or is wrong type.
-    """
-    value: str = get_attribute(element=element, key=key)
-
-    # Check if string is numeric
-    if str.isnumeric(value) is False:
-        raise ValueError(f"Value of attribute '{key}' is not numeric.")
-
-    return value
-
-
 def parse_xml(xml_object_or_string: str | Element) -> Element:
     """Returns XML Element object from string or XML Element.
 

@@ -151,8 +151,6 @@ Utils
     .. automethod:: __init__
 
 
-.. autofunction:: keggtools.utils::get_attribute
-.. autofunction:: keggtools.utils::get_numeric_attribute
 .. autofunction:: keggtools.utils::parse_tsv
 .. autofunction:: keggtools.utils::parse_tsv_to_dict
 .. autofunction:: keggtools.utils::parse_xml

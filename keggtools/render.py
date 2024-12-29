@@ -9,41 +9,9 @@ from xml.etree.ElementTree import Element, SubElement
 from pydot import Dot, Edge, Node
 
 from .models import Entry, Pathway
-from .resolver import Resolver  # get_gene_names,
+from .resolver import Resolver
 from .storage import Storage
 from .utils import ColorGradient
-
-# from enum import Enum, unique
-
-
-# TODO: add hex string to int tuple function
-# TODO: add int tuple to hex string function
-
-
-# Color variables
-# TODO: implement all colors as tuple or Union[str, Tuple[int, int, int]]
-# TODO: convert color from tuple to string on function level
-
-# @unique
-# class Color(Enum):
-#     """
-#     Color variables.
-#     """
-#     WHITE: Tuple[int, int, int] = (255, 255, 255)
-#     BLACK: Tuple[int, int, int] = (0, 0, 0)
-
-
-# TODO: use enum nested classes for different parameter options in pydot ???
-# class PydotNode(Enum):
-#     """
-#     ...
-#     """
-#     class LineStyle(Enum):
-#         """
-#         ...
-#         """
-#         DASHED: str = ""
-
 
 # Helper functions for renderer
 

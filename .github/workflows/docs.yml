@@ -1,5 +1,5 @@
 
-name: Deploy docs
+name: Build and deploy docs
 
 on:
     workflow_dispatch:
@@ -24,12 +24,15 @@ jobs:
             uses: actions/setup-python@v5
             with:
                 python-version: "3.10"
+                cache: "pip"
+                cache-dependency-path: "**/pyproject.toml"
 
 
         # Test and build the docs for keggtools
         -   name: test and build docs
             run: |
-                pip install flit Sphinx furo
+                sudo apt-get install -y pandoc
+                pip install flit Sphinx furo nbsphinx
                 flit install --deps=production
                 python -m sphinx -M doctest ./docs ./docs/_build
                 python -m  sphinx -M coverage ./docs ./docs/_build

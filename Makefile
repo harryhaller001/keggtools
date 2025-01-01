@@ -37,30 +37,7 @@ help: ## This help.
 
 .PHONY: install
 install: ## install all python dependencies
-	@$(PIP_OPT) install \
-		mypy \
-		pytest \
-		coverage \
-		twine \
-		setuptools \
-		types-requests \
-		responses \
-		flit \
-		pre-commit \
-		requests \
-		scipy \
-		pydot \
-		pandas \
-		Sphinx \
-		furo \
-		scanpy \
-		mygene \
-		ipykernel \
-		nbconvert \
-		pydantic-xml \
-		ruff \
-		pybiomart \
-		--upgrade
+	@$(PIP_OPT) install ".[test,docs]" --upgrade
 
 	@$(PRECOMMIT_OPT) install
 

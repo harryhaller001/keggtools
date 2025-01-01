@@ -58,7 +58,7 @@ test = [
     "flit",
 ]
 
-docs = ["Sphinx", "furo", "nbsphinx"]
+docs = ["Sphinx", "furo", "nbsphinx", "ipython"]
 
 # Mypy config
 # https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
@@ -136,5 +136,18 @@ omit = ["*/test/*"]
 # Flit sdist config
 # https://flit.pypa.io/en/latest/pyproject_toml.html#sdist-section
 [tool.flit.sdist]
-include = ["keggtools/"]
-exclude = ["docs", "test", "reproducibility"]
+include = ["keggtools/", "test/"]
+exclude = [
+    "docs",
+    # "test",
+    "reproducibility",
+    ".vscode",
+    ".github",
+    ".git",
+    "*.sqlite",
+    ".pre-commit-config.yaml",
+    ".python-version",
+    "requirements.txt",
+    "Makefile",
+    ".gitignore",
+]

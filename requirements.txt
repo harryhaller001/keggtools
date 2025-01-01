@@ -70,7 +70,7 @@ mdurl==0.1.2
 mistune==3.0.2
 more-itertools==10.5.0
 mygene==3.2.2
-mypy==1.14.0
+mypy==1.14.1
 mypy-extensions==1.0.0
 natsort==8.4.0
 nbclient==0.10.2

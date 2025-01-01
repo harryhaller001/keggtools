@@ -13,13 +13,13 @@ DOCS_DIR		= $(BASE_DIR)/docs
 PYTHON_OPT		= python3
 PIP_OPT			= $(PYTHON_OPT) -m pip --require-virtualenv
 MYPY_OPT		= $(PYTHON_OPT) -m mypy
-FLAKE8_OPT		= $(PYTHON_OPT) -m flake8
-BLACK_OPT		= $(PYTHON_OPT) -m black
 TEST_OPT		= $(PYTHON_OPT) -m pytest
 TWINE_OPT		= $(PYTHON_OPT) -m twine
 SPHINX_OPT		= $(PYTHON_OPT) -m sphinx
 COVERAGE_OPT	= $(PYTHON_OPT) -m coverage
 FLIT_OPT		= $(PYTHON_OPT) -m flit
+PRECOMMIT_OPT	= pre-commit
+RUFF_OPT		= $(PYTHON_OPT) -m ruff
 
 # Run help by default
 
@@ -37,44 +37,19 @@ help: ## This help.
 
 .PHONY: install
 install: ## install all python dependencies
-	@$(PIP_OPT) install \
-		mypy \
-		pytest \
-		coverage \
-		twine \
-		setuptools \
-		types-requests \
-		responses \
-		flit \
-		pre-commit \
-		requests \
-		scipy \
-		pydot \
-		pandas \
-		Sphinx \
-		furo \
-		scanpy \
-		mygene \
-		ipykernel \
-		leidenalg \
-		umap-learn==0.5.1 \
-		nbconvert \
-		pydantic-xml \
-		ruff \
-		pybiomart \
-		--upgrade
+	@$(PIP_OPT) install ".[test,docs]" --upgrade
 
-	pre-commit install
+	@$(PRECOMMIT_OPT) install
 
 
 .PHONY: freeze
 freeze: ## Freeze package dependencies
 	@$(PIP_OPT) freeze --exclude keggtools > requirements.txt
+	@$(PYTHON_OPT) --version > .python-version
 
 
-
-.PHONY: twine
-twine: ## Twine package upload and checks
+.PHONY: build
+build: ## Build package upload and checks
 # Remove old keggtools package
 	@$(PIP_OPT) uninstall $(PACKAGE_NAME) -y --quiet
 
@@ -95,20 +70,20 @@ twine: ## Twine package upload and checks
 .PHONY : format
 format: ## Lint and format code
 
-	ruff format keggtools/*.py
-	ruff check --fix keggtools/*.py
+	@$(RUFF_OPT) format keggtools/*.py
+	@$(RUFF_OPT) check --fix keggtools/*.py
 
-	ruff format test/*.py
-	ruff check --fix test/*.py
+	@$(RUFF_OPT) format test/*.py
+	@$(RUFF_OPT) check --fix test/*.py
 
 
-.PHONY: pytest
-pytest: ## Unittest of package
+.PHONY: unittest
+unittest: ## Unittest of package
 	@$(TEST_OPT) --show-capture=log
 
 
-.PHONY: mypy
-mypy: ## Run static code analysis
+.PHONY: typing
+typing: ## Run static code analysis
 	@$(MYPY_OPT) $(PACKAGE_DIR) $(TEST_DIR) $(DOCS_DIR)/conf.py
 
 
@@ -160,7 +135,7 @@ docs: ## Build sphinx docs
 
 # Run all checks (always before committing!)
 .PHONY: check
-check: install freeze format mypy coverage twine docs precommit ## Full check of package
+check: install freeze format typing coverage build docs precommit ## Full check of package
 
 
 
@@ -178,13 +153,12 @@ coverage: ## Run Coverage
 .PHONY : precommit
 precommit: ## Run precommit file
 #	@pre-commit run --all-files --verbose
-	@pre-commit run --all-files
+	@$(PRECOMMIT_OPT) run --all-files
 
 
-.PHONY : pdf
-pdf: ## Generate Pdf file from latex
-
-	cd ./reproducibility/latex; \
-	biber paper; \
-	pdflatex paper.tex
+# .PHONY : pdf
+# pdf: ## Generate Pdf file from latex
+# 	cd ./reproducibility/latex; \
+# 	biber paper; \
+# 	pdflatex paper.tex
 

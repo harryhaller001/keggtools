@@ -43,30 +43,30 @@ jobs:
 # Setup github pages from actions
 # https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
 
-        # # Upload static files as artifact
-        # # https://github.com/actions/upload-pages-artifact
-        # -   name: Upload static files as artifact
-        #     id: deployment
-        #     uses: actions/upload-pages-artifact@v3
-        #     with:
-        #         path: ./docs/_build/html
+        # Upload static files as artifact
+        # https://github.com/actions/upload-pages-artifact
+        -   name: Upload static files as artifact
+            id: deployment
+            uses: actions/upload-pages-artifact@v3
+            with:
+                path: ./docs/_build/html
 
 
-    # deploy:
-    #     # Deployment job
-    #     needs: docs
+    deploy:
+        # Deployment job
+        needs: docs
 
-    #     permissions:
-    #         pages: write      # to deploy to Pages
-    #         id-token: write
+        permissions:
+            pages: write      # to deploy to Pages
+            id-token: write
 
-    #     environment:
-    #         name: github-pages
-    #         url: ${{ steps.deployment.outputs.page_url }}
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
 
-    #     runs-on: ubuntu-latest
+        runs-on: ubuntu-latest
 
-    #     steps:
-    #         -   name: Deploy to GitHub Pages
-    #             id: deployment
-    #             uses: actions/deploy-pages@v4
+        steps:
+            -   name: Deploy to GitHub Pages
+                id: deployment
+                uses: actions/deploy-pages@v4

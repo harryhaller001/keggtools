@@ -35,6 +35,7 @@ jobs:
                 # For OS support of actions check out:
                 # https://github.com/actions/runner-images/issues/10636
                 include:
+                    -   os: ubuntu-24.04
                         python: "3.10"
                     -   os: ubuntu-24.04
                         python: "3.11"

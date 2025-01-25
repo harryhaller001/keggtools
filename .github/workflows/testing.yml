@@ -82,12 +82,6 @@ jobs:
 
             # Run unittest on installed package
             -   name: Unit testing with pytest
-                run: |
-                    pytest --show-capture=log
-
-
-            # Run unittest on installed package
-            -   name: Unit testing with pytest
                 env:
                     MPLBACKEND: agg
                     PLATFORM: ${{ matrix.os }}

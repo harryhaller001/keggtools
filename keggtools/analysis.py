@@ -239,7 +239,7 @@ class Enrichment:
         if isinstance(file_obj, str):
             # file is str (Name of file)
             if os.path.isfile(file_obj) and not overwrite:
-                raise RuntimeError(f"File {file_obj} does already exist." "To solve please set overwrite=True.")
+                raise RuntimeError(f"File {file_obj} does already exist.To solve please set overwrite=True.")
 
             csv_file = open(file_obj, mode="w", encoding="utf-8")
         elif isinstance(file_obj, IOBase):

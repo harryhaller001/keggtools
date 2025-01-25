@@ -31,7 +31,7 @@ def test_get_gene_names() -> None:
         mocked_response.add(
             method=HTTP_METHOD_GET,
             url="http://rest.kegg.jp/list/mmu:11797+mmu:266632+mmu:22033",
-            body="mmu:11797\tBirc2, AW146227, Api1, Api2, Birc3\n" "mmu:266632\tIrak4, 8430405M07Rik, 9330209D03Rik\n",
+            body="mmu:11797\tBirc2, AW146227, Api1, Api2, Birc3\nmmu:266632\tIrak4, 8430405M07Rik, 9330209D03Rik\n",
             status=200,
         )
 

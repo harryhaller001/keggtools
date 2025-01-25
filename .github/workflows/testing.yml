@@ -64,6 +64,7 @@ jobs:
             # Install dependencies from freeze
             -   name: Install dependencies
                 run: |
+                    sudo apt-get install -y graphviz
                     python -m pip install --upgrade pip wheel
                     pip install ${{ matrix.pip-flags }} ".[test]"
 

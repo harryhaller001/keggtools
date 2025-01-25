@@ -8,6 +8,20 @@
 keggtools
 =========
 
+.. image:: https://codecov.io/gh/harryhaller001/keggtools/graph/badge.svg?token=3VBDIALBLK
+ :target: https://codecov.io/gh/harryhaller001/keggtools
+
+.. image:: https://img.shields.io/pypi/v/keggtools
+   :alt: PyPI - Version
+
+.. image:: https://img.shields.io/pypi/l/keggtools
+   :alt: PyPI - License
+
+.. image:: https://img.shields.io/pypi/pyversions/keggtools
+   :alt: PyPI - Python Version
+
+
+
 Library for KEGG pathway enrichment analysis.
 
 .. image:: figures/figure4.png

@@ -1,4 +1,9 @@
 
+
+# Ignore KGML pathway files and local caching
+*.kgml
+!/tests/*.kgml
+
 # Ignore caching directories
 .keggtools_cache/
 coverage/
@@ -131,9 +136,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Ignore KGML pathway files and local caching
-*.kgml
-!/test/*.kgml
 
 *.dump
 /.cache

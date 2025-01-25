@@ -24,12 +24,28 @@ You can install ``keggtools`` with ``pip``::
 For more details, see :ref:`install`.
 
 
+Contact
+-------
+
+If you found a bug, please use the `Issue tracker <https://github.com/harryhaller001/keggtools/issues>`_.
+
+
+
+
 
 .. toctree::
-    :maxdepth: 1
+    :caption: Start
+    :maxdepth: 4
+    :glob:
+
 
     install
     vignette
     kgml
-    api
 
+.. toctree::
+    :caption: API Documentation
+    :maxdepth: 4
+    :glob:
+
+    autoapi/keggtools/index

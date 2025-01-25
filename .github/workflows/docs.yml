@@ -1,25 +1,23 @@
+name: Build documentation (python 3.10)
 
-name: Build and deploy docs
+# CAVE: this workflow published sphinx docs to github pages, which are public by default!
 
 on:
+    push:
+        branches: [main]
+
+    # Option for trigger worflow manually
     workflow_dispatch:
-    release:
-        types: [published]
-        branches:
-            - main
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
 
-# Jobs
 jobs:
-
     docs:
-        # Run on ubuntu latest
         runs-on: ubuntu-latest
-
-
         steps:
         -   uses: actions/checkout@v4
-
         -   name: Set up Python 3.10
             uses: actions/setup-python@v5
             with:
@@ -27,24 +25,48 @@ jobs:
                 cache: "pip"
                 cache-dependency-path: "**/pyproject.toml"
 
-
-        # Test and build the docs for keggtools
-        -   name: test and build docs
+        # Install docs dependencies
+        -   name: Install docs dependencies
             run: |
                 sudo apt-get install -y pandoc
-                pip install flit Sphinx furo nbsphinx
-                flit install --deps=production
-                python -m sphinx -M doctest ./docs ./docs/_build
-                python -m  sphinx -M coverage ./docs ./docs/_build
-                python -m  sphinx -M html ./docs ./docs/_build
-
-        # Deploy with cloudflare workers
-        -   name: Publish
-            uses: cloudflare/wrangler-action@2.0.0
-            with:
-                workingDirectory: ./docs
-                preCommands: cd ./cloudflare-workers && yarn install --frozen-lockfile && cd ..
-                apiToken: ${{ secrets.CF_API_TOKEN }}
-                accountId: ${{ secrets.CF_ACCOUNT_ID }}
+                python -m pip install ".[docs]"
 
 
+        # Test and build the docs
+        -   name: Test and build docs
+            run: |
+                python -m sphinx -M doctest ./docs/source ./docs/_build
+                python -m  sphinx -M coverage ./docs/source ./docs/_build
+                python -m  sphinx -M html ./docs/source ./docs/_build
+
+
+# Setup github pages from actions
+# https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+
+        # # Upload static files as artifact
+        # # https://github.com/actions/upload-pages-artifact
+        # -   name: Upload static files as artifact
+        #     id: deployment
+        #     uses: actions/upload-pages-artifact@v3
+        #     with:
+        #         path: ./docs/_build/html
+
+
+    # deploy:
+    #     # Deployment job
+    #     needs: docs
+
+    #     permissions:
+    #         pages: write      # to deploy to Pages
+    #         id-token: write
+
+    #     environment:
+    #         name: github-pages
+    #         url: ${{ steps.deployment.outputs.page_url }}
+
+    #     runs-on: ubuntu-latest
+
+    #     steps:
+    #         -   name: Deploy to GitHub Pages
+    #             id: deployment
+    #             uses: actions/deploy-pages@v4

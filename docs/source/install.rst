@@ -65,5 +65,3 @@ Or install package from local source files
 
     # Install dependencies and package
     python3 -m pip install -e .
-
-

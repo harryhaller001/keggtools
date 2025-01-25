@@ -1,78 +1,89 @@
 
 # Package build system
+
 [build-system]
-requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
-
 # Project details
+requires = [ "flit-core>=3.2,<4" ]
+
 [project]
 name = "keggtools"
 description = "Enrichment analysis and visualisation toolkit for KEGG pathways"
-requires-python = '>=3.10'
-license = { file = "LICENSE" }
-
-authors = [{ name = "harryhaller001", email = "harryhaller001@gmail.com" }]
-
-maintainers = [{ name = "harryhaller001", email = "harryhaller001@gmail.com" }]
-
 readme = { file = "README.md", content-type = "text/markdown" }
 
+license = { file = "LICENSE" }
+
+maintainers = [ { name = "harryhaller001", email = "harryhaller001@gmail.com" } ]
+
+authors = [ { name = "harryhaller001", email = "harryhaller001@gmail.com" } ]
+
+requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 3 - Alpha",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Natural Language :: English",
-    "Intended Audience :: Healthcare Industry",
-    "Intended Audience :: Science/Research",
     "Typing :: Typed",
 ]
-dependencies = ["pydot", "requests", "scipy", "pydantic-xml", "pybiomart"]
+dynamic = [ "version" ]
 
-dynamic = ["version"]
+dependencies = [ "pybiomart", "pydantic-xml", "pydot", "requests", "scipy" ]
 
-
-# Project urls
-[project.urls]
-Documentation = "https://keggtools.org/"
-Source = "https://github.com/harryhaller001/keggtools"
-Homepage = "https://github.com/harryhaller001/keggtools"
-
-
-# Optional dependencies for testing and docs
-[project.optional-dependencies]
-test = [
-    "pytest",
-    "coverage",
-    "mypy",
-    "types-requests",
-    "responses",
-    "pandas",
-    "isort",
-    "ruff",
-    "twine",
-    "setuptools",
-    "flit",
+optional-dependencies.docs = [
+    # Required for syntax highlighing (https://github.com/spatialaudio/nbsphinx/issues/24)
+    "ipython",
+    "nbsphinx",
+    "sphinx",
+    "sphinx-autoapi",
+    "sphinx-autodoc-typehints",
+    "sphinx-book-theme",
 ]
-
-docs = ["Sphinx", "furo", "nbsphinx", "ipython"]
 
 # Mypy config
 # https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
-[tool.mypy]
-python_version = "3.10"
-warn_return_any = true
-warn_unused_configs = true
+# Optional dependencies for testing and docs
+optional-dependencies.test = [
+    "coverage",
+    "flit",
+    "isort",
+    "mypy",
+    "pandas",
+    "pandas-stubs",
+    "pytest",
+    "responses",
+    "ruff",
+    "setuptools",
+    "twine",
+    "types-requests",
+]
+# Project urls
+urls.Documentation = "https://keggtools.org/"
+urls.Homepage = "https://github.com/harryhaller001/keggtools"
+urls.Source = "https://github.com/harryhaller001/keggtools"
 
-
-# Ignore libs which are not PEP 561 compliant
-[[tool.mypy.overrides]]
-module = ["pandas", "setuptools", "scipy", "pydot", "pybiomart"]
-ignore_missing_imports = true
-
+[tool.flit.sdist]
+include = [ "keggtools/", "tests/" ]
+exclude = [
+    "docs",
+    # "test",
+    "reproducibility",
+    ".vscode",
+    ".github",
+    ".git",
+    "*.sqlite",
+    ".pre-commit-config.yaml",
+    ".python-version",
+    "requirements.txt",
+    "Makefile",
+    ".gitignore",
+]
 
 [tool.ruff]
 line-length = 120
@@ -95,6 +106,7 @@ lint.select = [
 ]
 lint.ignore = [
     "B008", # Errors from function calls in argument defaults. These are fine when the result is immutable.
+    "C408",
     "D100", # Missing docstring in public module
     "D104", # Missing docstring in public package
     "D105", # __magic__ methods are often self-explanatory, allow missing docstrings
@@ -108,13 +120,18 @@ lint.ignore = [
     "E731", # Do not assign a lambda expression, use a def -> lambda expression assignments are convenient
     "E741", # allow I, O, l as variable names -> I is the identity matrix
 ]
-lint.per-file-ignores."*/__init__.py" = ["F401"]
-lint.per-file-ignores."docs/*" = ["I"]
-lint.per-file-ignores."tests/*" = ["D"]
+lint.per-file-ignores."*/__init__.py" = [ "F401" ]
+lint.per-file-ignores."docs/*" = [ "I" ]
+lint.per-file-ignores."tests/*" = [ "D" ]
+# Pytest config
 lint.pydocstyle.convention = "google"
 
+[tool.pyproject-fmt]
+column_width = 120            # after how many column width split arrays/dicts into multiple lines, 1 will force always
+indent = 4
+keep_full_version = false     # if false will remove unnecessary trailing ``.0``'s from version specifiers
+max_supported_python = "3.12" # maximum Python version to use when generating version specifiers
 
-# Pytest config
 [tool.pytest.ini_options]
 minversion = "7.0"
 
@@ -124,30 +141,35 @@ log_level = "DEBUG"
 log_cli = true
 
 python_files = "test_*.py"
-testpaths = ["test"]
+testpaths = [ "tests" ]
 
+xfail_strict = true
+addopts = [
+    "--import-mode=importlib", # allow using test files with same name
+]
 
 # Coverage config
-[tool.coverage.run]
-source = ["keggtools"]
-omit = ["*/test/*"]
 
+[tool.coverage.run]
+source = [ "keggtools" ]
+omit = [ "*/tests/*" ]
 
 # Flit sdist config
 # https://flit.pypa.io/en/latest/pyproject_toml.html#sdist-section
-[tool.flit.sdist]
-include = ["keggtools/", "test/"]
-exclude = [
-    "docs",
-    # "test",
-    "reproducibility",
-    ".vscode",
-    ".github",
-    ".git",
-    "*.sqlite",
-    ".pre-commit-config.yaml",
-    ".python-version",
-    "requirements.txt",
-    "Makefile",
-    ".gitignore",
-]
+
+[tool.coverage.report]
+exclude_lines = [ "raise" ]
+ignore_errors = true
+
+[tool.coverage.html]
+directory = "docs/coverage_report"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+
+# Ignore libs which are not PEP 561 compliant
+[[tool.mypy.overrides]]
+module = [ "setuptools", "scipy", "pydot", "pybiomart" ]
+ignore_missing_imports = true

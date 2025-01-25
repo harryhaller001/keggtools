@@ -1,0 +1,35 @@
+name: Build package (python 3.10)
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+        -   uses: actions/checkout@v4
+        -   name: Set up Python 3.10
+            uses: actions/setup-python@v5
+            with:
+                python-version: "3.10"
+                cache: "pip"
+                cache-dependency-path: "**/pyproject.toml"
+
+        # Install build dependencies
+        -   name: Install build dependencies
+            run: python -m pip install --upgrade pip wheel twine build
+
+        # Run build pipeline
+        -   name: Build package
+            run: python -m build
+
+        # Check package
+        -   name: Check package
+            run: twine check --strict dist/*.whl

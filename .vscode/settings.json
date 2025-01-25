@@ -1,4 +1,5 @@
 {
+    // Editor config
     "editor.rulers": [
         {
             "column": 120,
@@ -9,47 +10,64 @@
     "editor.insertSpaces": true,
     "editor.detectIndentation": true,
     "editor.formatOnSave": true,
-    "python.languageServer": "Pylance",
-    "python.analysis.typeCheckingMode": "off",
-    "[python]": {
-        "editor.formatOnPaste": false,
-        "editor.formatOnSaveMode": "file",
-        "editor.defaultFormatter": "charliermarsh.ruff"
+    // Git config
+    "git.ignoreLimitWarning": true,
+    // File watcher config
+    "files.exclude": {
+        "**/.DS_Store": true,
+        // "**/venv": true,
+        "**/.mypy_cache": true,
+        "**/.ruff_cache": true,
+        "**/.pytest_cache": true,
+        "**/.coverage": true,
+        "**/coverage": true,
+        "**/**__pycache__**": true,
+        "**/*.pyc": true,
     },
-    "python.analysis.extraPaths": [
-        "keggtools",
-        "test",
-        "docs",
-        "reproducibility",
-    ],
-    "python.analysis.exclude": [
-        "**/venv/**",
-        "**/__pycache__/**"
-    ],
-    "python.defaultInterpreterPath": "venv/bin/python",
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true,
-    "files.insertFinalNewline": true,
-    "trailing-spaces.trimOnSave": true,
-    "notebook.formatOnSave.enabled": true,
-    "notebook.cellFocusIndicator": "gutter",
-    "notebook.lineNumbers": "on",
     "files.watcherExclude": {
-        "**/venv/**": true,
         "**/node_modules": true,
         "**/.ruff_cache": true,
         "**/.pytest_cache": true
     },
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "**/Thumbs.db": true,
-        "**/node_modules": true,
-        "**/.ruff_cache": true,
-        "**/.pytest_cache": true,
-        "**/__pycache__/**": true
-    }
+    "files.insertFinalNewline": true,
+    // Python config
+    "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "off",
+    "python.defaultInterpreterPath": "./venv/bin/python",
+    "[python]": {
+        "editor.formatOnPaste": false,
+        "editor.formatOnSaveMode": "file",
+        "editor.rulers": [
+            120
+        ],
+        "editor.defaultFormatter": "charliermarsh.ruff",
+    },
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.analysis.extraPaths": [
+        "keggtools",
+        "tests",
+        "docs",
+        "reproducibility",
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    // Trailing spaces config
+    "trailing-spaces.trimOnSave": true,
+    // Notebook config
+    "notebook.formatOnSave.enabled": true,
+    "notebook.cellFocusIndicator": "gutter",
+    "notebook.lineNumbers": "on",
+    // "[ipynb]": {
+    //     "editor.rulers": [
+    //         80
+    //     ],
+    // },
+    // https://taplo.tamasfe.dev/configuration/formatter-options.html
+    "evenBetterToml.formatter.compactArrays": false,
+    "evenBetterToml.formatter.compactInlineTables": false,
+    "evenBetterToml.formatter.compactEntries": false,
+    "evenBetterToml.formatter.indentString": "    ",
+    "evenBetterToml.formatter.columnWidth": 120,
 }

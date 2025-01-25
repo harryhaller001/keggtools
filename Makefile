@@ -1,14 +1,13 @@
 
 # Declare global variables
 
-PACKAGE_NAME	= keggtools
-
 BASE_DIR		= ${PWD}
 
-PACKAGE_DIR		= $(BASE_DIR)/$(PACKAGE_NAME)
-TEST_DIR		= $(BASE_DIR)/test
-DOCS_DIR		= $(BASE_DIR)/docs
+PACKAGE_NAME	= keggtools
 
+PACKAGE_DIR		= $(BASE_DIR)/keggtools
+TEST_DIR		= $(BASE_DIR)/tests
+DOCS_DIR		= $(BASE_DIR)/docs
 
 PYTHON_OPT		= python3
 PIP_OPT			= $(PYTHON_OPT) -m pip --require-virtualenv
@@ -18,15 +17,16 @@ TWINE_OPT		= $(PYTHON_OPT) -m twine
 SPHINX_OPT		= $(PYTHON_OPT) -m sphinx
 COVERAGE_OPT	= $(PYTHON_OPT) -m coverage
 FLIT_OPT		= $(PYTHON_OPT) -m flit
-PRECOMMIT_OPT	= pre-commit
 RUFF_OPT		= $(PYTHON_OPT) -m ruff
+PRE_COMMIT_OPT	= pre-commit
 
 # Run help by default
 
 .DEFAULT_GOAL := help
 
 
-.PHONY: help
+
+.PHONY : help
 help: ## This help.
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
@@ -35,21 +35,26 @@ help: ## This help.
 
 # Dependency handling
 
-.PHONY: install
+.PHONY : install
 install: ## install all python dependencies
-	@$(PIP_OPT) install ".[test,docs]" --upgrade
 
-	@$(PRECOMMIT_OPT) install
+# Install dev dependencies
+	@$(PIP_OPT) install -e ".[test,docs]" --upgrade
 
+# Install precommit hook
+	@$(PRE_COMMIT_OPT) install
 
-.PHONY: freeze
+.PHONY : freeze
 freeze: ## Freeze package dependencies
-	@$(PIP_OPT) freeze --exclude keggtools > requirements.txt
 	@$(PYTHON_OPT) --version > .python-version
+	@$(PIP_OPT) freeze --exclude $(PACKAGE_NAME) > requirements.txt
 
 
-.PHONY: build
-build: ## Build package upload and checks
+
+
+.PHONY : build
+build: # Twine package upload and checks
+
 # Remove old keggtools package
 	@$(PIP_OPT) uninstall $(PACKAGE_NAME) -y --quiet
 
@@ -68,23 +73,25 @@ build: ## Build package upload and checks
 
 
 .PHONY : format
-format: ## Lint and format code
-
-	@$(RUFF_OPT) format keggtools/*.py
-	@$(RUFF_OPT) check --fix keggtools/*.py
-
-	@$(RUFF_OPT) format test/*.py
-	@$(RUFF_OPT) check --fix test/*.py
+format: ## Lint and format code with flake8 and black
+	@$(RUFF_OPT) format $(PACKAGE_DIR) $(TEST_DIR) $(DOCS_DIR)/source/conf.py
+	@$(RUFF_OPT) check --fix $(PACKAGE_DIR) $(TEST_DIR) $(DOCS_DIR)/source/conf.py
 
 
-.PHONY: unittest
-unittest: ## Unittest of package
-	@$(TEST_OPT) --show-capture=log
+.PHONY: testing
+testing: ## Unittest of package
+# @$(TEST_OPT) --show-capture=log
+
+	@$(COVERAGE_OPT) run -m pytest
+	@$(COVERAGE_OPT) html
+
+# Long coverage report
+	@$(COVERAGE_OPT) report -m
 
 
 .PHONY: typing
 typing: ## Run static code analysis
-	@$(MYPY_OPT) $(PACKAGE_DIR) $(TEST_DIR) $(DOCS_DIR)/conf.py
+	@$(MYPY_OPT) $(PACKAGE_DIR) $(TEST_DIR) $(DOCS_DIR)/source/conf.py
 
 
 
@@ -101,12 +108,12 @@ clean: ## Clean all build and caching directories
 	@rm -rf ./.pytest_cache
 	@rm -rf ./coverage
 	@rm -f .coverage
+	@rm -rf .pybiomart.sqlite
 
 # Remove build folders for docs
 	@rm -rf ./docs/_build
-	@rm -rf ./docs/dist
-	@rm -rf ./docs/cloudflare-workers/node_modules
-
+	@rm -rf ./docs/.keggtools_cache
+	@rm -rf ./docs/.pybiomart.sqlite
 
 
 
@@ -115,19 +122,14 @@ docs: ## Build sphinx docs
 	@rm -rf ./docs/_build
 
 # Generate dot graphics
-	dot ./docs/figures/figure1.dot -Tpng -Gdpi=300 > ./docs/figures/figure1.png
-	dot ./docs/figures/figure5.dot -Tpng -Gdpi=300 > ./docs/figures/figure5.png
+	dot ./docs/source/figures/figure1.dot -Tpng -Gdpi=300 > ./docs/source/figures/figure1.png
+	dot ./docs/source/figures/figure5.dot -Tpng -Gdpi=300 > ./docs/source/figures/figure5.png
 
-
-	@$(SPHINX_OPT) -M doctest $(DOCS_DIR) $(DOCS_DIR)/_build
-	@$(SPHINX_OPT) -M coverage $(DOCS_DIR) $(DOCS_DIR)/_build
-
-# TODO: add latex pdf version of docs and copy to static files to include in HTML version
-#	@$(SPHINX_OPT) -M latexpdf ./docs ./docs/_build && cp ./docs/_build/latex/keggtools.pdf ./docs/static/keggtools.pdf
-
+	@$(SPHINX_OPT) -M doctest $(DOCS_DIR)/source $(DOCS_DIR)/_build
+	@$(SPHINX_OPT) -M coverage $(DOCS_DIR)/source $(DOCS_DIR)/_build
 
 # Build HTML version
-	@$(SPHINX_OPT) -M html $(DOCS_DIR) $(DOCS_DIR)/_build
+	@$(SPHINX_OPT) -M html $(DOCS_DIR)/source $(DOCS_DIR)/_build
 
 
 
@@ -135,25 +137,21 @@ docs: ## Build sphinx docs
 
 # Run all checks (always before committing!)
 .PHONY: check
-check: install freeze format typing coverage build docs precommit ## Full check of package
-
-
-
-
-.PHONY : coverage
-coverage: ## Run Coverage
-	@$(COVERAGE_OPT) run -m pytest
-	@$(COVERAGE_OPT) html --directory $(BASE_DIR)/coverage
-
-# Long coverage report
-	@$(COVERAGE_OPT) report -m
+check: install freeze format typing testing build docs precommit ## Full check of package
 
 
 
 .PHONY : precommit
 precommit: ## Run precommit file
 #	@pre-commit run --all-files --verbose
-	@$(PRECOMMIT_OPT) run --all-files
+	@$(PRE_COMMIT_OPT) run --all-files
+
+
+.PHONY : open-docs
+open-docs: ## Open build docs in webbrowser
+	@$(PYTHON_OPT) -m webbrowser -t file:///${PWD}/docs/_build/html/index.html
+
+
 
 
 # .PHONY : pdf
@@ -161,4 +159,3 @@ precommit: ## Run precommit file
 # 	cd ./reproducibility/latex; \
 # 	biber paper; \
 # 	pdflatex paper.tex
-

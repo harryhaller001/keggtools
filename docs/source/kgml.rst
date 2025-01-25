@@ -490,7 +490,3 @@ alt
       - Alternative name of parent element as KEGG identifier.
       - keggid.type
       - Required
-
-
-
-

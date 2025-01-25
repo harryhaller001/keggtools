@@ -9,5 +9,6 @@
         "njpwerner.autodocstring",
         "shardulm94.trailing-spaces",
         "ms-vscode.makefile-tools",
+        "tamasfe.even-better-toml",
     ]
 }

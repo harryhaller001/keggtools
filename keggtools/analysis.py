@@ -1,10 +1,13 @@
 """KEGG Enrichment analysis core."""
 
+import math
 import os
 from csv import DictWriter
 from io import IOBase
 from typing import Any
 
+import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 from scipy import stats
 
 from .models import Pathway
@@ -280,3 +283,46 @@ class Enrichment:
         for result in self.result:
             summary_list.append(result.json_summary())
         return pandas.DataFrame(summary_list)
+
+
+def plot_enrichment_result(
+    enrichment: Enrichment,
+    ax: Axes | None = None,
+    figsize: tuple[int, int] = (7, 7),
+    cmap: str = "coolwarm",
+    min_study_count: int = 1,
+    max_pval: float | None = None,
+    use_percent_study_count: bool = True,
+) -> Axes:
+    """Plot enrichment results."""
+    result_df = enrichment.to_dataframe()
+
+    # Filter out pathways with no genes found
+    result_df = result_df[result_df["study_count"] >= min_study_count]
+
+    if max_pval is not None:
+        result_df = result_df[result_df["pvalue"] <= max_pval]
+
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+
+    x_values = result_df["study_count"]
+    x_label = "genes in study"
+
+    if use_percent_study_count is True:
+        x_values = x_values / result_df["pathway_genes"] * 100
+        x_label = "genes in study [%]"
+
+    scatter = ax.scatter(
+        x=x_values,
+        y=result_df["pathway_title"],
+        c=[-math.log10(x) for x in result_df["pvalue"]],
+        cmap=cmap,
+    )
+
+    cbar = plt.colorbar(scatter)
+    cbar.set_label("- log10(p value)")
+    ax.set_xlabel(x_label)
+    ax.grid(visible=None)
+
+    return ax

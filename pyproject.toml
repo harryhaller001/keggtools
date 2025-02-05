@@ -34,7 +34,7 @@ classifiers = [
 ]
 dynamic = [ "version" ]
 
-dependencies = [ "pandas", "pybiomart", "pydantic-xml", "pydot", "requests", "scipy" ]
+dependencies = [ "matplotlib", "pandas", "pybiomart", "pydantic-xml", "pydot", "requests", "scipy" ]
 
 optional-dependencies.docs = [
     # Required for syntax highlighing (https://github.com/spatialaudio/nbsphinx/issues/24)

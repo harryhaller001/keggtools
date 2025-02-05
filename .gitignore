@@ -1,6 +1,6 @@
 
 /convert_ids
-
+/docs/coverage_report
 # Ignore KGML pathway files and local caching
 *.kgml
 !/tests/*.kgml

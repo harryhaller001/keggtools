@@ -20,6 +20,8 @@ keggtools
 .. image:: https://img.shields.io/pypi/pyversions/keggtools
    :alt: PyPI - Python Version
 
+.. image:: https://zenodo.org/badge/304011676.svg
+  :target: https://doi.org/10.5281/zenodo.14808443
 
 
 Library for KEGG pathway enrichment analysis.

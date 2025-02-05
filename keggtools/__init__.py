@@ -1,5 +1,5 @@
 from ._version import __version__
-from .analysis import Enrichment, EnrichmentResult
+from .analysis import Enrichment, EnrichmentResult, plot_enrichment_result
 from .const import (
     AMINO_ACID_METABOLISM,
     BIOSYNTHESIS_OF_OTHER_SECONDARY_METABOLITES,
@@ -51,4 +51,5 @@ __all__ = [
     "Storage",
     "ColorGradient",
     "msig_to_kegg_id",
+    "plot_enrichment_result",
 ]

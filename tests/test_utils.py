@@ -12,6 +12,7 @@ from keggtools.utils import (
     is_valid_pathway_number,
     is_valid_pathway_org,
     merge_entrez_geneid,
+    msig_to_kegg_id,
     parse_tsv,
     parse_tsv_to_dict,
     parse_xml,
@@ -148,3 +149,13 @@ def test_entrez_geneid_merging() -> None:
     )
 
     assert merged_df[merged_df["names"] == "IL17A"]["entrez"].values[0] == "3605"
+
+
+def test_msig_to_kegg_id() -> None:
+    """Testing msig to kegg id."""
+
+    df = msig_to_kegg_id()
+
+    assert isinstance(df, pd.DataFrame)
+
+    assert "msig_name" in df.columns

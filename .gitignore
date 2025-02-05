@@ -1,4 +1,5 @@
 
+/convert_ids
 
 # Ignore KGML pathway files and local caching
 *.kgml

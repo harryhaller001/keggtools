@@ -34,7 +34,7 @@ classifiers = [
 ]
 dynamic = [ "version" ]
 
-dependencies = [ "pybiomart", "pydantic-xml", "pydot", "requests", "scipy" ]
+dependencies = [ "pandas", "pybiomart", "pydantic-xml", "pydot", "requests", "scipy" ]
 
 optional-dependencies.docs = [
     # Required for syntax highlighing (https://github.com/spatialaudio/nbsphinx/issues/24)
@@ -54,7 +54,6 @@ optional-dependencies.test = [
     "flit",
     "isort",
     "mypy",
-    "pandas",
     "pandas-stubs",
     "pytest",
     "responses",
@@ -84,6 +83,9 @@ exclude = [
     "Makefile",
     ".gitignore",
 ]
+
+[tool.flit.external-data]
+directory = "keggtools/_static"
 
 [tool.ruff]
 line-length = 120

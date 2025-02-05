@@ -1,6 +1,7 @@
 """Basic utils for HTTP requests, parsing and rendering."""
 
 import csv
+import os
 import re
 from io import StringIO
 from xml.etree import ElementTree
@@ -246,3 +247,19 @@ def merge_entrez_geneid(
     # Filter missing entrez ids
     diffexp = diffexp[~diffexp["entrez"].isna()]
     return diffexp
+
+
+def msig_to_kegg_id() -> pd.DataFrame:
+    """Load dataframe to map canonical pathway id of MSigDB to KEGG pathway id.
+
+    Returns:
+        pandas.DataFrame: Dataframe containing MSigDB id and KEGG pathway id.
+
+    Raises:
+        AssertionError: If mapping file does not exist.
+    """
+    input_filename = os.path.join(os.path.dirname(__file__), "_static", "msig_to_kegg_id.csv")
+
+    assert os.path.isfile(input_filename), "File 'msig_to_kegg_id.csv' is missing."
+
+    return pd.read_csv(input_filename, sep=",")

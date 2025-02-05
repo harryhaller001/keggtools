@@ -113,24 +113,29 @@ make install
 
 ### Linting
 
-TODO
+`ruff` is used for linting and formatting.
+
+```bash
+# Run formatter
+make format
+```
 
 ### Static code analysis
 
-Static code analysis using `mypy`. Run static code analysis with `mypy`.
+Static code analysis using `mypy`.
 
 ```bash
 # Run static code analysis
-make mypy
+make typing
 ```
 
 ### Testing
 
-Run unittest for `keggtools` package.
+Run unittest for `keggtools` package. This uses `pytest` and `coverage`.
 
 ```bash
 # Run unittest for package
-make pytest
+make testing
 ```
 
 ### Install package from repo
@@ -139,5 +144,10 @@ The package is using the `flit` backend with a `pyproject.toml` and `twine`. To 
 
 ```bash
 # Install package from repo
-make twine
+make build
 ```
+
+
+### License
+
+MIT

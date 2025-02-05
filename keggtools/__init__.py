@@ -20,7 +20,7 @@ from .models import Component, Entry, Graphics, Pathway, Relation, Subtype
 from .render import Renderer
 from .resolver import Resolver
 from .storage import Storage
-from .utils import ColorGradient
+from .utils import ColorGradient, msig_to_kegg_id
 
 __all__ = [
     "__version__",
@@ -50,4 +50,5 @@ __all__ = [
     "Resolver",
     "Storage",
     "ColorGradient",
+    "msig_to_kegg_id",
 ]

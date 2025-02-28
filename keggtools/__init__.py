@@ -17,7 +17,7 @@ from .const import (
     XENOBIOTICS_BIODEGRADATION_AND_METABOLISM,
 )
 from .models import Component, Entry, Graphics, Pathway, Relation, Subtype
-from .render import Renderer
+from .render import Renderer, render_overlay_image
 from .resolver import Resolver
 from .storage import Storage
 from .utils import ColorGradient, msig_to_kegg_id
@@ -52,4 +52,5 @@ __all__ = [
     "ColorGradient",
     "msig_to_kegg_id",
     "plot_enrichment_result",
+    "render_overlay_image",
 ]

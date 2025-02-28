@@ -1,17 +1,26 @@
 """Render object."""
 
 # import logging
+import math
 from functools import lru_cache
-from typing import Any
+from io import BytesIO
+from typing import TYPE_CHECKING, Any
+from warnings import warn
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, SubElement
 
+import requests
+from matplotlib import colormaps
+from matplotlib.colors import Colormap, Normalize, to_hex
 from pydot import Dot, Edge, Node
 
 from .models import Entry, Pathway
 from .resolver import Resolver
 from .storage import Storage
 from .utils import ColorGradient
+
+if TYPE_CHECKING:
+    from PIL import Image
 
 # Helper functions for renderer
 
@@ -503,3 +512,133 @@ class Renderer:
         # Save binary data to file object
         with open(filename, mode="wb") as file_obj:
             file_obj.write(binary_data)
+
+
+def render_overlay_image(
+    pathway: Pathway,
+    ignore_map: bool = True,
+    ignore_compound: bool = True,
+    ignore_group: bool = True,
+    overlay_dict: dict[str, float] | None = None,
+    cmap: Colormap | str | None = None,
+    cache: Storage | str | None = None,
+) -> "Image.Image":
+    """Create overlay based on kegg prerendered image files."""
+    from PIL import Image, ImageDraw
+
+    if isinstance(cache, str):
+        cache = Storage(cachedir=cache)
+    if cache is None:
+        cache = Storage()
+
+    # Check for file in cache
+    image_filename = f"{pathway.name.split(':')[1]}_image.png"
+
+    img_memory: BytesIO
+
+    if cache.exist(image_filename) is True:
+        img_memory = BytesIO(cache.load_dump(image_filename))
+
+    else:
+        # HTTP request to fetch pathway image
+        assert pathway.image is not None
+        response = requests.get(url=pathway.image)
+        response.raise_for_status()
+        response_content_type = response.headers["Content-Type"]
+        if response_content_type != "image/png":
+            warn(
+                message=f"Unexpected Content-Type of {response_content_type}. Possible unsupported.",
+                category=UserWarning,
+                stacklevel=1,
+            )
+
+        # Save to cache
+        cache.save_dump(image_filename, response.content)
+
+        # Generate in-memory image file
+        img_memory = BytesIO(response.content)
+
+    # Generate image from bytes
+    img = Image.open(img_memory)
+    img_draw = ImageDraw.Draw(img)
+
+    if cmap is None and overlay_dict is not None:
+        cmap = colormaps["Reds"]
+    elif isinstance(cmap, str):
+        cmap = colormaps[cmap]
+
+    normalize: Normalize | None = None
+
+    if overlay_dict is not None:
+        normalize = Normalize(vmin=min(overlay_dict.values()), vmax=max(overlay_dict.values()))
+
+    # highlight all entries
+    for entry in pathway.entries:
+        if (
+            (ignore_map is True and entry.type == "map")
+            or (ignore_compound is True and entry.type == "compound")
+            or (ignore_group is True and entry.type == "group")
+        ):
+            pass
+
+        elif (
+            entry.graphics is not None
+            and entry.graphics.x is not None
+            and entry.graphics.y is not None
+            and entry.graphics.width is not None
+            and entry.graphics.height is not None
+        ):
+            half_w = math.ceil(entry.graphics.width / 2)
+            half_h = math.ceil(entry.graphics.height / 2)
+
+            if entry.graphics.type == "rectangle":
+                if entry.type == "gene":
+                    color = "white"
+                if overlay_dict is not None and normalize is not None and cmap is not None:
+                    if entry.get_gene_id()[0] in overlay_dict:
+                        color = to_hex(cmap(normalize(overlay_dict[entry.get_gene_id()[0]])))
+
+                img_draw.rectangle(
+                    (
+                        (entry.graphics.x - half_w, entry.graphics.y - half_h),
+                        (entry.graphics.x + half_w, entry.graphics.y + half_h),
+                    ),
+                    fill=color,
+                    outline="black",
+                    width=1,
+                )
+                if entry.graphics.name is not None:
+                    img_draw.text(
+                        (entry.graphics.x, entry.graphics.y),
+                        entry.graphics.name.split(",")[0].strip(),
+                        anchor="mm",
+                        fill="black",
+                        font_size=10,
+                    )
+            elif entry.graphics.type == "roundrectangle":
+                img_draw.rounded_rectangle(
+                    (
+                        (entry.graphics.x - half_w, entry.graphics.y - half_h),
+                        (entry.graphics.x + half_w + 1, entry.graphics.y + half_h + 1),
+                    ),
+                    outline="black",
+                    fill="white",
+                    width=2,
+                    radius=10,
+                )
+
+            elif entry.graphics.type == "circle":
+                img_draw.ellipse(
+                    (
+                        (entry.graphics.x - half_w, entry.graphics.y - half_h),
+                        (entry.graphics.x + half_w + 1, entry.graphics.y + half_h + 1),
+                    ),
+                    outline="black",
+                    fill="white",
+                    width=2,
+                )
+            else:
+                pass
+                # print(entry.graphics)
+
+    return img

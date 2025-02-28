@@ -1,13 +1,11 @@
-
-# Package build system
-
 [build-system]
+# Package build system
 build-backend = "flit_core.buildapi"
 
-# Project details
 requires = [ "flit-core>=3.2,<4" ]
 
 [project]
+# Project details
 name = "keggtools"
 description = "Enrichment analysis and visualisation toolkit for KEGG pathways"
 readme = { file = "README.md", content-type = "text/markdown" }
@@ -34,7 +32,7 @@ classifiers = [
 ]
 dynamic = [ "version" ]
 
-dependencies = [ "matplotlib", "pandas", "pybiomart", "pydantic-xml", "pydot", "requests", "scipy" ]
+dependencies = [ "matplotlib", "pandas", "pillow", "pybiomart", "pydantic-xml", "pydot", "requests", "scipy" ]
 
 optional-dependencies.docs = [
     # Required for syntax highlighing (https://github.com/spatialaudio/nbsphinx/issues/24)
@@ -46,12 +44,13 @@ optional-dependencies.docs = [
     "sphinx-book-theme",
 ]
 
-# Mypy config
-# https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
 # Optional dependencies for testing and docs
 optional-dependencies.test = [
     "coverage",
     "flit",
+    "ipykernel",
+    "ipython",
+    "ipywidgets",
     "isort",
     "mypy",
     "pandas-stubs",
@@ -68,6 +67,8 @@ urls.Homepage = "https://github.com/harryhaller001/keggtools"
 urls.Source = "https://github.com/harryhaller001/keggtools"
 
 [tool.flit.sdist]
+# Flit sdist config
+# https://flit.pypa.io/en/latest/pyproject_toml.html#sdist-section
 include = [ "keggtools/", "tests/" ]
 exclude = [
     "docs",
@@ -125,16 +126,17 @@ lint.ignore = [
 lint.per-file-ignores."*/__init__.py" = [ "F401" ]
 lint.per-file-ignores."docs/*" = [ "I" ]
 lint.per-file-ignores."tests/*" = [ "D" ]
-# Pytest config
 lint.pydocstyle.convention = "google"
 
 [tool.pyproject-fmt]
+# Pyproject formatting
 column_width = 120            # after how many column width split arrays/dicts into multiple lines, 1 will force always
 indent = 4
 keep_full_version = false     # if false will remove unnecessary trailing ``.0``'s from version specifiers
 max_supported_python = "3.12" # maximum Python version to use when generating version specifiers
 
 [tool.pytest.ini_options]
+# Pytest config
 minversion = "7.0"
 
 log_format = "%(asctime)s %(levelname)s %(message)s"
@@ -156,9 +158,6 @@ addopts = [
 source = [ "keggtools" ]
 omit = [ "*/tests/*" ]
 
-# Flit sdist config
-# https://flit.pypa.io/en/latest/pyproject_toml.html#sdist-section
-
 [tool.coverage.report]
 exclude_lines = [ "raise" ]
 ignore_errors = true
@@ -167,11 +166,13 @@ ignore_errors = true
 directory = "docs/coverage_report"
 
 [tool.mypy]
+# Mypy config
+# https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
 python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
 
-# Ignore libs which are not PEP 561 compliant
 [[tool.mypy.overrides]]
-module = [ "setuptools", "scipy", "pydot", "pybiomart" ]
+# Ignore libs which are not PEP 561 compliant
+module = [ "setuptools", "scipy", "pydot", "pybiomart", "PIL.Image" ]
 ignore_missing_imports = true

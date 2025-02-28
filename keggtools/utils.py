@@ -179,36 +179,6 @@ def is_valid_gene_name(value: str) -> bool:
     return re.match(pattern=r"^([a-z]{3}):([0-9]{5})$", string=value) is not None
 
 
-# TODO: is a custom warning class needed
-# class MissingDataWarning(Warning):
-#     """
-#     Warning to alert user of missing data.
-#     """
-
-#     def __init__(self, message: str) -> None:
-#         """
-#         Init custom missing data warning instance.
-
-#         :param str message: Message of missing data warning.
-#         """
-
-#         # Call super init method
-#         super().__init__()
-
-#         self.message: str = message
-
-
-#     def __str__(self) -> str:
-#         """
-#         Missing data warning instance to string.
-
-#         :return: String of message.
-#         :rtype: str
-#         """
-
-#         return repr(self.message)
-
-
 def merge_entrez_geneid(
     diffexp: pd.DataFrame,
     gene_column: str = "names",

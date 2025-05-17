@@ -1,10 +1,14 @@
-name: Build documentation (python 3.10)
+name: Documentation (python 3.10)
 
 # CAVE: this workflow published sphinx docs to github pages, which are public by default!
 
 on:
-    push:
-        branches: [main]
+    # push:
+    #     branches: [main]
+
+    # Trigger docs update on release
+    release:
+        types: [published]
 
     # Option for trigger worflow manually
     workflow_dispatch:
@@ -57,7 +61,8 @@ jobs:
         needs: docs
 
         permissions:
-            pages: write      # to deploy to Pages
+            # required to deploy to Pages
+            pages: write
             id-token: write
 
         environment:

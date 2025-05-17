@@ -28,6 +28,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
 dynamic = [ "version" ]
@@ -130,10 +131,13 @@ lint.pydocstyle.convention = "google"
 
 [tool.pyproject-fmt]
 # Pyproject formatting
-column_width = 120            # after how many column width split arrays/dicts into multiple lines, 1 will force always
+# after how many column width split arrays/dicts into multiple lines, 1 will force always
+column_width = 120
 indent = 4
-keep_full_version = false     # if false will remove unnecessary trailing ``.0``'s from version specifiers
-max_supported_python = "3.12" # maximum Python version to use when generating version specifiers
+# if false will remove unnecessary trailing ``.0``'s from version specifiers
+keep_full_version = false
+# maximum Python version to use when generating version specifiers
+max_supported_python = "3.13"
 
 [tool.pytest.ini_options]
 # Pytest config

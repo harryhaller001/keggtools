@@ -30,7 +30,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                # Check for all python versions >=3.8
+                # Check for all python versions >=3.10
 
                 # For OS support of actions check out:
                 # https://github.com/actions/runner-images/issues/10636
@@ -42,7 +42,9 @@ jobs:
                     -   os: ubuntu-24.04
                         python: "3.12"
                     -   os: ubuntu-24.04
-                        python: "3.12"
+                        python: "3.13"
+                    -   os: ubuntu-24.04
+                        python: "3.13"
                         pip-flags: "--pre"
                         name: PRE-RELEASE DEPENDENCIES
 

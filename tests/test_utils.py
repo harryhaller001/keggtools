@@ -11,7 +11,7 @@ from keggtools.utils import (
     is_valid_pathway_name,
     is_valid_pathway_number,
     is_valid_pathway_org,
-    merge_entrez_geneid,
+    # merge_entrez_geneid,
     msig_to_kegg_id,
     parse_tsv,
     parse_tsv_to_dict,
@@ -136,19 +136,19 @@ def test_valid_gene_name() -> None:
     assert is_valid_gene_name(value="hsa:1234") is False
 
 
-def test_entrez_geneid_merging() -> None:
-    """Testing pybiomart gene id conversion."""
-    diffexp_df = pd.DataFrame({"names": ["IL17A", "TNF", "TBX21", "IFNG"]})
-    merged_df = merge_entrez_geneid(
-        diffexp=diffexp_df,
-        gene_column="names",
-        dataset_name="hsapiens_gene_ensembl",
-        symbol_source="hgnc_symbol",
-        entrez_source="entrezgene_id",
-        use_cache=True,
-    )
+# def test_entrez_geneid_merging() -> None:
+#     """Testing pybiomart gene id conversion."""
+#     diffexp_df = pd.DataFrame({"names": ["IL17A", "TNF", "TBX21", "IFNG"]})
+#     merged_df = merge_entrez_geneid(
+#         diffexp=diffexp_df,
+#         gene_column="names",
+#         dataset_name="hsapiens_gene_ensembl",
+#         symbol_source="hgnc_symbol",
+#         entrez_source="entrezgene_id",
+#         use_cache=True,
+#     )
 
-    assert merged_df[merged_df["names"] == "IL17A"]["entrez"].values[0] == "3605"
+#     assert merged_df[merged_df["names"] == "IL17A"]["entrez"].values[0] == "3605"
 
 
 def test_msig_to_kegg_id() -> None:

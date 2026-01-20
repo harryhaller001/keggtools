@@ -36,15 +36,15 @@ jobs:
                 # https://github.com/actions/runner-images/issues/10636
                 include:
                     -   os: ubuntu-24.04
-                        python: "3.10"
-                    -   os: ubuntu-24.04
                         python: "3.11"
                     -   os: ubuntu-24.04
                         python: "3.12"
                     -   os: ubuntu-24.04
                         python: "3.13"
                     -   os: ubuntu-24.04
-                        python: "3.13"
+                        python: "3.14"
+                    -   os: ubuntu-24.04
+                        python: "3.14"
                         pip-flags: "--pre"
                         name: PRE-RELEASE DEPENDENCIES
 
@@ -55,9 +55,9 @@ jobs:
             PYTHON: ${{ matrix.python }}
 
         steps:
-            -   uses: actions/checkout@v4
+            -   uses: actions/checkout@v6
             -   name: Set up Python ${{ matrix.python }}
-                uses: actions/setup-python@v5
+                uses: actions/setup-python@v6
                 with:
                     python-version: ${{ matrix.python }}
                     cache: "pip"

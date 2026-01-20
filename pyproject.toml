@@ -2,21 +2,17 @@
 # Package build system
 build-backend = "flit_core.buildapi"
 
-requires = [ "flit-core>=3.2,<4" ]
+requires = [ "flit-core>=3.4,<4" ]
 
 [project]
 # Project details
 name = "keggtools"
 description = "Enrichment analysis and visualisation toolkit for KEGG pathways"
 readme = { file = "README.md", content-type = "text/markdown" }
-
 license = { file = "LICENSE" }
-
 maintainers = [ { name = "harryhaller001", email = "harryhaller001@gmail.com" } ]
-
 authors = [ { name = "harryhaller001", email = "harryhaller001@gmail.com" } ]
-
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Healthcare Industry",
@@ -25,10 +21,10 @@ classifiers = [
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Typing :: Typed",
 ]
 dynamic = [ "version" ]
@@ -64,7 +60,6 @@ optional-dependencies.test = [
 ]
 # Project urls
 urls.Documentation = "https://keggtools.org/"
-urls.Homepage = "https://github.com/harryhaller001/keggtools"
 urls.Source = "https://github.com/harryhaller001/keggtools"
 
 [tool.flit.sdist]
@@ -137,7 +132,7 @@ indent = 4
 # if false will remove unnecessary trailing ``.0``'s from version specifiers
 keep_full_version = false
 # maximum Python version to use when generating version specifiers
-max_supported_python = "3.13"
+max_supported_python = "3.14"
 
 [tool.pytest.ini_options]
 # Pytest config
@@ -172,7 +167,7 @@ directory = "docs/coverage_report"
 [tool.mypy]
 # Mypy config
 # https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
-python_version = "3.10"
+python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 

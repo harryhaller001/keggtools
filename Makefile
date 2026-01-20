@@ -150,12 +150,3 @@ precommit: ## Run precommit file
 .PHONY : open-docs
 open-docs: ## Open build docs in webbrowser
 	@$(PYTHON_OPT) -m webbrowser -t file:///${PWD}/docs/_build/html/index.html
-
-
-
-
-# .PHONY : pdf
-# pdf: ## Generate Pdf file from latex
-# 	cd ./reproducibility/latex; \
-# 	biber paper; \
-# 	pdflatex paper.tex

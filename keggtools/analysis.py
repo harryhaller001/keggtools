@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from scipy import stats
 
-from .models import Pathway
+from keggtools.models import Pathway
 
 
 class EnrichmentResult:

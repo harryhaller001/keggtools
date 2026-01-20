@@ -14,10 +14,10 @@ from matplotlib import colormaps
 from matplotlib.colors import Colormap, Normalize, to_hex
 from pydot import Dot, Edge, Node
 
-from .models import Entry, Pathway
-from .resolver import Resolver
-from .storage import Storage
-from .utils import ColorGradient
+from keggtools.models import Entry, Pathway
+from keggtools.resolver import Resolver
+from keggtools.storage import Storage
+from keggtools.utils import ColorGradient
 
 if TYPE_CHECKING:
     from PIL import Image

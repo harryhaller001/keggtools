@@ -2,7 +2,13 @@
 
 from pydantic_xml import BaseXmlModel, attr
 
-from ._types import EntryTypeAlias, GraphicTypeAlias, ReactionTypeAlias, RelationSubtypeAlias, RelationTypeAlias
+from keggtools._types import (
+    EntryTypeAlias,
+    GraphicTypeAlias,
+    ReactionTypeAlias,
+    RelationSubtypeAlias,
+    RelationTypeAlias,
+)
 
 
 class Subtype(BaseXmlModel, tag="subtype"):

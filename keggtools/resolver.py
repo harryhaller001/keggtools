@@ -4,9 +4,9 @@ from typing import Any
 
 import requests
 
-from .models import Pathway
-from .storage import Storage
-from .utils import parse_tsv_to_dict
+from keggtools.models import Pathway
+from keggtools.storage import Storage
+from keggtools.utils import parse_tsv_to_dict
 
 
 def _request(url: str, **kwargs: Any) -> str:

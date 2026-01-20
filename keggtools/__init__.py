@@ -1,6 +1,6 @@
-from ._version import __version__
-from .analysis import Enrichment, EnrichmentResult, plot_enrichment_result
-from .const import (
+from keggtools._version import __version__
+from keggtools.analysis import Enrichment, EnrichmentResult, plot_enrichment_result
+from keggtools.const import (
     AMINO_ACID_METABOLISM,
     BIOSYNTHESIS_OF_OTHER_SECONDARY_METABOLITES,
     CARBOHYDRATE_METABOLISM,
@@ -16,11 +16,11 @@ from .const import (
     NUCLEOTIDE_METABOLISM,
     XENOBIOTICS_BIODEGRADATION_AND_METABOLISM,
 )
-from .models import Component, Entry, Graphics, Pathway, Relation, Subtype
-from .render import Renderer, render_overlay_image
-from .resolver import Resolver
-from .storage import Storage
-from .utils import ColorGradient, msig_to_kegg_id
+from keggtools.models import Component, Entry, Graphics, Pathway, Relation, Subtype
+from keggtools.render import Renderer, render_overlay_image
+from keggtools.resolver import Resolver
+from keggtools.storage import Storage
+from keggtools.utils import ColorGradient, msig_to_kegg_id
 
 __all__ = [
     "__version__",

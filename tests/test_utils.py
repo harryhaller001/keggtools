@@ -1,7 +1,5 @@
 """Testing utils module."""
 
-from xml.etree.ElementTree import Element
-
 import pandas as pd
 
 from keggtools.utils import (
@@ -11,24 +9,10 @@ from keggtools.utils import (
     is_valid_pathway_name,
     is_valid_pathway_number,
     is_valid_pathway_org,
-    # merge_entrez_geneid,
     msig_to_kegg_id,
     parse_tsv,
     parse_tsv_to_dict,
-    parse_xml,
 )
-
-
-def test_xml_parsing_wrapper() -> None:
-    """Testing function to wrap XML element parser."""
-    xml_string: str = "<hello>world</hello>"
-
-    element: Element = parse_xml(xml_object_or_string=xml_string)
-
-    assert isinstance(element, Element) is True
-    assert element.tag == "hello"
-
-    assert isinstance(parse_xml(xml_object_or_string=element), Element)
 
 
 def test_attribute_checks() -> None:

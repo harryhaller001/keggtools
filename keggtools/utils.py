@@ -4,24 +4,8 @@ import csv
 import os
 import re
 from io import StringIO
-from xml.etree import ElementTree
-from xml.etree.ElementTree import Element
 
 import pandas as pd
-
-# XML parsing helper functions
-
-
-def parse_xml(xml_object_or_string: str | Element) -> Element:
-    """Returns XML Element object from string or XML Element.
-
-    :param typing.Union[str, xml.etree.ElementTree.Element] xml_object_or_string: Input parameter to check.
-    :return: XML element instance.
-    :rtype: xml.etree.ElementTree.Element
-    """
-    if isinstance(xml_object_or_string, str):
-        return ElementTree.fromstring(xml_object_or_string)
-    return xml_object_or_string
 
 
 def parse_tsv(data: str) -> list:

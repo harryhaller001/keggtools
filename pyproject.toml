@@ -38,13 +38,13 @@ optional-dependencies.docs = [
 ]
 
 optional-dependencies.test = [
-    "coverage",
     "ipykernel",
     "ipython",
     "ipywidgets",
     "isort",
     "pandas-stubs",
     "pytest",
+    "pytest-cov>=7",
     "responses",
     "ruff",
     "setuptools",
@@ -76,32 +76,25 @@ keep_full_version = false
 # maximum Python version to use when generating version specifiers
 max_supported_python = "3.14"
 
-[tool.pytest.ini_options]
-# Pytest config
-minversion = "7.0"
-
-log_format = "%(asctime)s %(levelname)s %(message)s"
-log_date_format = "%Y-%m-%d %H:%M:%S"
-log_level = "DEBUG"
-log_cli = true
-
-python_files = "test_*.py"
-testpaths = [ "tests" ]
-
-xfail_strict = true
-addopts = [
-    "--import-mode=importlib", # allow using test files with same name
+[tool.pytest]
+ini_options.minversion = "7.0"
+ini_options.log_format = "%(asctime)s %(levelname)s %(message)s"
+ini_options.log_date_format = "%Y-%m-%d %H:%M:%S"
+ini_options.log_level = "INFO"
+ini_options.log_cli = true
+ini_options.python_files = "test_*.py"
+ini_options.testpaths = [ "tests" ]
+ini_options.xfail_strict = true
+ini_options.addopts = [
+    "--import-mode=importlib",           # allow using test files with same name
+    "--cov=src/keggtools",
+    "--cov-report=html:coverage_report",
+    "--cov-report=term",
 ]
 
-# Coverage config
-
-[tool.coverage.run]
-source = [ "keggtools" ]
-omit = [ "*/tests/*" ]
-
-[tool.coverage.report]
-exclude_lines = [ "raise" ]
-ignore_errors = true
-
-[tool.coverage.html]
-directory = "coverage_report"
+[tool.coverage]
+run.omit = [ "*/tests/*" ]
+run.source = [ "src/keggtools" ]
+report.exclude_lines = [ "raise" ]
+report.ignore_errors = true
+html.directory = "coverage_report"

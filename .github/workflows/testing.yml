@@ -81,25 +81,11 @@ jobs:
                     uv run ty check --python-version=${{ matrix.python }} ./src/keggtools ./docs/*.py ./tests
 
 
-            # Run unittest on installed package
+            # Run unittest on installed package with coverage
             -   name: Unit testing with pytest
                 run: |
-                    uv run pytest --show-capture=log
+                    uv run pytest --cov --junitxml=junit.xml -o junit_family=legacy
 
-
-            # Run unittest on installed package
-            -   name: Unit testing with pytest
-                env:
-                    MPLBACKEND: agg
-                    PLATFORM: ${{ matrix.os }}
-                    DISPLAY: :42
-                run: |
-                    uv run coverage run -m pytest -v --color=yes
-
-            # generation of coverage report
-            -   name: Report coverage
-                run: |
-                    uv run coverage report
 
             # Upload to codecov
             -   name: Upload coverage reports to Codecov

@@ -16,7 +16,6 @@ TY_OPT			= $(UV_RUN_OPT) ty
 TEST_OPT		= $(UV_RUN_OPT) pytest
 TWINE_OPT		= $(UV_RUN_OPT) twine
 SPHINX_OPT		= $(PYTHON_OPT) -m sphinx
-COVERAGE_OPT	= $(UV_RUN_OPT) coverage
 RUFF_OPT		= $(UV_RUN_OPT) ruff
 PRE_COMMIT_OPT	= $(UV_RUN_OPT) pre-commit
 
@@ -67,16 +66,10 @@ format: ## Lint and format code with flake8 and black
 	@$(RUFF_OPT) check --fix $(PACKAGE_DIR) $(TEST_DIR) $(DOCS_DIR)/conf.py
 
 
+
 .PHONY: testing
 testing: ## Unittest of package
-# @$(TEST_OPT) --show-capture=log
-
-	@$(COVERAGE_OPT) run -m pytest
-	@$(COVERAGE_OPT) html
-
-# Long coverage report
-	@$(COVERAGE_OPT) report -m
-
+	@$(TEST_OPT)
 
 .PHONY: typing
 typing: ## Run static code analysis

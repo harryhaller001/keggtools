@@ -65,6 +65,7 @@ jobs:
             # Install dependencies from freeze
             -   name: Install dependencies
                 run: |
+                    sudo apt-get install -y graphviz
                     uv sync --locked --all-extras --dev
 
 

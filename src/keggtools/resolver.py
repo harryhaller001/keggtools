@@ -198,7 +198,7 @@ class Resolver:
         :param str code: Pathway identify used by KEGG database.
         :param typing.Any kwargs: other arguments to `requests.get`.
         :return: Returns parsed Pathway instance.
-        :rtype: Pathway
+        :rtype: keggtools.models.Pathway
         """
         # TODO: verify org code
 

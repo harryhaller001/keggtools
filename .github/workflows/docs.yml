@@ -1,16 +1,8 @@
 name: Documentation (python 3.11)
 
-# CAVE: this workflow published sphinx docs to github pages, which are public by default!
-
 on:
-    # push:
-    #     branches: [main]
-
-    # Trigger docs update on release
     release:
         types: [published]
-
-    # Option for trigger worflow manually
     workflow_dispatch:
 
 concurrency:
@@ -22,30 +14,27 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         -   uses: actions/checkout@v6
-        -   name: Set up Python 3.11
-            uses: actions/setup-python@v6
+
+        -   name: Install uv
+            uses: astral-sh/setup-uv@v7
             with:
+                enable-cache: true
                 python-version: "3.11"
-                cache: "pip"
-                cache-dependency-path: "**/pyproject.toml"
 
         # Install docs dependencies
         -   name: Install docs dependencies
             run: |
                 sudo apt-get install -y pandoc
-                python -m pip install ".[docs]"
+                uv sync --locked --extra docs
 
 
         # Test and build the docs
         -   name: Test and build docs
             run: |
-                python -m sphinx -M doctest ./docs/source ./docs/_build
-                python -m  sphinx -M coverage ./docs/source ./docs/_build
-                python -m  sphinx -M html ./docs/source ./docs/_build
+                uv run python -m sphinx -M doctest ./docs ./docs/_build
+                uv run python -m sphinx -M coverage ./docs ./docs/_build
+                uv run python -m sphinx -M html ./docs ./docs/_build
 
-
-# Setup github pages from actions
-# https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
 
         # Upload static files as artifact
         # https://github.com/actions/upload-pages-artifact
@@ -61,8 +50,7 @@ jobs:
         needs: docs
 
         permissions:
-            # required to deploy to Pages
-            pages: write
+            pages: write      # to deploy to Pages
             id-token: write
 
         environment:

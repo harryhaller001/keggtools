@@ -30,7 +30,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                # Check for all python versions >=3.10
+                # Check for all python versions >=3.11
 
                 # For OS support of actions check out:
                 # https://github.com/actions/runner-images/issues/10636
@@ -56,31 +56,34 @@ jobs:
 
         steps:
             -   uses: actions/checkout@v6
-            -   name: Set up Python ${{ matrix.python }}
-                uses: actions/setup-python@v6
+            -   name: Install uv and set the Python version
+                uses: astral-sh/setup-uv@v7
                 with:
                     python-version: ${{ matrix.python }}
-                    cache: "pip"
-                    cache-dependency-path: "**/pyproject.toml"
+                    enable-cache: true
 
             # Install dependencies from freeze
             -   name: Install dependencies
                 run: |
-                    sudo apt-get install -y graphviz
-                    python -m pip install --upgrade pip wheel
-                    pip install ${{ matrix.pip-flags }} ".[test]"
+                    uv sync --locked --all-extras --dev
 
 
             # Linting package
             -   name: Format and Linting
                 run: |
-                    ruff check ./keggtools ./tests/*.py ./docs/source/*.py
+                    uv run ruff check ./src/keggtools ./tests/*.py ./docs/*.py
 
 
             # Install package from setup.py and static code analysis
             -   name: Static code analysis
                 run: |
-                    mypy ./keggtools ./docs/source/*.py ./tests
+                    uv run ty check --python-version=${{ matrix.python }} ./src/keggtools ./docs/*.py ./tests
+
+
+            # Run unittest on installed package
+            -   name: Unit testing with pytest
+                run: |
+                    uv run pytest --show-capture=log
 
 
             # Run unittest on installed package
@@ -90,12 +93,12 @@ jobs:
                     PLATFORM: ${{ matrix.os }}
                     DISPLAY: :42
                 run: |
-                    coverage run -m pytest -v --color=yes
+                    uv run coverage run -m pytest -v --color=yes
 
             # generation of coverage report
             -   name: Report coverage
                 run: |
-                    coverage report
+                    uv run coverage report
 
             # Upload to codecov
             -   name: Upload coverage reports to Codecov

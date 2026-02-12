@@ -9,7 +9,7 @@ from keggtools import __version__
 
 
 # https://github.com/sphinx-doc/sphinx/issues/4317
-sys.path.insert(0, os.path.abspath("../"))
+sys.path.insert(0, os.path.abspath("../src/keggtools"))
 
 
 project = "keggtools"
@@ -60,7 +60,7 @@ exclude_patterns = [
 autoapi_type = "python"
 autoapi_add_toctree_entry = False
 autoapi_ignore: list[str] = ["_*.py"]
-autoapi_dirs = ["../../keggtools"]
+autoapi_dirs = ["../src/keggtools"]
 autoapi_options = [
     "members",
     "undoc-members",

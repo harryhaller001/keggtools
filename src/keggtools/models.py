@@ -1,6 +1,7 @@
 """KEGG pathway models to parse object relational."""
 
 from pydantic_xml import BaseXmlModel, attr
+from pydantic_xml.element.element import SearchMode
 
 from keggtools._types import (
     EntryTypeAlias,
@@ -49,7 +50,7 @@ class Graphics(BaseXmlModel, tag="graphics"):
     bgcolor: str | None = attr(name="bgcolor", default=None)
 
 
-class Entry(BaseXmlModel, tag="entry", search_mode="unordered"):
+class Entry(BaseXmlModel, tag="entry", search_mode=SearchMode.UNORDERED):
     """Entry model class."""
 
     id: str = attr(name="id")
@@ -102,7 +103,7 @@ class Substrate(BaseXmlModel, tag="substrate"):
     alt: Alt | None = None
 
 
-class Reaction(BaseXmlModel, tag="reaction", search_mode="unordered"):
+class Reaction(BaseXmlModel, tag="reaction", search_mode=SearchMode.UNORDERED):
     """Reaction model."""
 
     id: str = attr(name="id")
@@ -113,7 +114,7 @@ class Reaction(BaseXmlModel, tag="reaction", search_mode="unordered"):
     substrates: list[Substrate] = []
 
 
-class Pathway(BaseXmlModel, tag="pathway", search_mode="unordered"):
+class Pathway(BaseXmlModel, tag="pathway", search_mode=SearchMode.UNORDERED):
     """KEGG Pathway object.
 
     The KEGG pathway object stores graphics information and related objects.

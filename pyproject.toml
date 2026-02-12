@@ -1,14 +1,14 @@
 [build-system]
-# Package build system
-build-backend = "flit_core.buildapi"
-requires = [ "flit-core>=3.4,<4" ]
+build-backend = "uv_build"
+requires = [ "uv-build>=0.9.28,<0.10" ]
 
 [project]
-# Project details
 name = "keggtools"
+version = "1.1.0"
+
 description = "Enrichment analysis and visualisation toolkit for KEGG pathways"
 readme = { file = "README.md", content-type = "text/markdown" }
-license = { file = "LICENSE" }
+license = "MIT"
 maintainers = [ { name = "harryhaller001", email = "harryhaller001@gmail.com" } ]
 authors = [ { name = "harryhaller001", email = "harryhaller001@gmail.com" } ]
 requires-python = ">=3.11"
@@ -26,13 +26,10 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Typing :: Typed",
 ]
-dynamic = [ "version" ]
-
 dependencies = [ "matplotlib", "pandas", "pillow", "pybiomart", "pydantic-xml", "pydot", "requests", "scipy" ]
 
 optional-dependencies.docs = [
-    # Required for syntax highlighing (https://github.com/spatialaudio/nbsphinx/issues/24)
-    "ipython",
+    "ipython",                  # Required for syntax highlighing (https://github.com/spatialaudio/nbsphinx/issues/24)
     "nbsphinx",
     "sphinx",
     "sphinx-autoapi",
@@ -40,92 +37,38 @@ optional-dependencies.docs = [
     "sphinx-book-theme",
 ]
 
-# Optional dependencies for testing and docs
 optional-dependencies.test = [
     "coverage",
-    "flit",
     "ipykernel",
     "ipython",
     "ipywidgets",
     "isort",
-    "mypy",
     "pandas-stubs",
     "pytest",
     "responses",
     "ruff",
     "setuptools",
     "twine",
+    "ty>=0.0.16",
     "types-requests",
 ]
 # Project urls
 urls.Documentation = "https://keggtools.org/"
 urls.Source = "https://github.com/harryhaller001/keggtools"
 
-[tool.flit.sdist]
-# Flit sdist config
-# https://flit.pypa.io/en/latest/pyproject_toml.html#sdist-section
-include = [ "keggtools/", "tests/" ]
-exclude = [
-    "docs",
-    # "test",
-    "reproducibility",
-    ".vscode",
-    ".github",
-    ".git",
-    "*.sqlite",
-    ".pre-commit-config.yaml",
-    ".python-version",
-    "requirements.txt",
-    "Makefile",
-    ".gitignore",
-]
-
-[tool.flit.external-data]
-directory = "keggtools/_static"
-
 [tool.ruff]
 line-length = 120
-# extend-include = ["*.ipynb"]
 
 format.docstring-code-format = true
 
-lint.select = [
-    "B",      # flake8-bugbear
-    "BLE",    # flake8-blind-except
-    "C4",     # flake8-comprehensions
-    "D",      # pydocstyle
-    "E",      # Error detected by Pycodestyle
-    "F",      # Errors detected by Pyflakes
-    "I",      # isort
-    "RUF100", # Report unused noqa directives
-    "TID",    # flake8-tidy-imports
-    "UP",     # pyupgrade
-    "W",      # Warning detected by Pycodestyle
-]
-lint.ignore = [
-    "B008", # Errors from function calls in argument defaults. These are fine when the result is immutable.
-    "C408",
-    "D100", # Missing docstring in public module
-    "D104", # Missing docstring in public package
-    "D105", # __magic__ methods are often self-explanatory, allow missing docstrings
-    "D107", # Missing docstring in __init__
-    # Disable one in each pair of mutually incompatible rules
-    "D203", # We don’t want a blank line before a class docstring
-    "D213", # <> We want docstrings to start immediately after the opening triple quote
-    "D400", # first line should end with a period [Bug: doesn’t work with single-line docstrings]
-    "D401", # First line should be in imperative mood; try rephrasing
-    "E501", # line too long -> we accept long comment lines; formatter gets rid of long code lines
-    "E731", # Do not assign a lambda expression, use a def -> lambda expression assignments are convenient
-    "E741", # allow I, O, l as variable names -> I is the identity matrix
-]
+lint.select = [ "B", "BLE", "C4", "D", "E", "F", "I", "RUF100", "TID", "UP", "W" ]
+lint.ignore = [ "B008", "C408", "D100", "D104", "D105", "D107", "D203", "D213", "D400", "D401", "E501", "E731", "E741" ]
 lint.per-file-ignores."*/__init__.py" = [ "F401" ]
 lint.per-file-ignores."docs/*" = [ "I" ]
 lint.per-file-ignores."tests/*" = [ "D" ]
 lint.pydocstyle.convention = "google"
 
 [tool.pyproject-fmt]
-# Pyproject formatting
-# after how many column width split arrays/dicts into multiple lines, 1 will force always
 column_width = 120
 indent = 4
 # if false will remove unnecessary trailing ``.0``'s from version specifiers
@@ -161,16 +104,4 @@ exclude_lines = [ "raise" ]
 ignore_errors = true
 
 [tool.coverage.html]
-directory = "docs/coverage_report"
-
-[tool.mypy]
-# Mypy config
-# https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-
-[[tool.mypy.overrides]]
-# Ignore libs which are not PEP 561 compliant
-module = [ "setuptools", "scipy", "pydot", "pybiomart", "PIL.Image" ]
-ignore_missing_imports = true
+directory = "coverage_report"

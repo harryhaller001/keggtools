@@ -36,7 +36,7 @@ nbsphinx_execute = "never"
 # Mapping for intersphinx extension
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "pandas": ("http://pandas.pydata.org/pandas-docs/dev", None),
+    "pandas": ("http://pandas.pydata.org/docs", None),
 }
 
 
@@ -91,7 +91,6 @@ html_theme_options = dict(
     use_download_button=True,
     use_fullscreen_button=False,
     use_repository_button=True,
-    # collapse_navbar=False,
 )
 
 html_static_path = ["_static"]

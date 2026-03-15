@@ -2,13 +2,9 @@
 name: Testing package
 
 on:
-    # Option for trigger worflow manually
     workflow_dispatch:
-
     push:
         branches: [main]
-
-    # Run action when pull request is opened
     pull_request:
         branches: [main]
         types:  [opened, reopened, synchronize]
@@ -19,14 +15,9 @@ concurrency:
     cancel-in-progress: true
 
 
-
-# Jobs
 jobs:
-
     test:
         runs-on: ${{ matrix.os }}
-
-        # Matrix testing
         strategy:
             fail-fast: false
             matrix:
@@ -43,10 +34,6 @@ jobs:
                         python: "3.13"
                     -   os: ubuntu-24.04
                         python: "3.14"
-                    -   os: ubuntu-24.04
-                        python: "3.14"
-                        pip-flags: "--pre"
-                        name: PRE-RELEASE DEPENDENCIES
 
         name: ${{ matrix.name }} Python ${{ matrix.python }}
 
@@ -72,13 +59,13 @@ jobs:
             # Linting package
             -   name: Format and Linting
                 run: |
-                    uv run ruff check ./src/keggtools ./tests/*.py ./docs/*.py
+                    uv run ruff check
 
 
             # Install package from setup.py and static code analysis
             -   name: Static code analysis
                 run: |
-                    uv run ty check --python-version=${{ matrix.python }} ./src/keggtools ./docs/*.py ./tests
+                    uv run ty check --python-version=${{ matrix.python }}
 
 
             # Run unittest on installed package with coverage

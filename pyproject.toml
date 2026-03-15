@@ -52,15 +52,12 @@ optional-dependencies.test = [
     "ty>=0.0.16",
     "types-requests",
 ]
-# Project urls
 urls.Documentation = "https://keggtools.org/"
 urls.Source = "https://github.com/harryhaller001/keggtools"
 
 [tool.ruff]
 line-length = 120
-
 format.docstring-code-format = true
-
 lint.select = [ "B", "BLE", "C4", "D", "E", "F", "I", "RUF100", "TID", "UP", "W" ]
 lint.ignore = [ "B008", "C408", "D100", "D104", "D105", "D107", "D203", "D213", "D400", "D401", "E501", "E731", "E741" ]
 lint.per-file-ignores."*/__init__.py" = [ "F401" ]
@@ -71,9 +68,7 @@ lint.pydocstyle.convention = "google"
 [tool.pyproject-fmt]
 column_width = 120
 indent = 4
-# if false will remove unnecessary trailing ``.0``'s from version specifiers
 keep_full_version = false
-# maximum Python version to use when generating version specifiers
 max_supported_python = "3.14"
 
 [tool.pytest]
@@ -98,3 +93,7 @@ run.source = [ "src/keggtools" ]
 report.exclude_lines = [ "raise" ]
 report.ignore_errors = true
 html.directory = "coverage_report"
+
+[tool.ty]
+src.include = [ "src", "tests", "docs" ]
+src.exclude = [ "docs/vignette.ipynb" ]

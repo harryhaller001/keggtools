@@ -151,21 +151,22 @@ class Enrichment:
 
         return buffer
 
-    def run_analysis(self, gene_list: list[str]) -> list[EnrichmentResult]:
+    def run_analysis(self, gene_list: list[str], alternative: str = "two-sided") -> list[EnrichmentResult]:
         """List of gene ids. Return list of EnrichmentResult instances.
 
         :param typing.List[str] gene_list: List of genes to analyse.
+        :param str alternative: Alternative hypothesis of Fisher exact test ("two-sided", "less" or "greater").
         :return: List of enrichment result instances.
         :rtype: typing.List[EnrichmentResult]
         """
+        self.result = []
         all_found_genes: int = 0
-        absolute_pathway_genes: int = 0
-        study_n: int = len(gene_list)
+        background_genes: set[str] = set()
 
         for pathway in self.all_pathways:
             genes_found: list[str] = []
             all_pathways_genes = pathway.get_genes()
-            absolute_pathway_genes += len(all_pathways_genes)
+            background_genes.update(all_pathways_genes)
 
             # Check for intersection between gene list and genes in pathway
             for gene_id in all_pathways_genes:
@@ -185,6 +186,9 @@ class Enrichment:
             )
             self.result.append(pathway_result)
 
+        absolute_pathway_genes: int = len(background_genes)
+        study_n: int = len(set(gene_list) & background_genes)
+
         # Perform Fisher exact test
         # http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.stats.fisher_exact.html
         for analysis in self.result:
@@ -200,7 +204,8 @@ class Enrichment:
                     [
                         [a_var, b_var],
                         [c_var, d_var],
-                    ]
+                    ],
+                    alternative=alternative,
                 )
 
                 analysis.pvalue = pval
